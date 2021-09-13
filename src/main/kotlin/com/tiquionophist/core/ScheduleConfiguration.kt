@@ -52,7 +52,7 @@ data class ScheduleConfiguration(
         }
         .filterValues { it.isNotEmpty() }
         .mapValues { EnumSet.copyOf(it.value) }
-        .let { EnumMap(it) }
+        .let { if (it.isEmpty()) EnumMap(Subject::class.java) else EnumMap(it) }
 
     /**
      * A map from each teacher in [teacherAssignments] to the minimum number of classes per week they must teach (i.e.
@@ -65,7 +65,7 @@ data class ScheduleConfiguration(
                 .filter { subject -> subjectAssignments[subject]?.size == 1 }
                 .sumOf { subjectFrequency[it] ?: 0 }
         }
-        .let { EnumMap(it) }
+        .let { if (it.isEmpty()) EnumMap(Teacher::class.java) else EnumMap(it) }
 
     /**
      * A map from each teacher in [teacherAssignments] to the maximum number of classes per week they can teach (i.e. if
@@ -75,7 +75,7 @@ data class ScheduleConfiguration(
     @Transient
     val maxClassesTaughtPerTeacher: EnumMap<Teacher, Int> = teacherAssignments
         .mapValues { (_, subjects) -> classes * subjects.sumOf { subjectFrequency[it] ?: 0 } }
-        .let { EnumMap(it) }
+        .let { if (it.isEmpty()) EnumMap(Teacher::class.java) else EnumMap(it) }
 
     /**
      * The [StatSet] gained by students in each class per week as a result of the subjects being taught.
