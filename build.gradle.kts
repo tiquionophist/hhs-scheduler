@@ -4,6 +4,7 @@ plugins {
     kotlin("jvm") version "1.5.30"
     kotlin("plugin.serialization") version "1.5.30"
     id("io.gitlab.arturbosch.detekt") version "1.18.1"
+    jacoco
 }
 
 repositories {
@@ -32,6 +33,11 @@ tasks.withType<KotlinCompile>().configureEach {
 
 tasks.test {
     useJUnitPlatform()
+    finalizedBy(tasks.jacocoTestReport)
+}
+
+tasks.jacocoTestReport {
+    dependsOn(tasks.test)
 }
 
 detekt {
