@@ -3,6 +3,7 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 plugins {
     kotlin("jvm") version "1.5.30"
     kotlin("plugin.serialization") version "1.5.30"
+    id("io.gitlab.arturbosch.detekt") version "1.18.1"
 }
 
 repositories {
@@ -10,6 +11,8 @@ repositories {
 }
 
 dependencies {
+    detektPlugins("io.gitlab.arturbosch.detekt:detekt-formatting:1.18.1")
+
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.2.2")
     implementation("org.optaplanner:optaplanner-core:8.11.0.Final")
 
@@ -29,4 +32,10 @@ tasks.withType<KotlinCompile>().configureEach {
 
 tasks.test {
     useJUnitPlatform()
+}
+
+detekt {
+    toolVersion = "1.18.1"
+    config = files("detekt.yml")
+    buildUponDefaultConfig = true
 }

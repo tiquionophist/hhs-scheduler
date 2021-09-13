@@ -1,0 +1,11 @@
+complexity:
+  ComplexMethod:
+    active: false
+  NestedBlockDepth:
+    active: false
+  LongMethod:
+    active: false
+
+style:
+  ReturnCount:
+    active: false
