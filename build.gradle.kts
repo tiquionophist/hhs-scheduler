@@ -3,16 +3,21 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 plugins {
     kotlin("jvm") version "1.5.30"
     kotlin("plugin.serialization") version "1.5.30"
-    id("io.gitlab.arturbosch.detekt") version "1.18.1"
     jacoco
+    id("io.gitlab.arturbosch.detekt") version "1.18.1"
+    id("org.jetbrains.compose") version "1.0.0-alpha4-build344"
 }
 
 repositories {
     mavenCentral()
+    maven("https://maven.pkg.jetbrains.space/public/p/compose/dev")
+    google()
 }
 
 dependencies {
     detektPlugins("io.gitlab.arturbosch.detekt:detekt-formatting:1.18.1")
+
+    implementation(compose.desktop.currentOs)
 
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.2.2")
     implementation("org.optaplanner:optaplanner-core:8.11.0.Final")
@@ -44,4 +49,10 @@ detekt {
     toolVersion = "1.18.1"
     config = files("detekt.yml")
     buildUponDefaultConfig = true
+}
+
+compose.desktop {
+    application {
+        mainClass = "com.tiquionophist.ui.MainKt"
+    }
 }

@@ -41,7 +41,8 @@ class RandomizedScheduler(
                         List(configuration.periodsPerWeek) { null }
                     },
                     remainingSubjects = List(configuration.classes) {
-                        EnumMap(configuration.subjectFrequency)
+                        configuration.subjectFrequency.takeIf { it.isNotEmpty() }?.let { EnumMap(it) }
+                            ?: EnumMap(Subject::class.java)
                     }
                 ),
                 random = randomSeed(round)?.let { Random(it) },
