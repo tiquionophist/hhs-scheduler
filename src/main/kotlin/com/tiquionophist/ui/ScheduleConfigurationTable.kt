@@ -16,6 +16,7 @@ import androidx.compose.ui.unit.dp
 import com.tiquionophist.core.ScheduleConfiguration
 import com.tiquionophist.core.Subject
 import com.tiquionophist.core.Teacher
+import com.tiquionophist.ui.common.NumberPicker
 import com.tiquionophist.util.prettyName
 import org.jetbrains.skia.Image
 
@@ -53,6 +54,29 @@ private object SubjectNameColumn : ColumnWithHeader<Subject> {
         Text(
             text = value.prettyName,
             modifier = Modifier.padding(8.dp),
+        )
+    }
+}
+
+private class SubjectFrequencyPickerColumn(
+    private val scheduleConfigurationState: MutableState<ScheduleConfiguration>
+) : ColumnWithHeader<Subject> {
+    override val items = subjects
+
+    @Composable
+    override fun itemContent(value: Subject) {
+        val config = scheduleConfigurationState.value
+        NumberPicker(
+            modifier = Modifier.padding(8.dp),
+            value = config.subjectFrequency[value] ?: 0,
+            onValueChange = { newValue ->
+                scheduleConfigurationState.value = config.copy(
+                    subjectFrequency = config.subjectFrequency
+                        .plus(value to newValue)
+                        .filterValues { it > 0 }
+                )
+            },
+            range = IntRange(0, config.periodsPerWeek)
         )
     }
 }
@@ -99,6 +123,7 @@ fun ScheduleConfigurationTable(scheduleConfigurationState: MutableState<Schedule
         columns = listOf(
             SubjectIconColumn,
             SubjectNameColumn,
+            SubjectFrequencyPickerColumn(scheduleConfigurationState),
         ).plus(
             Teacher.values().map { teacher ->
                 SubjectTeacherAssignmentsColumn(teacher, scheduleConfigurationState)

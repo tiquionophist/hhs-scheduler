@@ -26,6 +26,7 @@ import java.lang.Integer.max
 fun NumberPicker(
     value: Int,
     onValueChange: (Int) -> Unit,
+    modifier: Modifier = Modifier,
     range: IntRange? = null,
     cornerRounding: Dp = 4.dp,
     buttonWidth: Dp = 32.dp,
@@ -39,6 +40,7 @@ fun NumberPicker(
     val clearedState = remember { mutableStateOf(false) }
 
     Layout(
+        modifier = modifier,
         content = {
             Button(
                 modifier = Modifier.widthIn(max = buttonWidth),
