@@ -1,6 +1,7 @@
 package com.tiquionophist.ui
 
 import androidx.compose.desktop.DesktopMaterialTheme
+import androidx.compose.foundation.BoxWithTooltip
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.HorizontalScrollbar
 import androidx.compose.foundation.VerticalScrollbar
@@ -17,13 +18,18 @@ import androidx.compose.foundation.rememberScrollbarAdapter
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Button
 import androidx.compose.material.CircularProgressIndicator
+import androidx.compose.material.Icon
+import androidx.compose.material.Surface
 import androidx.compose.material.Text
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Warning
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.key.Key
 import androidx.compose.ui.input.key.KeyShortcut
@@ -134,36 +140,64 @@ fun main() {
                                 )
                             }
 
-                            val loading = remember { mutableStateOf(false) }
-                            val coroutineScope = rememberCoroutineScope()
-                            Button(
-                                enabled = !loading.value,
-                                onClick = {
-                                    loading.value = true
-                                    coroutineScope.launch {
-                                        val config = scheduleConfigurationState.value
-                                        val scheduler = RandomizedScheduler(attemptsPerRound = 1_000, rounds = 1_000)
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.spacedBy(16.dp)
+                            ) {
+                                val validationError = runCatching { scheduleConfigurationState.value.verify() }
+                                    .exceptionOrNull()
+                                    ?.message
 
-                                        val result = runCatching { scheduler.schedule(config) }
-                                        if (result.isSuccess) {
-                                            val schedule = result.getOrThrow()
-                                            println("Scheduled: $schedule")
-                                        } else {
-                                            val throwable = result.exceptionOrNull()
-                                            println("Error: $throwable")
-                                        }
-
-                                        loading.value = false
-                                    }
-                                },
-                                content = {
-                                    if (loading.value) {
-                                        CircularProgressIndicator(Modifier.size(16.dp))
-                                    } else {
-                                        Text("Run")
+                                if (validationError != null) {
+                                    BoxWithTooltip(
+                                        tooltip = {
+                                            Surface(modifier = Modifier.shadow(4.dp)) {
+                                                Text(
+                                                    text = validationError,
+                                                    modifier = Modifier.padding(10.dp),
+                                                )
+                                            }
+                                        },
+                                    ) {
+                                        Icon(
+                                            imageVector = Icons.Default.Warning,
+                                            contentDescription = null,
+                                            tint = Color.Red,
+                                        )
                                     }
                                 }
-                            )
+
+                                val loading = remember { mutableStateOf(false) }
+                                val coroutineScope = rememberCoroutineScope()
+                                Button(
+                                    enabled = validationError == null && !loading.value,
+                                    onClick = {
+                                        loading.value = true
+                                        coroutineScope.launch {
+                                            val config = scheduleConfigurationState.value
+                                            val scheduler = RandomizedScheduler(attemptsPerRound = 1_000, rounds = 1_000)
+
+                                            val result = runCatching { scheduler.schedule(config) }
+                                            if (result.isSuccess) {
+                                                val schedule = result.getOrThrow()
+                                                println("Scheduled: $schedule")
+                                            } else {
+                                                val throwable = result.exceptionOrNull()
+                                                println("Error: $throwable")
+                                            }
+
+                                            loading.value = false
+                                        }
+                                    },
+                                    content = {
+                                        if (loading.value) {
+                                            CircularProgressIndicator(Modifier.size(16.dp))
+                                        } else {
+                                            Text("Run")
+                                        }
+                                    }
+                                )
+                            }
                         }
                     }
                 )
