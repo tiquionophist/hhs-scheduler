@@ -61,7 +61,7 @@ fun main() {
 
                 ContentWithBottomPane(
                     content = {
-                        Box {
+                        Box(contentAlignment = Alignment.Center) {
                             Box(Modifier.verticalScroll(verticalScrollState).horizontalScroll(horizontalScrollState)) {
                                 ScheduleConfigurationTable(scheduleConfigurationState)
                             }
