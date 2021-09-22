@@ -9,6 +9,7 @@ import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.painter.BitmapPainter
 import androidx.compose.ui.text.style.TextAlign
@@ -81,6 +82,26 @@ private class SubjectFrequencyPickerColumn(
     }
 }
 
+private class TotalTeacherAssignmentsColumn(val configuration: ScheduleConfiguration) : ColumnWithHeader<Subject> {
+    override val items = subjects
+
+    override val horizontalAlignment = Alignment.Start
+
+    @Composable
+    override fun itemContent(value: Subject) {
+        val numTeachers = configuration.subjectAssignments[value]?.size ?: 0
+        val teachersPlural = numTeachers != 1
+
+        val frequency = configuration.subjectFrequency[value] ?: 0
+        val error = (frequency == 0) != (numTeachers == 0)
+
+        Text(
+            text = "$numTeachers teacher${if (teachersPlural) "s" else ""}",
+            color = if (error) Color.Red else Color.Unspecified
+        )
+    }
+}
+
 private class SubjectTeacherAssignmentsColumn(
     private val teacher: Teacher,
     private val scheduleConfigurationState: MutableState<ScheduleConfiguration>
@@ -128,6 +149,8 @@ fun ScheduleConfigurationTable(scheduleConfigurationState: MutableState<Schedule
             Teacher.values().map { teacher ->
                 SubjectTeacherAssignmentsColumn(teacher, scheduleConfigurationState)
             }
+        ).plus(
+            TotalTeacherAssignmentsColumn(scheduleConfigurationState.value)
         )
     )
 }
