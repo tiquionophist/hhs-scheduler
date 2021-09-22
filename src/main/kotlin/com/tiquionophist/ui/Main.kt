@@ -32,7 +32,10 @@ import androidx.compose.ui.window.rememberWindowState
 import com.tiquionophist.core.ScheduleConfiguration
 import com.tiquionophist.scheduler.RandomizedScheduler
 import com.tiquionophist.ui.common.ContentWithBottomPane
+import com.tiquionophist.ui.common.NumberPicker
 import kotlinx.coroutines.launch
+
+private const val MAX_CLASSES = 100
 
 @ExperimentalFoundationApi
 fun main() {
@@ -80,7 +83,22 @@ fun main() {
                             horizontalArrangement = Arrangement.SpaceBetween,
                             verticalAlignment = Alignment.CenterVertically
                         ) {
-                            Text("${scheduleConfigurationState.value.classes} classes")
+                            Row(
+                                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Text("Classes:")
+
+                                NumberPicker(
+                                    value = scheduleConfigurationState.value.classes,
+                                    onValueChange = { newValue ->
+                                        scheduleConfigurationState.value = scheduleConfigurationState.value.copy(
+                                            classes = newValue
+                                        )
+                                    },
+                                    range = IntRange(1, MAX_CLASSES),
+                                )
+                            }
 
                             val loading = remember { mutableStateOf(false) }
                             val coroutineScope = rememberCoroutineScope()
