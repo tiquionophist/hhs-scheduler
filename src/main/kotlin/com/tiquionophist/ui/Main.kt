@@ -22,9 +22,13 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.key.Key
+import androidx.compose.ui.input.key.KeyShortcut
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.MenuBar
 import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.WindowPlacement
 import androidx.compose.ui.window.application
@@ -32,11 +36,13 @@ import androidx.compose.ui.window.rememberWindowState
 import com.tiquionophist.core.ScheduleConfiguration
 import com.tiquionophist.scheduler.RandomizedScheduler
 import com.tiquionophist.ui.common.ContentWithBottomPane
+import com.tiquionophist.ui.common.FilePicker
 import com.tiquionophist.ui.common.NumberPicker
 import kotlinx.coroutines.launch
 
 private const val MAX_CLASSES = 100
 
+@ExperimentalComposeUiApi
 @ExperimentalFoundationApi
 fun main() {
     application {
@@ -45,17 +51,45 @@ fun main() {
             title = "HHS+ Scheduler",
             state = rememberWindowState(placement = WindowPlacement.Maximized)
         ) {
-            DesktopMaterialTheme {
-                val scheduleConfigurationState = remember {
-                    mutableStateOf(
-                        ScheduleConfiguration(
-                            classes = 2,
-                            teacherAssignments = emptyMap(),
-                            subjectFrequency = emptyMap()
-                        )
+            val scheduleConfigurationState = remember {
+                mutableStateOf(
+                    ScheduleConfiguration(
+                        classes = 2,
+                        teacherAssignments = emptyMap(),
+                        subjectFrequency = emptyMap()
+                    )
+                )
+            }
+
+            MenuBar {
+                Menu("File") {
+                    Item(
+                        text = "Save configuration",
+                        shortcut = KeyShortcut(Key.S, ctrl = true),
+                        onClick = {
+                            FilePicker.save()?.let { file ->
+                                scheduleConfigurationState.value.save(file)
+                                // TODO show success (or error) modal
+                            }
+                        }
+                    )
+
+                    Item(
+                        text = "Load configuration",
+                        shortcut = KeyShortcut(Key.O, ctrl = true),
+                        onClick = {
+                            FilePicker.load()?.let { file ->
+                                ScheduleConfiguration.load(file)?.let {
+                                    // TODO show error modal on null case
+                                    scheduleConfigurationState.value = it
+                                }
+                            }
+                        }
                     )
                 }
+            }
 
+            DesktopMaterialTheme {
                 val verticalScrollState = rememberScrollState(0)
                 val horizontalScrollState = rememberScrollState(0)
 
