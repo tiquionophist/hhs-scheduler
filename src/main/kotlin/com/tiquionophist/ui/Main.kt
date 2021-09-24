@@ -39,15 +39,27 @@ import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.WindowPlacement
 import androidx.compose.ui.window.application
 import androidx.compose.ui.window.rememberWindowState
+import com.tiquionophist.core.Schedule
 import com.tiquionophist.core.ScheduleConfiguration
 import com.tiquionophist.core.Teacher
 import com.tiquionophist.scheduler.RandomizedScheduler
 import com.tiquionophist.ui.common.ContentWithBottomPane
 import com.tiquionophist.ui.common.FilePicker
 import com.tiquionophist.ui.common.NumberPicker
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 private const val MAX_CLASSES = 100
+
+data class ComputedSchedule(
+    val configuration: ScheduleConfiguration,
+    val schedule: Schedule,
+    val index: Int = indexCounter++
+) {
+    companion object {
+        private var indexCounter: Int = 0
+    }
+}
 
 @ExperimentalComposeUiApi
 @ExperimentalFoundationApi
@@ -72,6 +84,7 @@ fun main() {
                 mutableStateOf(listOf<Teacher>())
             }
             val customTeacherDialogVisibleState = remember { mutableStateOf(false) }
+            val computedSchedulesState = remember { mutableStateOf(listOf<ComputedSchedule>()) }
 
             MenuBar {
                 Menu("File") {
@@ -120,6 +133,16 @@ fun main() {
                         }
                     }
                 )
+
+                computedSchedulesState.value.forEach { computedSchedule ->
+                    ScheduleWindow(
+                        computedSchedule = computedSchedule,
+                        onClose = {
+                            computedSchedulesState.value = computedSchedulesState.value
+                                .minus(computedSchedule)
+                        }
+                    )
+                }
 
                 val verticalScrollState = rememberScrollState(0)
                 val horizontalScrollState = rememberScrollState(0)
@@ -196,7 +219,7 @@ fun main() {
                                 }
 
                                 val loading = remember { mutableStateOf(false) }
-                                val coroutineScope = rememberCoroutineScope()
+                                val coroutineScope = rememberCoroutineScope { Dispatchers.Default }
                                 Button(
                                     enabled = validationError == null && !loading.value,
                                     onClick = {
@@ -211,8 +234,20 @@ fun main() {
                                             val result = runCatching { scheduler.schedule(config) }
                                             if (result.isSuccess) {
                                                 val schedule = result.getOrThrow()
-                                                println("Scheduled: $schedule")
+                                                if (schedule == null) {
+                                                    // TODO show as dialog
+                                                    println("No schedule found")
+                                                } else {
+                                                    val computedSchedule = ComputedSchedule(
+                                                        configuration = config,
+                                                        schedule = schedule
+                                                    )
+
+                                                    computedSchedulesState.value = computedSchedulesState.value
+                                                        .plus(computedSchedule)
+                                                }
                                             } else {
+                                                // TODO show as dialog
                                                 val throwable = result.exceptionOrNull()
                                                 println("Error: $throwable")
                                             }
