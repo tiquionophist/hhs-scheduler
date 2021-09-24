@@ -40,6 +40,7 @@ import androidx.compose.ui.window.WindowPlacement
 import androidx.compose.ui.window.application
 import androidx.compose.ui.window.rememberWindowState
 import com.tiquionophist.core.ScheduleConfiguration
+import com.tiquionophist.core.Teacher
 import com.tiquionophist.scheduler.RandomizedScheduler
 import com.tiquionophist.ui.common.ContentWithBottomPane
 import com.tiquionophist.ui.common.FilePicker
@@ -67,6 +68,11 @@ fun main() {
                 )
             }
 
+            val customTeachersState = remember {
+                mutableStateOf(listOf<Teacher>())
+            }
+            val customTeacherDialogVisibleState = remember { mutableStateOf(false) }
+
             MenuBar {
                 Menu("File") {
                     Item(
@@ -93,9 +99,28 @@ fun main() {
                         }
                     )
                 }
+
+                Menu("Edit") {
+                    Item(
+                        text = "Add custom teacher",
+                        onClick = {
+                            customTeacherDialogVisibleState.value = true
+                        }
+                    )
+                }
             }
 
             DesktopMaterialTheme {
+                CustomTeacherDialog(
+                    visible = customTeacherDialogVisibleState.value,
+                    onClose = { teacher ->
+                        customTeacherDialogVisibleState.value = false
+                        teacher?.let {
+                            customTeachersState.value = customTeachersState.value.plus(teacher)
+                        }
+                    }
+                )
+
                 val verticalScrollState = rememberScrollState(0)
                 val horizontalScrollState = rememberScrollState(0)
 
@@ -103,7 +128,10 @@ fun main() {
                     content = {
                         Box(contentAlignment = Alignment.Center) {
                             Box(Modifier.verticalScroll(verticalScrollState).horizontalScroll(horizontalScrollState)) {
-                                ScheduleConfigurationTable(scheduleConfigurationState)
+                                ScheduleConfigurationTable(
+                                    scheduleConfigurationState = scheduleConfigurationState,
+                                    customTeachers = customTeachersState.value,
+                                )
                             }
 
                             VerticalScrollbar(
@@ -175,7 +203,10 @@ fun main() {
                                         loading.value = true
                                         coroutineScope.launch {
                                             val config = scheduleConfigurationState.value
-                                            val scheduler = RandomizedScheduler(attemptsPerRound = 1_000, rounds = 1_000)
+                                            val scheduler = RandomizedScheduler(
+                                                attemptsPerRound = 1_000,
+                                                rounds = 1_000
+                                            )
 
                                             val result = runCatching { scheduler.schedule(config) }
                                             if (result.isSuccess) {

@@ -16,14 +16,18 @@ data class Schedule(val lessons: List<List<Lesson>>) {
      * A map from each [Teacher] in the schedule to the [StatSet] of stats gained by the teacher each week as a result
      * of the lessons they are teaching.
      */
-    val teacherStats: EnumMap<Teacher, StatSet> by lazy {
-        EnumMap<Teacher, StatSet>(Teacher::class.java).also { map ->
-            lessons.flatten().forEach { lesson ->
+    val teacherStats: Map<Teacher, StatSet> by lazy {
+        lessons
+            .flatten()
+            .fold(mutableMapOf()) { acc, lesson ->
                 lesson.teacher?.let { teacher ->
-                    map.compute(teacher) { _, stats -> stats?.plus(lesson.subject.stats) ?: lesson.subject.stats }
+                    acc.compute(teacher) { _, stats ->
+                        stats?.plus(lesson.subject.stats) ?: lesson.subject.stats
+                    }
                 }
+
+                acc
             }
-        }
     }
 
     /**
@@ -39,7 +43,7 @@ data class Schedule(val lessons: List<List<Lesson>>) {
                             cls.classroom?.let { append(" in ${it.prettyName}") }
                         }
                         if (includeTeacher) {
-                            cls.teacher?.let { append(" by ${it.prettyName}") }
+                            cls.teacher?.let { append(" by ${it.fullName}") }
                         }
                     }.toString()
                 }
@@ -62,7 +66,7 @@ data class Schedule(val lessons: List<List<Lesson>>) {
         }
 
         for (periodIndex in 0 until config.periodsPerWeek) {
-            val teachers = EnumSet.noneOf(Teacher::class.java)
+            val teachers = mutableSetOf<Teacher>()
             val classrooms = EnumSet.noneOf(Classroom::class.java)
 
             for (classIndex in 0 until config.classes) {
@@ -70,7 +74,7 @@ data class Schedule(val lessons: List<List<Lesson>>) {
 
                 lesson.teacher?.let { teacher ->
                     require(teacher !in teachers) {
-                        "${teacher.prettyName} is overbooked for $classIndex | $periodIndex"
+                        "${teacher.fullName} is overbooked for $classIndex | $periodIndex"
                     }
                     teachers.add(teacher)
                 }

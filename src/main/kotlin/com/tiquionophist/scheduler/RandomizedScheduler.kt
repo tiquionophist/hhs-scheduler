@@ -119,7 +119,7 @@ class RandomizedScheduler(
         private fun scheduleOptions(classIndex: Int, periodIndex: Int): List<Lesson> {
             val classOptions = mutableListOf<Lesson>()
 
-            val busyTeachers = EnumSet.noneOf(Teacher::class.java)
+            val busyTeachers = mutableSetOf<Teacher>()
             val busyClassrooms = EnumSet.noneOf(Classroom::class.java)
 
             for (classSchedule in lessons) {

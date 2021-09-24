@@ -1,7 +1,6 @@
 package com.tiquionophist.core
 
 import com.tiquionophist.util.prettyName
-import java.util.EnumSet
 
 /**
  * Represents a single lesson on the schedule, including
@@ -18,11 +17,11 @@ data class Lesson(val subject: Subject, val teacher: Teacher?, val classroom: Cl
             require(teacher == null) { "empty subject must not have a teacher" }
             require(classroom == null) { "empty subject must not have a classroom" }
         } else {
-            val allowedTeachers: EnumSet<Teacher>? = config.subjectAssignments[subject]
+            val allowedTeachers: Set<Teacher>? = config.subjectAssignments[subject]
             requireNotNull(allowedTeachers) { "no teachers assigned for ${subject.prettyName}" }
             requireNotNull(teacher) { "no teacher provided for ${subject.prettyName}" }
             require(allowedTeachers.contains(teacher)) {
-                "${teacher.prettyName} not allowed to teach ${subject.prettyName}"
+                "${teacher.fullName} not allowed to teach ${subject.prettyName}"
             }
 
             val classrooms = subject.classrooms

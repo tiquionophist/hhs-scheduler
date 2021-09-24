@@ -1,6 +1,5 @@
 package com.tiquionophist.core
 
-import com.tiquionophist.util.prettyName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
 import kotlinx.serialization.decodeFromString
@@ -8,7 +7,6 @@ import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import java.io.File
 import java.util.EnumMap
-import java.util.EnumSet
 
 /**
  * User-provided inputs that a generated schedule must satisfy.
@@ -46,12 +44,11 @@ data class ScheduleConfiguration(
      * non-empty.
      */
     @Transient
-    val subjectAssignments: EnumMap<Subject, EnumSet<Teacher>> = Subject.values()
+    val subjectAssignments: EnumMap<Subject, Set<Teacher>> = Subject.values()
         .associateWith { subject ->
             teacherAssignments.filterValues { it.contains(subject) }.keys
         }
         .filterValues { it.isNotEmpty() }
-        .mapValues { EnumSet.copyOf(it.value) }
         .let { if (it.isEmpty()) EnumMap(Subject::class.java) else EnumMap(it) }
 
     /**
@@ -59,13 +56,12 @@ data class ScheduleConfiguration(
      * the subjects for which they are the only assigned teacher).
      */
     @Transient
-    val minClassesTaughtPerTeacher: EnumMap<Teacher, Int> = teacherAssignments
+    val minClassesTaughtPerTeacher: Map<Teacher, Int> = teacherAssignments
         .mapValues { (_, subjects) ->
             classes * subjects
                 .filter { subject -> subjectAssignments[subject]?.size == 1 }
                 .sumOf { subjectFrequency[it] ?: 0 }
         }
-        .let { if (it.isEmpty()) EnumMap(Teacher::class.java) else EnumMap(it) }
 
     /**
      * A map from each teacher in [teacherAssignments] to the maximum number of classes per week they can teach (i.e. if
@@ -73,9 +69,8 @@ data class ScheduleConfiguration(
      * subject).
      */
     @Transient
-    val maxClassesTaughtPerTeacher: EnumMap<Teacher, Int> = teacherAssignments
+    val maxClassesTaughtPerTeacher: Map<Teacher, Int> = teacherAssignments
         .mapValues { (_, subjects) -> classes * subjects.sumOf { subjectFrequency[it] ?: 0 } }
-        .let { if (it.isEmpty()) EnumMap(Teacher::class.java) else EnumMap(it) }
 
     /**
      * The [StatSet] gained by students in each class per week as a result of the subjects being taught.
@@ -94,7 +89,7 @@ data class ScheduleConfiguration(
         }
 
         teacherAssignments.forEach { (teacher, subjects) ->
-            require(subjects.isNotEmpty()) { "${teacher.prettyName} has no assigned subjects" }
+            require(subjects.isNotEmpty()) { "${teacher.fullName} has no assigned subjects" }
         }
 
         val missingSubjects = subjectFrequency.keys.minus(teacherAssignments.values.flatten()).minus(Subject.EMPTY)
@@ -102,7 +97,7 @@ data class ScheduleConfiguration(
 
         minClassesTaughtPerTeacher.forEach { (teacher, minClasses) ->
             require(minClasses <= periodsPerWeek) {
-                "${teacher.prettyName} must teach at least $minClasses classes per week, which is impossible"
+                "${teacher.fullName} must teach at least $minClasses classes per week, which is impossible"
             }
         }
     }
@@ -118,12 +113,13 @@ data class ScheduleConfiguration(
         private val json = Json {
             prettyPrint = true
             encodeDefaults = true
+            allowStructuredMapKeys = true
         }
 
         fun load(file: File): ScheduleConfiguration? {
             return runCatching {
                 val lines = file.readLines().joinToString(separator = "\n")
-                Json.decodeFromString<ScheduleConfiguration>(lines)
+                json.decodeFromString<ScheduleConfiguration>(lines)
             }.getOrNull()
         }
     }

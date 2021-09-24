@@ -111,7 +111,7 @@ private class SubjectTeacherAssignmentsColumn(
     @Composable
     override fun header() {
         Text(
-            text = teacher.prettyName.replace(' ', '\n'),
+            text = "${teacher.firstName}\n${teacher.lastName}",
             textAlign = TextAlign.Center,
             modifier = Modifier.padding(8.dp),
         )
@@ -139,14 +139,24 @@ private class SubjectTeacherAssignmentsColumn(
  * A grid-based view of the teacher/subject assignments and frequencies in [scheduleConfigurationState].
  */
 @Composable
-fun ScheduleConfigurationTable(scheduleConfigurationState: MutableState<ScheduleConfiguration>) {
+fun ScheduleConfigurationTable(
+    scheduleConfigurationState: MutableState<ScheduleConfiguration>,
+    customTeachers: List<Teacher>
+) {
+    val teachers = remember(customTeachers) {
+        Teacher.DEFAULT_TEACHERS
+            .plus(Teacher.LEXVILLE_TEACHERS)
+            .plus(customTeachers)
+            .sortedBy { it.fullName }
+    }
+
     Table(
         columns = listOf(
             SubjectIconColumn,
             SubjectNameColumn,
             SubjectFrequencyPickerColumn(scheduleConfigurationState),
         ).plus(
-            Teacher.values().map { teacher ->
+            teachers.map { teacher ->
                 SubjectTeacherAssignmentsColumn(teacher, scheduleConfigurationState)
             }
         ).plus(

@@ -23,7 +23,7 @@ fun main() {
     config.teacherAssignments.forEach { (teacher, _) ->
         val min = config.minClassesTaughtPerTeacher[teacher]
         val max = config.maxClassesTaughtPerTeacher[teacher]
-        println("${teacher.prettyName} teachers at least $min and at most $max classes per week")
+        println("${teacher.fullName} teachers at least $min and at most $max classes per week")
     }
     println()
 
@@ -60,7 +60,7 @@ fun main() {
 
         val teacherStats = schedule.teacherStats[teacher] ?: StatSet()
 
-        println("${teacher.prettyName} teaches ${lessons.size} classes per week, gaining the stats:")
+        println("${teacher.fullName} teaches ${lessons.size} classes per week, gaining the stats:")
         teacherStats.stats.forEach { (statName, statValue) ->
             println("  $statName : $statValue")
         }
