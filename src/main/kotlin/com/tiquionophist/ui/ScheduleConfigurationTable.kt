@@ -21,7 +21,10 @@ import com.tiquionophist.ui.common.NumberPicker
 import com.tiquionophist.util.prettyName
 import org.jetbrains.skia.Image
 
-private val subjects = Subject.values().filter { it != Subject.EMPTY }
+private val subjects = Subject.values()
+    .filter { it != Subject.EMPTY }
+    .sortedBy { it.prettyName }
+    .plus(Subject.EMPTY)
 
 private object SubjectIconColumn : ColumnWithHeader<Subject> {
     override val items = subjects
@@ -67,18 +70,26 @@ private class SubjectFrequencyPickerColumn(
     @Composable
     override fun itemContent(value: Subject) {
         val config = scheduleConfigurationState.value
-        NumberPicker(
-            modifier = Modifier.padding(8.dp),
-            value = config.subjectFrequency[value] ?: 0,
-            onValueChange = { newValue ->
-                scheduleConfigurationState.value = config.copy(
-                    subjectFrequency = config.subjectFrequency
-                        .plus(value to newValue)
-                        .filterValues { it > 0 }
-                )
-            },
-            range = IntRange(0, config.periodsPerWeek)
-        )
+        if (value == Subject.EMPTY) {
+            Text(
+                modifier = Modifier.padding(8.dp),
+                text = (config.subjectFrequency[value] ?: 0).toString(),
+            )
+        } else {
+            NumberPicker(
+                modifier = Modifier.padding(8.dp),
+                value = config.subjectFrequency[value] ?: 0,
+                onValueChange = { newValue ->
+                    scheduleConfigurationState.value = config.copy(
+                        subjectFrequency = ScheduleConfiguration.fillFreePeriods(
+                            periodsPerWeek = config.periodsPerWeek,
+                            subjectFrequency = config.subjectFrequency.plus(value to newValue),
+                        )
+                    )
+                },
+                range = IntRange(0, config.periodsPerWeek)
+            )
+        }
     }
 }
 
@@ -89,6 +100,8 @@ private class TotalTeacherAssignmentsColumn(val configuration: ScheduleConfigura
 
     @Composable
     override fun itemContent(value: Subject) {
+        if (value == Subject.EMPTY) return
+
         val numTeachers = configuration.subjectAssignments[value]?.size ?: 0
         val teachersPlural = numTeachers != 1
 
@@ -119,6 +132,8 @@ private class SubjectTeacherAssignmentsColumn(
 
     @Composable
     override fun itemContent(value: Subject) {
+        if (value == Subject.EMPTY) return
+
         val config = scheduleConfigurationState.value
         val currentAssignments = config.teacherAssignments.getOrDefault(teacher, emptySet())
         Checkbox(

@@ -122,5 +122,17 @@ data class ScheduleConfiguration(
                 json.decodeFromString<ScheduleConfiguration>(lines)
             }.getOrNull()
         }
+
+        /**
+         * Returns a subject frequency map from the given [subjectFrequency] with [Subject.EMPTY] set to the number of
+         * missing slots per week. Also removes any subjects with zero frequency.
+         */
+        fun fillFreePeriods(periodsPerWeek: Int, subjectFrequency: Map<Subject, Int>): Map<Subject, Int> {
+            val totalFrequency = subjectFrequency.filterKeys { it != Subject.EMPTY }.values.sum()
+            val freePeriods = (periodsPerWeek - totalFrequency).coerceAtLeast(0)
+            return subjectFrequency
+                .plus(Subject.EMPTY to freePeriods)
+                .filterValues { it > 0 }
+        }
     }
 }
