@@ -28,6 +28,10 @@ import com.tiquionophist.ui.Dimens
 import java.lang.Integer.max
 import java.lang.Integer.min
 
+/**
+ * A component allowing the user to select a numeric value, either by incrementing/decrementing buttons or by a text
+ * field between them.
+ */
 @Composable
 fun NumberPicker(
     value: Int,
@@ -105,6 +109,7 @@ fun NumberPicker(
 
             val height = max(leftButtonPlaceable.height, rightButtonPlaceable.height)
 
+            // text field's height matches the maximum of the buttons (which should be the same)
             val textFieldPlaceable = textFieldMeasurable.measure(
                 constraints.copy(minHeight = height, maxHeight = height)
             )

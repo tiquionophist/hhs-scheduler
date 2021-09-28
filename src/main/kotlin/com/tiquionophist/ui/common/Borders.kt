@@ -12,12 +12,19 @@ import androidx.compose.ui.unit.Dp
 import com.tiquionophist.ui.Colors
 import com.tiquionophist.ui.Dimens
 
+/**
+ * Adds a border line to the top of this element.
+ */
 @Composable
 fun Modifier.topBorder(width: Dp = Dimens.BORDER_WIDTH, color: Color = Colors.divider): Modifier {
     val widthPx = with(LocalDensity.current) { width.toPx() }
     return this
-        .border(width = width, color = color, shape = GenericShape { size, _ ->
-            addRect(Rect(left = 0f, top = 0f, right = size.width, bottom = widthPx))
-        })
+        .border(
+            width = width,
+            color = color,
+            shape = GenericShape { size, _ ->
+                addRect(Rect(left = 0f, top = 0f, right = size.width, bottom = widthPx))
+            }
+        )
         .padding(top = width)
 }

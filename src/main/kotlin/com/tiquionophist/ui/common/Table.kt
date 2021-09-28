@@ -24,7 +24,8 @@ import kotlin.math.max
 import kotlin.math.roundToInt
 
 /**
- * Represents a column in a [Table].
+ * Represents a column in a [Table] whose rows have type [T], specifying how its contents are laid out and the [content]
+ * of each row.
  */
 interface Column<T> {
     /**
@@ -52,7 +53,7 @@ interface Column<T> {
 }
 
 /**
- * A convenience wrapper for a [Column] which includes a special header row as the first row.
+ * A convenience wrapper for a [Column] which includes a special header row as the first row as a null value.
  */
 interface ColumnWithHeader<T : Any> : Column<T?> {
     val headerHorizontalAlignment: Alignment.Horizontal
@@ -94,6 +95,9 @@ interface ColumnWithHeader<T : Any> : Column<T?> {
     fun itemContent(value: T)
 }
 
+/**
+ * Specifies how the width of a column is determined.
+ */
 sealed class ColumnWidth {
     /**
      * Fixed column width of [width].
@@ -124,8 +128,14 @@ data class TableDivider(
     val totalSize = paddingBefore + paddingAfter + dividerSize
 }
 
-// verticalDividers: [colIndex -> divider BEFORE that column]
-// horizontalDivider: [rowIndex -> divider BEFORE that row]
+/**
+ * A grid-based component which lays out a series of [columns], each taking values from [rows]. Each of [columns]
+ * determines the content for each cell in the column and how it is laid out (e.g. how the column width is computed).
+ *
+ * [verticalDividers] and [horizontalDividers] may also be added between columns and rows, respectively. They are
+ * specified as a map from the index of the column/row BEFORE which the divider should be placed to the [TableDivider]
+ * value.
+ */
 @Composable
 fun <T> Table(
     columns: List<Column<T>>,
