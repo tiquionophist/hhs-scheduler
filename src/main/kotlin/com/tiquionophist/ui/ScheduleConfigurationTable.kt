@@ -13,6 +13,7 @@ import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.BitmapPainter
 import androidx.compose.ui.text.style.TextAlign
@@ -31,27 +32,43 @@ private val subjects = Subject.values()
     .sortedBy { it.prettyName }
     .plus(Subject.EMPTY)
 
-private object SubjectIconColumn : ColumnWithHeader<Subject> {
+private const val DISABLED_ALPHA = 0.3f
+
+private fun Modifier.enabledIf(enabled: Boolean) = alpha(if (enabled) 1f else DISABLED_ALPHA)
+
+private fun ScheduleConfiguration.teacherEnabled(teacher: Teacher): Boolean {
+    return teacherAssignments[teacher]?.isNotEmpty() == true
+}
+
+private fun ScheduleConfiguration.subjectEnabled(subject: Subject): Boolean {
+    return subjectFrequency[subject]?.let { it > 0 } == true || subjectAssignments[subject]?.isNotEmpty() == true
+}
+
+private class SubjectIconColumn(private val scheduleConfiguration: ScheduleConfiguration) : ColumnWithHeader<Subject> {
     @Composable
     override fun itemContent(value: Subject) {
         value.imageBitmap?.let { imageBitmap ->
             Image(
                 painter = BitmapPainter(imageBitmap),
                 contentDescription = value.prettyName,
-                modifier = Modifier.padding(horizontal = 8.dp)
+                modifier = Modifier
+                    .padding(horizontal = 8.dp)
+                    .enabledIf(scheduleConfiguration.subjectEnabled(value)),
             )
         }
     }
 }
 
-private object SubjectNameColumn : ColumnWithHeader<Subject> {
+private class SubjectNameColumn(private val scheduleConfiguration: ScheduleConfiguration) : ColumnWithHeader<Subject> {
     override val itemHorizontalAlignment = Alignment.Start
 
     @Composable
     override fun itemContent(value: Subject) {
         Text(
             text = value.prettyName,
-            modifier = Modifier.padding(8.dp),
+            modifier = Modifier
+                .padding(8.dp)
+                .enabledIf(scheduleConfiguration.subjectEnabled(value)),
         )
     }
 }
@@ -110,8 +127,8 @@ private class TotalTeacherAssignmentsColumn(val configuration: ScheduleConfigura
 
         Text(
             text = "$numTeachers teacher${if (teachersPlural) "s" else ""}",
-            modifier = Modifier.padding(8.dp),
             color = if (error) Color.Red else Color.Unspecified,
+            modifier = Modifier.padding(8.dp).enabledIf(configuration.subjectEnabled(value)),
         )
     }
 }
@@ -124,8 +141,10 @@ private class SubjectTeacherAssignmentsColumn(
 
     @Composable
     override fun header() {
+        val config = scheduleConfigurationState.value
+
         Column(
-            modifier = Modifier.padding(8.dp),
+            modifier = Modifier.padding(8.dp).enabledIf(config.teacherEnabled(teacher)),
             verticalArrangement = Arrangement.spacedBy(8.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
@@ -142,7 +161,6 @@ private class SubjectTeacherAssignmentsColumn(
                 textAlign = TextAlign.Center,
             )
 
-            val config = scheduleConfigurationState.value
             val numAssignments = config.teacherAssignments[teacher]?.size ?: 0
             Text(text = "$numAssignments subjects")
         }
@@ -187,8 +205,8 @@ fun ScheduleConfigurationTable(
     val weakDividerColor = strongDividerColor.copy(alpha = 0.25f)
 
     val fixedColumns = listOf(
-        SubjectIconColumn,
-        SubjectNameColumn,
+        SubjectIconColumn(scheduleConfigurationState.value),
+        SubjectNameColumn(scheduleConfigurationState.value),
         SubjectFrequencyPickerColumn(scheduleConfigurationState),
     )
 
