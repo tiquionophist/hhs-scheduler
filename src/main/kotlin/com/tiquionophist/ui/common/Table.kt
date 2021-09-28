@@ -118,7 +118,7 @@ data class TableDivider(
     val paddingBefore: Dp = 0.dp,
     val paddingAfter: Dp = 0.dp,
     val dividerSize: Dp = 1.dp,
-    val dividerColor: Color? = null,
+    val color: Color? = null,
 ) {
     val totalSize = paddingBefore + paddingAfter + dividerSize
 }
@@ -152,7 +152,7 @@ fun <T> Table(
                         .padding(top = divider.paddingBefore, bottom = divider.paddingAfter)
                         .fillMaxWidth()
                         .height(divider.dividerSize)
-                        .background(divider.dividerColor ?: LocalContentColor.current)
+                        .background(divider.color ?: LocalContentColor.current)
                 )
             }
 
@@ -162,7 +162,7 @@ fun <T> Table(
                         .padding(start = divider.paddingBefore, end = divider.paddingAfter)
                         .fillMaxHeight()
                         .width(divider.dividerSize)
-                        .background(divider.dividerColor ?: LocalContentColor.current)
+                        .background(divider.color ?: LocalContentColor.current)
                 )
             }
 

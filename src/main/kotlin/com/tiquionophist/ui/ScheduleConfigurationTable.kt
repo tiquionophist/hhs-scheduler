@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.Checkbox
+import androidx.compose.material.LocalContentColor
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
@@ -64,7 +65,7 @@ private class SubjectFrequencyPickerColumn(
     override fun header() {
         Text(
             modifier = Modifier.padding(vertical = 8.dp),
-            text = "Times taught per week",
+            text = "Times/week",
         )
     }
 
@@ -182,25 +183,53 @@ fun ScheduleConfigurationTable(
             .sortedBy { it.fullName }
     }
 
+    val strongDividerColor = LocalContentColor.current
+    val weakDividerColor = strongDividerColor.copy(alpha = 0.25f)
+
+    val fixedColumns = listOf(
+        SubjectIconColumn,
+        SubjectNameColumn,
+        SubjectFrequencyPickerColumn(scheduleConfigurationState),
+    )
+
+    val fixedRows = listOf(null)
+
     Table(
-        columns = listOf(
-            SubjectIconColumn,
-            SubjectNameColumn,
-            SubjectFrequencyPickerColumn(scheduleConfigurationState),
+        columns = fixedColumns
+            .plus(
+                teachers.map { teacher ->
+                    SubjectTeacherAssignmentsColumn(teacher, scheduleConfigurationState)
+                }
+            )
+            .plus(
+                TotalTeacherAssignmentsColumn(scheduleConfigurationState.value)
+            ),
+        rows = fixedRows.plus(subjects),
+        verticalDividers = mapOf(
+            // strong divider after fixed columns
+            Pair(
+                fixedColumns.size,
+                TableDivider(paddingBefore = 8.dp, paddingAfter = 4.dp, color = strongDividerColor)
+            ),
+            // strong divider before total teacher assignments column
+            Pair(
+                fixedColumns.size + teachers.size,
+                TableDivider(paddingBefore = 8.dp, paddingAfter = 8.dp, color = strongDividerColor)
+            ),
         ).plus(
-            teachers.map { teacher ->
-                SubjectTeacherAssignmentsColumn(teacher, scheduleConfigurationState)
+            // weak dividers between each teacher column
+            List(teachers.size - 1) { teacherIndex ->
+                Pair(teacherIndex + fixedColumns.size + 1, TableDivider(color = weakDividerColor))
             }
-        ).plus(
-            TotalTeacherAssignmentsColumn(scheduleConfigurationState.value)
-        ),
-        rows = listOf(null).plus(subjects),
-        verticalDividers = @Suppress("MagicNumber") mapOf(
-            3 to TableDivider(paddingBefore = 8.dp, paddingAfter = 4.dp),
-            3 + teachers.size to TableDivider(paddingBefore = 8.dp, paddingAfter = 8.dp),
         ),
         horizontalDividers = mapOf(
-            1 to TableDivider(paddingBefore = 8.dp, paddingAfter = 4.dp),
+            // strong divider after header row
+            fixedRows.size to TableDivider(paddingBefore = 8.dp, paddingAfter = 4.dp, color = strongDividerColor),
+        ).plus(
+            // weak dividers between each subject row
+            List(subjects.size) { subjectIndex ->
+                Pair(subjectIndex + fixedRows.size + 1, TableDivider(color = weakDividerColor))
+            }
         ),
     )
 }

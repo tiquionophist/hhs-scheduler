@@ -111,10 +111,10 @@ fun ScheduleTable(configuration: ScheduleConfiguration, schedule: Schedule, clas
         columns = columns,
         rows = rows,
         horizontalDividers = List(rows.size - 1) { rowIndex ->
-            rowIndex + 1 to TableDivider(dividerColor = if (rowIndex == 0) strongDividerColor else weakDividerColor)
+            rowIndex + 1 to TableDivider(color = if (rowIndex == 0) strongDividerColor else weakDividerColor)
         }.toMap(),
         verticalDividers = List(columns.size - 1) { colIndex ->
-            colIndex + 1 to TableDivider(dividerColor = if (colIndex == 0) strongDividerColor else weakDividerColor)
+            colIndex + 1 to TableDivider(color = if (colIndex == 0) strongDividerColor else weakDividerColor)
         }.toMap(),
     )
 }
