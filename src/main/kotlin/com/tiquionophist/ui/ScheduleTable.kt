@@ -49,6 +49,7 @@ private class ScheduleDayColumn(
 @Composable
 fun ScheduleTable(configuration: ScheduleConfiguration, schedule: Schedule, classIndex: Int) {
     val dayNames = remember(configuration.daysPerWeek) {
+        @Suppress("MagicNumber")
         if (configuration.daysPerWeek == 5) {
             listOf("Monday", "Tuesday", "Wednesday", "Thursday", "Friday")
         } else {

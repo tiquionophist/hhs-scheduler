@@ -26,12 +26,12 @@ data class ScheduleConfiguration(
      *
      * [Teacher]s who should not be scheduled should be omitted from the map; all [Subject] sets must be non-empty.
      */
-    val teacherAssignments: Map<Teacher, Set<Subject>>,
+    val teacherAssignments: Map<Teacher, Set<Subject>> = emptyMap(),
 
     /**
      * A map from each [Subject] to the number of times per week it ought to be taught (including free periods).
      */
-    val subjectFrequency: Map<Subject, Int>,
+    val subjectFrequency: Map<Subject, Int> = mapOf(Subject.EMPTY to daysPerWeek * periodsPerDay),
 ) {
     @Transient
     val periodsPerWeek: Int = daysPerWeek * periodsPerDay

@@ -41,7 +41,6 @@ import androidx.compose.ui.window.application
 import androidx.compose.ui.window.rememberWindowState
 import com.tiquionophist.core.Schedule
 import com.tiquionophist.core.ScheduleConfiguration
-import com.tiquionophist.core.Subject
 import com.tiquionophist.core.Teacher
 import com.tiquionophist.scheduler.RandomizedScheduler
 import com.tiquionophist.ui.common.ContentWithBottomPane
@@ -72,13 +71,7 @@ fun main() {
             state = rememberWindowState(placement = WindowPlacement.Maximized)
         ) {
             val scheduleConfigurationState = remember {
-                mutableStateOf(
-                    ScheduleConfiguration(
-                        classes = 2,
-                        teacherAssignments = emptyMap(),
-                        subjectFrequency = mapOf(Subject.EMPTY to 20),
-                    )
-                )
+                mutableStateOf(ScheduleConfiguration(classes = 2))
             }
 
             val customTeachersState = remember {
