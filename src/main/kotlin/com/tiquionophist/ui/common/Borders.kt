@@ -10,10 +10,10 @@ import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.Dp
-import androidx.compose.ui.unit.dp
+import com.tiquionophist.ui.Dimens
 
 @Composable
-fun Modifier.topBorder(width: Dp = 1.dp, color: Color = LocalContentColor.current): Modifier {
+fun Modifier.topBorder(width: Dp = Dimens.BORDER_WIDTH, color: Color = LocalContentColor.current): Modifier {
     val widthPx = with(LocalDensity.current) { width.toPx() }
     return this
         .border(width = width, color = color, shape = GenericShape { size, _ ->

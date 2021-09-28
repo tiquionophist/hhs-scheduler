@@ -34,7 +34,6 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.key.Key
 import androidx.compose.ui.input.key.KeyShortcut
-import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.MenuBar
 import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.WindowPlacement
@@ -182,16 +181,16 @@ fun main() {
                         },
                         bottomPane = {
                             Row(
-                                modifier = Modifier.fillMaxWidth().topBorder().padding(8.dp),
+                                modifier = Modifier.fillMaxWidth().topBorder().padding(Dimens.SPACING_2),
                                 horizontalArrangement = Arrangement.SpaceBetween,
                                 verticalAlignment = Alignment.CenterVertically
                             ) {
                                 Row(
                                     verticalAlignment = Alignment.CenterVertically,
-                                    horizontalArrangement = Arrangement.spacedBy(16.dp)
+                                    horizontalArrangement = Arrangement.spacedBy(Dimens.SPACING_3)
                                 ) {
                                     Row(
-                                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                                        horizontalArrangement = Arrangement.spacedBy(Dimens.SPACING_2),
                                         verticalAlignment = Alignment.CenterVertically
                                     ) {
                                         Text("Classes:")
@@ -210,7 +209,7 @@ fun main() {
 
                                 Row(
                                     verticalAlignment = Alignment.CenterVertically,
-                                    horizontalArrangement = Arrangement.spacedBy(16.dp)
+                                    horizontalArrangement = Arrangement.spacedBy(Dimens.SPACING_3)
                                 ) {
                                     val validationError = runCatching { scheduleConfigurationState.value.verify() }
                                         .exceptionOrNull()
@@ -219,10 +218,10 @@ fun main() {
                                     if (validationError != null) {
                                         BoxWithTooltip(
                                             tooltip = {
-                                                Surface(modifier = Modifier.shadow(4.dp)) {
+                                                Surface(modifier = Modifier.shadow(Dimens.SHADOW_ELEVATION)) {
                                                     Text(
                                                         text = validationError,
-                                                        modifier = Modifier.padding(10.dp),
+                                                        modifier = Modifier.padding(Dimens.SPACING_2),
                                                     )
                                                 }
                                             },
@@ -274,7 +273,7 @@ fun main() {
                                         },
                                         content = {
                                             if (loading.value) {
-                                                CircularProgressIndicator(Modifier.size(16.dp))
+                                                CircularProgressIndicator(Modifier.size(Dimens.SPACING_3))
                                             } else {
                                                 Text("Run")
                                             }

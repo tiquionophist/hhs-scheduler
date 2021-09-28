@@ -12,7 +12,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.painter.BitmapPainter
-import androidx.compose.ui.unit.dp
 import com.tiquionophist.core.Lesson
 import com.tiquionophist.core.Schedule
 import com.tiquionophist.core.ScheduleConfiguration
@@ -28,7 +27,7 @@ private object PeriodNamesColumn : ColumnWithHeader<Int> {
     override fun itemContent(value: Int) {
         Text(
             text = "Period ${value + 1}",
-            modifier = Modifier.padding(8.dp),
+            modifier = Modifier.padding(Dimens.SPACING_2),
         )
     }
 }
@@ -43,7 +42,7 @@ private class ScheduleDayColumn(
     override fun header() {
         Text(
             text = dayName,
-            modifier = Modifier.padding(8.dp),
+            modifier = Modifier.padding(Dimens.SPACING_2),
         )
     }
 
@@ -51,7 +50,11 @@ private class ScheduleDayColumn(
     override fun itemContent(value: Int) {
         val lesson = lessons[value]
 
-        Column(modifier = Modifier.padding(8.dp).size(width = 200.dp, height = 80.dp)) {
+        Column(
+            modifier = Modifier
+                .padding(Dimens.SPACING_2)
+                .size(width = Dimens.ScheduleTable.CELL_WIDTH, height = Dimens.ScheduleTable.CELL_HEIGHT)
+        ) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 val subject = lesson.subject
                 subject.imageBitmap?.let { imageBitmap ->
@@ -63,7 +66,7 @@ private class ScheduleDayColumn(
 
                 Text(
                     text = subject.prettyName,
-                    modifier = Modifier.padding(8.dp),
+                    modifier = Modifier.padding(Dimens.SPACING_2),
                 )
             }
 

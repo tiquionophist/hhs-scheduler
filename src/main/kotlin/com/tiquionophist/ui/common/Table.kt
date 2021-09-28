@@ -19,6 +19,7 @@ import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import com.tiquionophist.ui.Dimens
 import kotlin.math.max
 import kotlin.math.roundToInt
 
@@ -117,7 +118,7 @@ sealed class ColumnWidth {
 data class TableDivider(
     val paddingBefore: Dp = 0.dp,
     val paddingAfter: Dp = 0.dp,
-    val dividerSize: Dp = 1.dp,
+    val dividerSize: Dp = Dimens.BORDER_WIDTH,
     val color: Color? = null,
 ) {
     val totalSize = paddingBefore + paddingAfter + dividerSize

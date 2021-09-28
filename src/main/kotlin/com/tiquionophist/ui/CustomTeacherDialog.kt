@@ -12,7 +12,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.Dp
-import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.WindowPosition
 import androidx.compose.ui.window.WindowSize
@@ -31,7 +30,7 @@ fun CustomTeacherDialog(visible: Boolean, onClose: (Teacher?) -> Unit) {
         ),
         resizable = false,
     ) {
-        Column(Modifier.padding(8.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+        Column(Modifier.padding(Dimens.SPACING_2), verticalArrangement = Arrangement.spacedBy(Dimens.SPACING_2)) {
             val firstNameState = remember { mutableStateOf("") }
             val lastNameState = remember { mutableStateOf("") }
 

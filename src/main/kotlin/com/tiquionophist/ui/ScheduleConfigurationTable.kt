@@ -17,7 +17,6 @@ import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.BitmapPainter
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.unit.dp
 import com.tiquionophist.core.ScheduleConfiguration
 import com.tiquionophist.core.Subject
 import com.tiquionophist.core.Teacher
@@ -52,7 +51,7 @@ private class SubjectIconColumn(private val scheduleConfiguration: ScheduleConfi
                 painter = BitmapPainter(imageBitmap),
                 contentDescription = value.prettyName,
                 modifier = Modifier
-                    .padding(horizontal = 8.dp)
+                    .padding(horizontal = Dimens.SPACING_2)
                     .enabledIf(scheduleConfiguration.subjectEnabled(value)),
             )
         }
@@ -67,7 +66,7 @@ private class SubjectNameColumn(private val scheduleConfiguration: ScheduleConfi
         Text(
             text = value.prettyName,
             modifier = Modifier
-                .padding(8.dp)
+                .padding(Dimens.SPACING_2)
                 .enabledIf(scheduleConfiguration.subjectEnabled(value)),
         )
     }
@@ -81,7 +80,7 @@ private class SubjectFrequencyPickerColumn(
     @Composable
     override fun header() {
         Text(
-            modifier = Modifier.padding(vertical = 8.dp),
+            modifier = Modifier.padding(vertical = Dimens.SPACING_2),
             text = "Times/week",
         )
     }
@@ -91,12 +90,12 @@ private class SubjectFrequencyPickerColumn(
         val config = scheduleConfigurationState.value
         if (value == Subject.EMPTY) {
             Text(
-                modifier = Modifier.padding(8.dp),
+                modifier = Modifier.padding(Dimens.SPACING_2),
                 text = (config.subjectFrequency[value] ?: 0).toString(),
             )
         } else {
             NumberPicker(
-                modifier = Modifier.padding(8.dp),
+                modifier = Modifier.padding(Dimens.SPACING_2),
                 value = config.subjectFrequency[value] ?: 0,
                 onValueChange = { newValue ->
                     scheduleConfigurationState.value = config.copy(
@@ -128,7 +127,7 @@ private class TotalTeacherAssignmentsColumn(val configuration: ScheduleConfigura
         Text(
             text = "$numTeachers teacher${if (teachersPlural) "s" else ""}",
             color = if (error) Color.Red else Color.Unspecified,
-            modifier = Modifier.padding(8.dp).enabledIf(configuration.subjectEnabled(value)),
+            modifier = Modifier.padding(Dimens.SPACING_2).enabledIf(configuration.subjectEnabled(value)),
         )
     }
 }
@@ -144,15 +143,15 @@ private class SubjectTeacherAssignmentsColumn(
         val config = scheduleConfigurationState.value
 
         Column(
-            modifier = Modifier.padding(8.dp).enabledIf(config.teacherEnabled(teacher)),
-            verticalArrangement = Arrangement.spacedBy(8.dp),
+            modifier = Modifier.padding(Dimens.SPACING_2).enabledIf(config.teacherEnabled(teacher)),
+            verticalArrangement = Arrangement.spacedBy(Dimens.SPACING_2),
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
             teacher.imageBitmap?.let { imageBitmap ->
                 Image(
                     painter = BitmapPainter(imageBitmap),
                     contentDescription = teacher.fullName,
-                    modifier = Modifier.width(50.dp),
+                    modifier = Modifier.width(Dimens.ScheduleConfigurationTable.TEACHER_IMAGE_WIDTH),
                 )
             }
 
@@ -227,12 +226,20 @@ fun ScheduleConfigurationTable(
             // strong divider after fixed columns
             Pair(
                 fixedColumns.size,
-                TableDivider(paddingBefore = 8.dp, paddingAfter = 4.dp, color = strongDividerColor)
+                TableDivider(
+                    paddingBefore = Dimens.SPACING_2,
+                    paddingAfter = Dimens.SPACING_1,
+                    color = strongDividerColor
+                )
             ),
             // strong divider before total teacher assignments column
             Pair(
                 fixedColumns.size + teachers.size,
-                TableDivider(paddingBefore = 8.dp, paddingAfter = 8.dp, color = strongDividerColor)
+                TableDivider(
+                    paddingBefore = Dimens.SPACING_2,
+                    paddingAfter = Dimens.SPACING_2,
+                    color = strongDividerColor
+                )
             ),
         ).plus(
             // weak dividers between each teacher column
@@ -242,7 +249,11 @@ fun ScheduleConfigurationTable(
         ),
         horizontalDividers = mapOf(
             // strong divider after header row
-            fixedRows.size to TableDivider(paddingBefore = 8.dp, paddingAfter = 4.dp, color = strongDividerColor),
+            fixedRows.size to TableDivider(
+                paddingBefore = Dimens.SPACING_2,
+                paddingAfter = Dimens.SPACING_1,
+                color = strongDividerColor
+            ),
         ).plus(
             // weak dividers between each subject row
             List(subjects.size) { subjectIndex ->

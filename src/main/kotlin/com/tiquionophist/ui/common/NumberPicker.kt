@@ -24,6 +24,7 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import com.tiquionophist.ui.Dimens
 import java.lang.Integer.max
 
 @Composable
@@ -32,9 +33,9 @@ fun NumberPicker(
     onValueChange: (Int) -> Unit,
     modifier: Modifier = Modifier,
     range: IntRange? = null,
-    cornerRounding: Dp = 4.dp,
-    buttonWidth: Dp = 32.dp,
-    textFieldWidth: Dp = 50.dp,
+    cornerRounding: Dp = Dimens.CORNER_ROUNDING,
+    buttonWidth: Dp = Dimens.NumberPicker.BUTTON_WIDTH,
+    textFieldWidth: Dp = Dimens.NumberPicker.TEXT_FIELD_WIDTH,
 ) {
     fun setValue(newValue: Int) {
         onValueChange(range?.let { newValue.coerceIn(it) } ?: newValue)
@@ -59,7 +60,7 @@ fun NumberPicker(
             BasicTextField(
                 modifier = Modifier
                     .widthIn(max = textFieldWidth)
-                    .border(width = 1.dp, color = MaterialTheme.colors.primary),
+                    .border(width = Dimens.BORDER_WIDTH, color = MaterialTheme.colors.primary),
                 value = if (clearedState.value) "" else value.toString(),
                 singleLine = true,
                 cursorBrush = SolidColor(LocalContentColor.current),
@@ -69,7 +70,10 @@ fun NumberPicker(
                     newValue.toIntOrNull()?.let { setValue(it) }
                 },
                 decorationBox = { innerTextField ->
-                    Box(contentAlignment = Alignment.CenterStart, modifier = Modifier.padding(horizontal = 8.dp)) {
+                    Box(
+                        contentAlignment = Alignment.CenterStart,
+                        modifier = Modifier.padding(horizontal = Dimens.SPACING_2)
+                    ) {
                         innerTextField()
                     }
                 }
