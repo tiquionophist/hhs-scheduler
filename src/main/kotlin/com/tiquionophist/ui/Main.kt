@@ -248,7 +248,9 @@ fun main() {
                                                     rounds = 1_000
                                                 )
 
-                                                val result = runCatching { scheduler.schedule(config) }
+                                                val result = runCatching {
+                                                    scheduler.schedule(config)?.also { it.verify(config) }
+                                                }
                                                 if (result.isSuccess) {
                                                     val schedule = result.getOrThrow()
                                                     if (schedule == null) {

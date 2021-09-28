@@ -31,8 +31,6 @@ data class Schedule(val lessons: List<List<Lesson>>) {
 
     /**
      * Verifies that this schedule is valid, throwing an [IllegalArgumentException] if it is not.
-     *
-     * TODO use in UI
      */
     fun verify(config: ScheduleConfiguration) {
         require(lessons.size == config.classes) { "wrong number of classes" }
