@@ -64,8 +64,7 @@ fun main() {
                     if (customTeacherDialogVisibleState.value) {
                         CustomTeacherDialog { teacher ->
                             customTeacherDialogVisibleState.value = false
-                            teacher?.let {
-                                // TODO handle duplicate teachers (since it is a data class)
+                            teacher?.takeUnless { customTeachersState.value.contains(it) }?.let {
                                 customTeachersState.value = customTeachersState.value.plus(teacher)
                             }
                         }

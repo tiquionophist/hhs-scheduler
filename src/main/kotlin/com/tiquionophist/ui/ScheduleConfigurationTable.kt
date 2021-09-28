@@ -249,6 +249,7 @@ fun ScheduleConfigurationTable(
         Teacher.DEFAULT_TEACHERS
             .plus(Teacher.LEXVILLE_TEACHERS)
             .plus(customTeachers)
+            .distinct()
             .sortedBy { it.fullName }
     }
 
