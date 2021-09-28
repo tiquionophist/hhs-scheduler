@@ -8,6 +8,8 @@ import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.shape.AbsoluteRoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material.Button
+import androidx.compose.material.LocalContentColor
+import androidx.compose.material.LocalTextStyle
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
@@ -15,8 +17,10 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.layout.Measurable
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -58,6 +62,8 @@ fun NumberPicker(
                     .border(width = 1.dp, color = MaterialTheme.colors.primary),
                 value = if (clearedState.value) "" else value.toString(),
                 singleLine = true,
+                cursorBrush = SolidColor(LocalContentColor.current),
+                textStyle = LocalTextStyle.current.merge(TextStyle(color = LocalContentColor.current)),
                 onValueChange = { newValue ->
                     clearedState.value = newValue.isEmpty()
                     newValue.toIntOrNull()?.let { setValue(it) }

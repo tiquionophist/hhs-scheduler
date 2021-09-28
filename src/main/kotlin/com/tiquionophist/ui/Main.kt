@@ -5,7 +5,6 @@ import androidx.compose.foundation.BoxWithTooltip
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.HorizontalScrollbar
 import androidx.compose.foundation.VerticalScrollbar
-import androidx.compose.foundation.background
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -21,8 +20,10 @@ import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.Icon
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
+import androidx.compose.material.darkColors
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Warning
+import androidx.compose.material.lightColors
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -46,6 +47,7 @@ import com.tiquionophist.scheduler.RandomizedScheduler
 import com.tiquionophist.ui.common.ContentWithBottomPane
 import com.tiquionophist.ui.common.FilePicker
 import com.tiquionophist.ui.common.NumberPicker
+import com.tiquionophist.ui.common.topBorder
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
@@ -70,6 +72,8 @@ fun main() {
             title = "HHS+ Scheduler",
             state = rememberWindowState(placement = WindowPlacement.Maximized)
         ) {
+            val darkThemeState = remember { mutableStateOf(false) }
+
             val scheduleConfigurationState = remember {
                 mutableStateOf(ScheduleConfiguration(classes = 2))
             }
@@ -117,150 +121,161 @@ fun main() {
                 }
             }
 
-            DesktopMaterialTheme {
-                CustomTeacherDialog(
-                    visible = customTeacherDialogVisibleState.value,
-                    onClose = { teacher ->
-                        customTeacherDialogVisibleState.value = false
-                        teacher?.let {
-                            customTeachersState.value = customTeachersState.value.plus(teacher)
-                        }
-                    }
-                )
-
-                computedSchedulesState.value.forEach { computedSchedule ->
-                    ScheduleWindow(
-                        computedSchedule = computedSchedule,
-                        onClose = {
-                            computedSchedulesState.value = computedSchedulesState.value
-                                .minus(computedSchedule)
+            DesktopMaterialTheme(colors = if (darkThemeState.value) darkColors() else lightColors()) {
+                Surface {
+                    CustomTeacherDialog(
+                        visible = customTeacherDialogVisibleState.value,
+                        onClose = { teacher ->
+                            customTeacherDialogVisibleState.value = false
+                            teacher?.let {
+                                customTeachersState.value = customTeachersState.value.plus(teacher)
+                            }
                         }
                     )
-                }
 
-                val verticalScrollState = rememberScrollState(0)
-                val horizontalScrollState = rememberScrollState(0)
+                    computedSchedulesState.value.forEach { computedSchedule ->
+                        ScheduleWindow(
+                            computedSchedule = computedSchedule,
+                            onClose = {
+                                computedSchedulesState.value = computedSchedulesState.value
+                                    .minus(computedSchedule)
+                            }
+                        )
+                    }
 
-                ContentWithBottomPane(
-                    content = {
-                        Box(contentAlignment = Alignment.Center) {
-                            Box(Modifier.verticalScroll(verticalScrollState).horizontalScroll(horizontalScrollState)) {
-                                ScheduleConfigurationTable(
-                                    scheduleConfigurationState = scheduleConfigurationState,
-                                    customTeachers = customTeachersState.value,
+                    val verticalScrollState = rememberScrollState(0)
+                    val horizontalScrollState = rememberScrollState(0)
+
+                    ContentWithBottomPane(
+                        content = {
+                            Box(contentAlignment = Alignment.Center) {
+                                Box(
+                                    modifier = Modifier
+                                        .verticalScroll(verticalScrollState)
+                                        .horizontalScroll(horizontalScrollState)
+                                ) {
+                                    ScheduleConfigurationTable(
+                                        scheduleConfigurationState = scheduleConfigurationState,
+                                        customTeachers = customTeachersState.value,
+                                    )
+                                }
+
+                                VerticalScrollbar(
+                                    adapter = rememberScrollbarAdapter(verticalScrollState),
+                                    modifier = Modifier.align(Alignment.CenterEnd),
+                                )
+
+                                HorizontalScrollbar(
+                                    adapter = rememberScrollbarAdapter(horizontalScrollState),
+                                    modifier = Modifier.align(Alignment.BottomCenter),
                                 )
                             }
-
-                            VerticalScrollbar(
-                                adapter = rememberScrollbarAdapter(verticalScrollState),
-                                modifier = Modifier.align(Alignment.CenterEnd),
-                            )
-
-                            HorizontalScrollbar(
-                                adapter = rememberScrollbarAdapter(horizontalScrollState),
-                                modifier = Modifier.align(Alignment.BottomCenter),
-                            )
-                        }
-                    },
-                    bottomPane = {
-                        Row(
-                            modifier = Modifier.fillMaxWidth().background(Color.Gray).padding(8.dp),
-                            horizontalArrangement = Arrangement.SpaceBetween,
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
+                        },
+                        bottomPane = {
                             Row(
-                                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                                modifier = Modifier.fillMaxWidth().topBorder().padding(8.dp),
+                                horizontalArrangement = Arrangement.SpaceBetween,
                                 verticalAlignment = Alignment.CenterVertically
                             ) {
-                                Text("Classes:")
-
-                                NumberPicker(
-                                    value = scheduleConfigurationState.value.classes,
-                                    onValueChange = { newValue ->
-                                        scheduleConfigurationState.value = scheduleConfigurationState.value.copy(
-                                            classes = newValue
-                                        )
-                                    },
-                                    range = IntRange(1, MAX_CLASSES),
-                                )
-                            }
-
-                            Row(
-                                verticalAlignment = Alignment.CenterVertically,
-                                horizontalArrangement = Arrangement.spacedBy(16.dp)
-                            ) {
-                                val validationError = runCatching { scheduleConfigurationState.value.verify() }
-                                    .exceptionOrNull()
-                                    ?.message
-
-                                if (validationError != null) {
-                                    BoxWithTooltip(
-                                        tooltip = {
-                                            Surface(modifier = Modifier.shadow(4.dp)) {
-                                                Text(
-                                                    text = validationError,
-                                                    modifier = Modifier.padding(10.dp),
-                                                )
-                                            }
-                                        },
+                                Row(
+                                    verticalAlignment = Alignment.CenterVertically,
+                                    horizontalArrangement = Arrangement.spacedBy(16.dp)
+                                ) {
+                                    Row(
+                                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                                        verticalAlignment = Alignment.CenterVertically
                                     ) {
-                                        Icon(
-                                            imageVector = Icons.Default.Warning,
-                                            contentDescription = null,
-                                            tint = Color.Red,
+                                        Text("Classes:")
+
+                                        NumberPicker(
+                                            value = scheduleConfigurationState.value.classes,
+                                            onValueChange = { newValue ->
+                                                scheduleConfigurationState.value = scheduleConfigurationState.value.copy(
+                                                    classes = newValue
+                                                )
+                                            },
+                                            range = IntRange(1, MAX_CLASSES),
                                         )
                                     }
                                 }
 
-                                val loading = remember { mutableStateOf(false) }
-                                val coroutineScope = rememberCoroutineScope { Dispatchers.Default }
-                                Button(
-                                    enabled = validationError == null && !loading.value,
-                                    onClick = {
-                                        loading.value = true
-                                        coroutineScope.launch {
-                                            val config = scheduleConfigurationState.value
-                                            val scheduler = RandomizedScheduler(
-                                                attemptsPerRound = 1_000,
-                                                rounds = 1_000
-                                            )
+                                Row(
+                                    verticalAlignment = Alignment.CenterVertically,
+                                    horizontalArrangement = Arrangement.spacedBy(16.dp)
+                                ) {
+                                    val validationError = runCatching { scheduleConfigurationState.value.verify() }
+                                        .exceptionOrNull()
+                                        ?.message
 
-                                            val result = runCatching { scheduler.schedule(config) }
-                                            if (result.isSuccess) {
-                                                val schedule = result.getOrThrow()
-                                                if (schedule == null) {
-                                                    // TODO show as dialog
-                                                    println("No schedule found")
-                                                } else {
-                                                    val computedSchedule = ComputedSchedule(
-                                                        configuration = config,
-                                                        schedule = schedule
+                                    if (validationError != null) {
+                                        BoxWithTooltip(
+                                            tooltip = {
+                                                Surface(modifier = Modifier.shadow(4.dp)) {
+                                                    Text(
+                                                        text = validationError,
+                                                        modifier = Modifier.padding(10.dp),
                                                     )
-
-                                                    computedSchedulesState.value = computedSchedulesState.value
-                                                        .plus(computedSchedule)
                                                 }
-                                            } else {
-                                                // TODO show as dialog
-                                                val throwable = result.exceptionOrNull()
-                                                println("Error: $throwable")
-                                            }
-
-                                            loading.value = false
-                                        }
-                                    },
-                                    content = {
-                                        if (loading.value) {
-                                            CircularProgressIndicator(Modifier.size(16.dp))
-                                        } else {
-                                            Text("Run")
+                                            },
+                                        ) {
+                                            Icon(
+                                                imageVector = Icons.Default.Warning,
+                                                contentDescription = null,
+                                                tint = Color.Red,
+                                            )
                                         }
                                     }
-                                )
+
+                                    val loading = remember { mutableStateOf(false) }
+                                    val coroutineScope = rememberCoroutineScope { Dispatchers.Default }
+                                    Button(
+                                        enabled = validationError == null && !loading.value,
+                                        onClick = {
+                                            loading.value = true
+                                            coroutineScope.launch {
+                                                val config = scheduleConfigurationState.value
+                                                val scheduler = RandomizedScheduler(
+                                                    attemptsPerRound = 1_000,
+                                                    rounds = 1_000
+                                                )
+
+                                                val result = runCatching { scheduler.schedule(config) }
+                                                if (result.isSuccess) {
+                                                    val schedule = result.getOrThrow()
+                                                    if (schedule == null) {
+                                                        // TODO show as dialog
+                                                        println("No schedule found")
+                                                    } else {
+                                                        val computedSchedule = ComputedSchedule(
+                                                            configuration = config,
+                                                            schedule = schedule
+                                                        )
+
+                                                        computedSchedulesState.value = computedSchedulesState.value
+                                                            .plus(computedSchedule)
+                                                    }
+                                                } else {
+                                                    // TODO show as dialog
+                                                    val throwable = result.exceptionOrNull()
+                                                    println("Error: $throwable")
+                                                }
+
+                                                loading.value = false
+                                            }
+                                        },
+                                        content = {
+                                            if (loading.value) {
+                                                CircularProgressIndicator(Modifier.size(16.dp))
+                                            } else {
+                                                Text("Run")
+                                            }
+                                        }
+                                    )
+                                }
                             }
                         }
-                    }
-                )
+                    )
+                }
             }
         }
     }

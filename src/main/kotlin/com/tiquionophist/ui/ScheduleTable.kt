@@ -5,12 +5,12 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.material.LocalContentColor
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.BitmapPainter
 import androidx.compose.ui.unit.dp
 import com.tiquionophist.core.Lesson
@@ -104,8 +104,7 @@ fun ScheduleTable(configuration: ScheduleConfiguration, schedule: Schedule, clas
         listOf(null).plus(List(configuration.periodsPerDay) { it })
     }
 
-    // TODO use color from theme
-    val strongDividerColor = Color.Black
+    val strongDividerColor = LocalContentColor.current
     val weakDividerColor = strongDividerColor.copy(alpha = 0.25f)
 
     Table(

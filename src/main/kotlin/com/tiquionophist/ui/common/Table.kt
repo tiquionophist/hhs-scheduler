@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.material.LocalContentColor
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -117,7 +118,7 @@ data class TableDivider(
     val paddingBefore: Dp = 0.dp,
     val paddingAfter: Dp = 0.dp,
     val dividerSize: Dp = 1.dp,
-    val dividerColor: Color = Color.Black, // TODO use color from theme
+    val dividerColor: Color? = null,
 ) {
     val totalSize = paddingBefore + paddingAfter + dividerSize
 }
@@ -151,7 +152,7 @@ fun <T> Table(
                         .padding(top = divider.paddingBefore, bottom = divider.paddingAfter)
                         .fillMaxWidth()
                         .height(divider.dividerSize)
-                        .background(divider.dividerColor)
+                        .background(divider.dividerColor ?: LocalContentColor.current)
                 )
             }
 
@@ -161,7 +162,7 @@ fun <T> Table(
                         .padding(start = divider.paddingBefore, end = divider.paddingAfter)
                         .fillMaxHeight()
                         .width(divider.dividerSize)
-                        .background(divider.dividerColor)
+                        .background(divider.dividerColor ?: LocalContentColor.current)
                 )
             }
 
