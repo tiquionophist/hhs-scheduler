@@ -24,6 +24,7 @@ import com.tiquionophist.ui.common.ColumnWithHeader
 import com.tiquionophist.ui.common.NumberPicker
 import com.tiquionophist.ui.common.Table
 import com.tiquionophist.ui.common.TableDivider
+import com.tiquionophist.util.pluralizedCount
 import com.tiquionophist.util.prettyName
 
 /**
@@ -137,15 +138,13 @@ private class TotalTeacherAssignmentsColumn(val configuration: ScheduleConfigura
     override fun itemContent(value: Subject) {
         if (value == Subject.EMPTY) return
 
-        // TODO consolidate pluralization
         val numTeachers = configuration.subjectAssignments[value]?.size ?: 0
-        val teachersPlural = numTeachers != 1
 
         val frequency = configuration.subjectFrequency[value] ?: 0
         val error = (frequency == 0) != (numTeachers == 0)
 
         Text(
-            text = "$numTeachers teacher${if (teachersPlural) "s" else ""}",
+            text = "teacher".pluralizedCount(numTeachers),
             color = if (error) MaterialTheme.colors.error else Color.Unspecified,
             modifier = Modifier.padding(Dimens.SPACING_2).enabledIf(configuration.subjectEnabled(value)),
         )
