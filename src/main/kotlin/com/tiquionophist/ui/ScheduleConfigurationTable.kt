@@ -1,7 +1,10 @@
 package com.tiquionophist.ui
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.material.Checkbox
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
@@ -10,7 +13,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.painter.BitmapPainter
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -18,8 +20,9 @@ import com.tiquionophist.core.ScheduleConfiguration
 import com.tiquionophist.core.Subject
 import com.tiquionophist.core.Teacher
 import com.tiquionophist.ui.common.NumberPicker
+import com.tiquionophist.ui.common.loadImageBitmapOrNull
 import com.tiquionophist.util.prettyName
-import org.jetbrains.skia.Image
+import java.util.Locale
 
 private val subjects = Subject.values()
     .filter { it != Subject.EMPTY }
@@ -32,10 +35,7 @@ private object SubjectIconColumn : ColumnWithHeader<Subject> {
     @Composable
     override fun itemContent(value: Subject) {
         val imageBitmap = remember(value) {
-            val classLoader = Thread.currentThread().contextClassLoader!!
-            classLoader.getResourceAsStream(value.name + ".png")?.use {
-                Image.makeFromEncoded(it.readAllBytes()).asImageBitmap()
-            }
+            loadImageBitmapOrNull("subjects/${value.name}.png")
         }
 
         imageBitmap?.let {
@@ -121,13 +121,34 @@ private class SubjectTeacherAssignmentsColumn(
 ) : ColumnWithHeader<Subject> {
     override val items = subjects
 
+    override val verticalAlignment = Alignment.Bottom
+
     @Composable
     override fun header() {
-        Text(
-            text = "${teacher.firstName}\n${teacher.lastName}",
-            textAlign = TextAlign.Center,
-            modifier = Modifier.padding(8.dp),
-        )
+        Column(
+            verticalArrangement = Arrangement.spacedBy(8.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+        ) {
+            val imageBitmap = remember(teacher) {
+                loadImageBitmapOrNull(
+                    "teachers/${teacher.firstName.uppercase(Locale.US)}_${teacher.lastName.uppercase(Locale.US)}.png"
+                )
+            }
+
+            imageBitmap?.let {
+                Image(
+                    painter = BitmapPainter(imageBitmap),
+                    contentDescription = teacher.fullName,
+                    modifier = Modifier.width(50.dp),
+                )
+            }
+
+            Text(
+                text = "${teacher.firstName}\n${teacher.lastName}",
+                textAlign = TextAlign.Center,
+                modifier = Modifier.padding(8.dp),
+            )
+        }
     }
 
     @Composable
