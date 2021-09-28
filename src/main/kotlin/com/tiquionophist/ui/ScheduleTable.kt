@@ -1,10 +1,15 @@
 package com.tiquionophist.ui
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material.LocalContentColor
+import androidx.compose.material.LocalTextStyle
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
@@ -14,6 +19,7 @@ import androidx.compose.ui.graphics.painter.BitmapPainter
 import com.tiquionophist.core.Lesson
 import com.tiquionophist.core.Schedule
 import com.tiquionophist.core.ScheduleConfiguration
+import com.tiquionophist.core.Subject
 import com.tiquionophist.ui.common.ColumnWidth
 import com.tiquionophist.ui.common.ColumnWithHeader
 import com.tiquionophist.ui.common.Table
@@ -43,8 +49,13 @@ private class ScheduleDayColumn(
     private val lessons: List<Lesson>
 ) : ColumnWithHeader<Int> {
     override val itemHorizontalAlignment = Alignment.Start
+    override val itemVerticalAlignment = Alignment.Top
 
     override val width = ColumnWidth.Fill(minWidth = Dimens.ScheduleTable.MIN_CELL_WIDTH)
+
+    override fun fillCell(value: Int?): Boolean {
+        return value != null && lessons[value].subject == Subject.EMPTY
+    }
 
     @Composable
     override fun header() {
@@ -57,15 +68,20 @@ private class ScheduleDayColumn(
     @Composable
     override fun itemContent(value: Int) {
         val lesson = lessons[value]
+        val subject = lesson.subject
 
-        // TODO polish schedule lesson content
-        Column(
-            modifier = Modifier
-                .padding(Dimens.SPACING_2)
-                .heightIn(min = Dimens.ScheduleTable.CELL_HEIGHT)
-        ) {
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                val subject = lesson.subject
+        if (subject == Subject.EMPTY) {
+            Box(Modifier.fillMaxSize().background(LocalContentColor.current.copy(alpha = 0.05f))) {
+                Text(
+                    text = subject.prettyName,
+                    modifier = Modifier.align(Alignment.Center)
+                )
+            }
+        } else {
+            Row(
+                modifier = Modifier.padding(Dimens.SPACING_2),
+                horizontalArrangement = Arrangement.spacedBy(Dimens.SPACING_2)
+            ) {
                 subject.imageBitmap?.let { imageBitmap ->
                     Image(
                         painter = BitmapPainter(imageBitmap),
@@ -73,18 +89,29 @@ private class ScheduleDayColumn(
                     )
                 }
 
-                Text(
-                    text = subject.prettyName,
-                    modifier = Modifier.padding(Dimens.SPACING_2),
-                )
-            }
+                Column {
+                    val largeSize = LocalTextStyle.current.fontSize.times(1.1f)
+                    val smallSize = LocalTextStyle.current.fontSize.times(0.9f)
+                    Text(
+                        text = subject.prettyName,
+                        //fontWeight = FontWeight.Bold,
+                        fontSize = largeSize,
+                    )
 
-            lesson.teacher?.let { teacher ->
-                Text("by ${teacher.fullName}")
-            }
+                    lesson.teacher?.let { teacher ->
+                        Text(
+                            text = "by ${teacher.fullName}",
+                            fontSize = smallSize,
+                        )
+                    }
 
-            lesson.classroom?.let { classroom ->
-                Text("in ${classroom.prettyName}")
+                    lesson.classroom?.let { classroom ->
+                        Text(
+                            text = "in ${classroom.prettyName}",
+                            fontSize = smallSize,
+                        )
+                    }
+                }
             }
         }
     }

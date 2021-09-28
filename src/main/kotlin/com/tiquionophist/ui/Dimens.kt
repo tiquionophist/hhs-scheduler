@@ -46,7 +46,6 @@ object Dimens {
     }
 
     object ScheduleTable {
-        val MIN_CELL_WIDTH = 200.dp
-        val CELL_HEIGHT = 80.dp
+        val MIN_CELL_WIDTH = 250.dp
     }
 }
