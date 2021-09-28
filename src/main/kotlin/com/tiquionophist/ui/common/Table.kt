@@ -34,11 +34,6 @@ interface Column<T> {
     fun verticalAlignment(rowIndex: Int): Alignment.Vertical = Alignment.CenterVertically
 
     /**
-     * The contents of the column, each of which is rendered by [content].
-     */
-    val rows: List<T>
-
-    /**
      * Renders the content of the cell for the given row containing [value]. May be empty. Will automatically be aligned
      * within the cell by [horizontalAlignment] and [verticalAlignment].
      */
@@ -50,11 +45,6 @@ interface Column<T> {
  * A convenience wrapper for a [Column] which includes a special header row as the first row.
  */
 interface ColumnWithHeader<T : Any> : Column<T?> {
-    /**
-     * The non-header items in the column.
-     */
-    val items: List<T>
-
     val headerHorizontalAlignment: Alignment.Horizontal
         get() = Alignment.CenterHorizontally
 
@@ -74,9 +64,6 @@ interface ColumnWithHeader<T : Any> : Column<T?> {
     override fun horizontalAlignment(rowIndex: Int): Alignment.Horizontal {
         return if (rowIndex == 0) headerHorizontalAlignment else itemHorizontalAlignment
     }
-
-    override val rows: List<T?>
-        get() = listOf(null).plus(items)
 
     @Composable
     override fun content(value: T?) {
@@ -116,27 +103,21 @@ sealed class ColumnWidth {
 }
 
 @Composable
-fun Table(columns: List<Column<*>>, modifier: Modifier = Modifier) {
-    require(columns.isNotEmpty()) { "Table() must have non-empty columns" }
+fun <T> Table(columns: List<Column<T>>, rows: List<T>, modifier: Modifier = Modifier) {
     val numCols = columns.size
-    val numRows = columns.first().rows.size
-    require(numRows > 0) { "Table() must have non-empty rows" }
-    require(columns.all { it.rows.size == numRows }) { "all columns must have the same number of rows" }
+    val numRows = rows.size
 
-    // parameterized extension to avoid type erasure when calling content()
-    @Composable
-    fun <T> Column<T>.rowContent() {
-        rows.forEach {
-            Box { content(it) }
-        }
-    }
+    require(numCols > 0) { "Table() must have non-empty columns" }
+    require(numRows > 0) { "Table() must have non-empty rows" }
 
     val layoutDirection = LocalLayoutDirection.current
 
     Layout(
         content = {
             columns.forEach { column ->
-                column.rowContent()
+                rows.forEach { item ->
+                    Box { column.content(item) }
+                }
             }
         },
         modifier = modifier,

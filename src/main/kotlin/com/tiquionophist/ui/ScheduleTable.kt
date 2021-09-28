@@ -13,9 +13,7 @@ import com.tiquionophist.ui.common.ColumnWithHeader
 import com.tiquionophist.ui.common.Table
 import com.tiquionophist.util.prettyName
 
-private class PeriodNamesColumn(periodsPerDay: Int) : ColumnWithHeader<Int> {
-    override val items = List(periodsPerDay) { it }
-
+private object PeriodNamesColumn : ColumnWithHeader<Int> {
     @Composable
     override fun itemContent(value: Int) {
         Text(
@@ -25,9 +23,10 @@ private class PeriodNamesColumn(periodsPerDay: Int) : ColumnWithHeader<Int> {
     }
 }
 
-private class ScheduleDayColumn(private val dayName: String, lessons: List<Lesson>) : ColumnWithHeader<Lesson> {
-    override val items = lessons
-
+private class ScheduleDayColumn(
+    private val dayName: String,
+    private val lessons: List<Lesson>
+) : ColumnWithHeader<Int> {
     @Composable
     override fun header() {
         Text(
@@ -37,9 +36,11 @@ private class ScheduleDayColumn(private val dayName: String, lessons: List<Lesso
     }
 
     @Composable
-    override fun itemContent(value: Lesson) {
+    override fun itemContent(value: Int) {
+        val lesson = lessons[value]
+
         Text(
-            text = value.subject.prettyName,
+            text = lesson.subject.prettyName,
             modifier = Modifier.padding(8.dp),
         )
     }
@@ -56,7 +57,7 @@ fun ScheduleTable(configuration: ScheduleConfiguration, schedule: Schedule, clas
     }
 
     val columns = remember(configuration.periodsPerDay, configuration.daysPerWeek, classIndex) {
-        val periodNamesColumn = PeriodNamesColumn(periodsPerDay = configuration.periodsPerDay)
+        val periodNamesColumn = PeriodNamesColumn
 
         val chunkedLessons = schedule.lessons[classIndex].chunked(configuration.periodsPerDay)
         val scheduleDayColumns = List(configuration.daysPerWeek) { day ->
@@ -66,5 +67,8 @@ fun ScheduleTable(configuration: ScheduleConfiguration, schedule: Schedule, clas
         listOf(periodNamesColumn).plus(scheduleDayColumns)
     }
 
-    Table(columns)
+    Table(
+        columns = columns,
+        rows = listOf(null).plus(List(configuration.periodsPerDay) { it })
+    )
 }

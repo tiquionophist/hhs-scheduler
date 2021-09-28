@@ -32,8 +32,6 @@ private val subjects = Subject.values()
     .plus(Subject.EMPTY)
 
 private object SubjectIconColumn : ColumnWithHeader<Subject> {
-    override val items = subjects
-
     @Composable
     override fun itemContent(value: Subject) {
         val imageBitmap = remember(value) {
@@ -51,8 +49,6 @@ private object SubjectIconColumn : ColumnWithHeader<Subject> {
 }
 
 private object SubjectNameColumn : ColumnWithHeader<Subject> {
-    override val items = subjects
-
     override val itemHorizontalAlignment = Alignment.Start
 
     @Composable
@@ -67,8 +63,6 @@ private object SubjectNameColumn : ColumnWithHeader<Subject> {
 private class SubjectFrequencyPickerColumn(
     private val scheduleConfigurationState: MutableState<ScheduleConfiguration>
 ) : ColumnWithHeader<Subject> {
-    override val items = subjects
-
     override val headerVerticalAlignment = Alignment.Bottom
 
     @Composable
@@ -106,8 +100,6 @@ private class SubjectFrequencyPickerColumn(
 }
 
 private class TotalTeacherAssignmentsColumn(val configuration: ScheduleConfiguration) : ColumnWithHeader<Subject> {
-    override val items = subjects
-
     override val itemHorizontalAlignment = Alignment.Start
 
     @Composable
@@ -131,8 +123,6 @@ private class SubjectTeacherAssignmentsColumn(
     private val teacher: Teacher,
     private val scheduleConfigurationState: MutableState<ScheduleConfiguration>
 ) : ColumnWithHeader<Subject> {
-    override val items = subjects
-
     override val headerVerticalAlignment = Alignment.Bottom
 
     @Composable
@@ -213,6 +203,7 @@ fun ScheduleConfigurationTable(
             }
         ).plus(
             TotalTeacherAssignmentsColumn(scheduleConfigurationState.value)
-        )
+        ),
+        rows = listOf(null).plus(subjects)
     )
 }
