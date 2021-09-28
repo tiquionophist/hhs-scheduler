@@ -126,6 +126,7 @@ private class SubjectTeacherAssignmentsColumn(
     @Composable
     override fun header() {
         Column(
+            modifier = Modifier.padding(8.dp),
             verticalArrangement = Arrangement.spacedBy(8.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
@@ -146,8 +147,11 @@ private class SubjectTeacherAssignmentsColumn(
             Text(
                 text = "${teacher.firstName}\n${teacher.lastName}",
                 textAlign = TextAlign.Center,
-                modifier = Modifier.padding(8.dp),
             )
+
+            val config = scheduleConfigurationState.value
+            val numAssignments = config.teacherAssignments[teacher]?.size ?: 0
+            Text(text = "$numAssignments subjects")
         }
     }
 
