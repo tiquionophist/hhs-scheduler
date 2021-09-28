@@ -174,7 +174,7 @@ fun <T> Table(
         },
         modifier = modifier,
         measurePolicy = { measurables: List<Measurable>, constraints: Constraints ->
-            val horizontalDividerMeasurables = measurables.take(numHorizontalDividers)
+            val horizontalDividerMeasurables = measurables.subList(fromIndex = 0, toIndex = numHorizontalDividers)
             val verticalDividerMeasurables = measurables.subList(
                 fromIndex = numHorizontalDividers,
                 toIndex = numHorizontalDividers + numVerticalDividers
@@ -184,15 +184,15 @@ fun <T> Table(
                 toIndex = measurables.size
             )
 
-            // TODO optimize
-            val horizontalDividerMeasurablesByRow = horizontalDividers
-                .toList()
-                .mapIndexed { index, pair -> pair.first to horizontalDividerMeasurables[index] }
-                .toMap()
-            val verticalDividerMeasurablesByCol = verticalDividers
-                .toList()
-                .mapIndexed { index, pair -> pair.first to verticalDividerMeasurables[index] }
-                .toMap()
+            // [rowIndex -> measurable for the divider for that row]
+            val horizontalDividerMeasurablesByRow = horizontalDividers.keys
+                .withIndex()
+                .associate { (index, rowIndex) -> rowIndex to horizontalDividerMeasurables[index] }
+
+            // [colIndex -> measurable for the divider for that col]
+            val verticalDividerMeasurablesByCol = verticalDividers.keys
+                .withIndex()
+                .associate { (index, colIndex) -> colIndex to verticalDividerMeasurables[index] }
 
             // [colIndex -> [measurables in that column]]
             val measurablesByColumn = itemMeasurables.chunked(numRows)
@@ -251,6 +251,7 @@ fun <T> Table(
                 }
             }
 
+            // [rowIndex -> height of the row in px]
             val rowHeights = Array(numRows) { rowIndex ->
                 columns.indices.maxOf { colIndex ->
                     val placeable = requireNotNull(placeables[colIndex][rowIndex]) { "null placeable" }
@@ -258,10 +259,13 @@ fun <T> Table(
                 }
             }
 
+            // we need to compute these width/heights before measuring the dividers themselves so that we know the total
+            // width and height
             val verticalDividerWidths = verticalDividers.mapValues { it.value.totalSize.roundToPx() }
             val horizontalDividerHeights = horizontalDividers.mapValues { it.value.totalSize.roundToPx() }
 
-            val totalWidth = colWidths.sumOf { it!! } + verticalDividerWidths.values.sum()
+            val totalWidth = colWidths.sumOf { requireNotNull(it) { "null col width" } } +
+                    verticalDividerWidths.values.sum()
             val totalHeight = rowHeights.sum() + horizontalDividerHeights.values.sum()
 
             val horizontalDividerPlaceables = horizontalDividerMeasurablesByRow.mapValues { (_, measurable) ->
