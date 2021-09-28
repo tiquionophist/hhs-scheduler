@@ -1,10 +1,17 @@
 package com.tiquionophist.ui
 
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.painter.BitmapPainter
 import androidx.compose.ui.unit.dp
 import com.tiquionophist.core.Lesson
 import com.tiquionophist.core.Schedule
@@ -15,6 +22,8 @@ import com.tiquionophist.ui.common.TableDivider
 import com.tiquionophist.util.prettyName
 
 private object PeriodNamesColumn : ColumnWithHeader<Int> {
+    override fun horizontalAlignment(rowIndex: Int) = Alignment.End
+
     @Composable
     override fun itemContent(value: Int) {
         Text(
@@ -28,6 +37,8 @@ private class ScheduleDayColumn(
     private val dayName: String,
     private val lessons: List<Lesson>
 ) : ColumnWithHeader<Int> {
+    override val itemHorizontalAlignment = Alignment.Start
+
     @Composable
     override fun header() {
         Text(
@@ -40,10 +51,30 @@ private class ScheduleDayColumn(
     override fun itemContent(value: Int) {
         val lesson = lessons[value]
 
-        Text(
-            text = lesson.subject.prettyName,
-            modifier = Modifier.padding(8.dp),
-        )
+        Column(modifier = Modifier.padding(8.dp).size(width = 200.dp, height = 80.dp)) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                val subject = lesson.subject
+                subject.imageBitmap?.let { imageBitmap ->
+                    Image(
+                        painter = BitmapPainter(imageBitmap),
+                        contentDescription = subject.prettyName,
+                    )
+                }
+
+                Text(
+                    text = subject.prettyName,
+                    modifier = Modifier.padding(8.dp),
+                )
+            }
+
+            lesson.teacher?.let { teacher ->
+                Text("by ${teacher.fullName}")
+            }
+
+            lesson.classroom?.let { classroom ->
+                Text("in ${classroom.prettyName}")
+            }
+        }
     }
 }
 
@@ -69,14 +100,22 @@ fun ScheduleTable(configuration: ScheduleConfiguration, schedule: Schedule, clas
         listOf(periodNamesColumn).plus(scheduleDayColumns)
     }
 
+    val rows = remember(configuration.periodsPerDay) {
+        listOf(null).plus(List(configuration.periodsPerDay) { it })
+    }
+
+    // TODO use color from theme
+    val strongDividerColor = Color.Black
+    val weakDividerColor = strongDividerColor.copy(alpha = 0.25f)
+
     Table(
         columns = columns,
-        rows = listOf(null).plus(List(configuration.periodsPerDay) { it }),
-        horizontalDividers = mapOf(
-            1 to TableDivider(),
-        ),
-        verticalDividers = mapOf(
-            1 to TableDivider(),
-        )
+        rows = rows,
+        horizontalDividers = List(rows.size - 1) { rowIndex ->
+            rowIndex + 1 to TableDivider(dividerColor = if (rowIndex == 0) strongDividerColor else weakDividerColor)
+        }.toMap(),
+        verticalDividers = List(columns.size - 1) { colIndex ->
+            colIndex + 1 to TableDivider(dividerColor = if (colIndex == 0) strongDividerColor else weakDividerColor)
+        }.toMap(),
     )
 }

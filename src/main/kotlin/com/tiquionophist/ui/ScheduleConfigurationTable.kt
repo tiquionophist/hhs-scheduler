@@ -23,9 +23,7 @@ import com.tiquionophist.ui.common.ColumnWithHeader
 import com.tiquionophist.ui.common.NumberPicker
 import com.tiquionophist.ui.common.Table
 import com.tiquionophist.ui.common.TableDivider
-import com.tiquionophist.ui.common.loadImageBitmapOrNull
 import com.tiquionophist.util.prettyName
-import java.util.Locale
 
 private val subjects = Subject.values()
     .filter { it != Subject.EMPTY }
@@ -35,11 +33,7 @@ private val subjects = Subject.values()
 private object SubjectIconColumn : ColumnWithHeader<Subject> {
     @Composable
     override fun itemContent(value: Subject) {
-        val imageBitmap = remember(value) {
-            loadImageBitmapOrNull("subjects/${value.name}.png")
-        }
-
-        imageBitmap?.let {
+        value.imageBitmap?.let { imageBitmap ->
             Image(
                 painter = BitmapPainter(imageBitmap),
                 contentDescription = value.prettyName,
@@ -133,13 +127,7 @@ private class SubjectTeacherAssignmentsColumn(
             verticalArrangement = Arrangement.spacedBy(8.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
-            val imageBitmap = remember(teacher) {
-                loadImageBitmapOrNull(
-                    "teachers/${teacher.firstName.uppercase(Locale.US)}_${teacher.lastName.uppercase(Locale.US)}.png"
-                )
-            }
-
-            imageBitmap?.let {
+            teacher.imageBitmap?.let { imageBitmap ->
                 Image(
                     painter = BitmapPainter(imageBitmap),
                     contentDescription = teacher.fullName,
@@ -206,7 +194,7 @@ fun ScheduleConfigurationTable(
             TotalTeacherAssignmentsColumn(scheduleConfigurationState.value)
         ),
         rows = listOf(null).plus(subjects),
-        verticalDividers = mapOf(
+        verticalDividers = @Suppress("MagicNumber") mapOf(
             3 to TableDivider(paddingBefore = 8.dp, paddingAfter = 4.dp),
             3 + teachers.size to TableDivider(paddingBefore = 8.dp, paddingAfter = 8.dp),
         ),

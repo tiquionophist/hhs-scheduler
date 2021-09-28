@@ -1,5 +1,6 @@
 package com.tiquionophist.core
 
+import com.tiquionophist.ui.common.loadImageBitmapOrNull
 import java.util.EnumSet
 
 /**
@@ -105,5 +106,9 @@ enum class Subject(
             Stat.INHIBITION to "-0.05",
             Stat.LUST to "0.2",
         )
-    ),
+    );
+
+    private val imageFilename = "subjects/$name.png"
+
+    val imageBitmap by lazy { loadImageBitmapOrNull(imageFilename) }
 }
