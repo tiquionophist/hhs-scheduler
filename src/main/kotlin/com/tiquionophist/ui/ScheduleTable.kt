@@ -3,8 +3,8 @@ package com.tiquionophist.ui
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
@@ -14,6 +14,7 @@ import androidx.compose.ui.graphics.painter.BitmapPainter
 import com.tiquionophist.core.Lesson
 import com.tiquionophist.core.Schedule
 import com.tiquionophist.core.ScheduleConfiguration
+import com.tiquionophist.ui.common.ColumnWidth
 import com.tiquionophist.ui.common.ColumnWithHeader
 import com.tiquionophist.ui.common.Table
 import com.tiquionophist.ui.common.TableDivider
@@ -43,6 +44,8 @@ private class ScheduleDayColumn(
 ) : ColumnWithHeader<Int> {
     override val itemHorizontalAlignment = Alignment.Start
 
+    override val width = ColumnWidth.Fill(minWidth = Dimens.ScheduleTable.MIN_CELL_WIDTH)
+
     @Composable
     override fun header() {
         Text(
@@ -59,7 +62,7 @@ private class ScheduleDayColumn(
         Column(
             modifier = Modifier
                 .padding(Dimens.SPACING_2)
-                .size(width = Dimens.ScheduleTable.CELL_WIDTH, height = Dimens.ScheduleTable.CELL_HEIGHT)
+                .heightIn(min = Dimens.ScheduleTable.CELL_HEIGHT)
         ) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 val subject = lesson.subject
