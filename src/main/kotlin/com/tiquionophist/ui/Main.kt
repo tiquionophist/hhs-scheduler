@@ -25,6 +25,7 @@ import com.tiquionophist.core.ScheduleConfiguration
 import com.tiquionophist.core.Teacher
 import com.tiquionophist.ui.common.ContentWithPane
 import com.tiquionophist.ui.common.PaneDirection
+import java.io.File
 
 // TODO add option to clear schedule configuration
 // TODO add scheduler option
@@ -36,19 +37,17 @@ import com.tiquionophist.ui.common.PaneDirection
 @ExperimentalComposeUiApi
 @ExperimentalFoundationApi
 fun main() {
+    // load from config.json by default on startup, if it exists, for convenience
+    val initialConfiguration = ScheduleConfiguration.load(File("config.json")) ?: ScheduleConfiguration(classes = 2)
+
     application {
         Window(
             onCloseRequest = ::exitApplication,
             title = "HHS+ Scheduler",
             state = rememberWindowState(placement = WindowPlacement.Maximized),
         ) {
-            val scheduleConfigurationState = remember {
-                mutableStateOf(ScheduleConfiguration(classes = 2))
-            }
-
-            val customTeachersState = remember {
-                mutableStateOf(listOf<Teacher>())
-            }
+            val scheduleConfigurationState = remember { mutableStateOf(initialConfiguration) }
+            val customTeachersState = remember { mutableStateOf(listOf<Teacher>()) }
             val customTeacherDialogVisibleState = remember { mutableStateOf(false) }
             val computedSchedulesState = remember { mutableStateOf(listOf<ComputedSchedule>()) }
 
