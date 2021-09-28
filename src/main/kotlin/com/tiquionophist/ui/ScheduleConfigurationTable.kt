@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.Checkbox
+import androidx.compose.material.CheckboxDefaults
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
@@ -222,12 +223,16 @@ private class SubjectTeacherAssignmentsColumn(
                 }
                 .fillMaxSize(),
             color = if (contains) {
-                MaterialTheme.colors.secondary.copy(alpha = Colors.DISABLED_ALPHA)
+                Colors.SELECTED.copy(alpha = Colors.DISABLED_ALPHA)
             } else {
                 Color.Unspecified
             },
         ) {
-            Checkbox(checked = contains, onCheckedChange = null)
+            Checkbox(
+                checked = contains,
+                onCheckedChange = null,
+                colors = CheckboxDefaults.colors(checkedColor = Colors.SELECTED)
+            )
         }
     }
 }

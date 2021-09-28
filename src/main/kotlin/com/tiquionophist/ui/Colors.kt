@@ -16,6 +16,7 @@ object Colors {
     const val DISABLED_ALPHA = 0.3f
 
     private val PRIMARY = Color(42, 149, 232)
+    val SELECTED = Color(22, 199, 28)
 
     /**
      * The color of dividers between elements.
