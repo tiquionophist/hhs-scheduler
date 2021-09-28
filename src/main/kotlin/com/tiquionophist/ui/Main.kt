@@ -10,6 +10,8 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.rememberScrollbarAdapter
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Surface
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -21,13 +23,13 @@ import androidx.compose.ui.window.application
 import androidx.compose.ui.window.rememberWindowState
 import com.tiquionophist.core.ScheduleConfiguration
 import com.tiquionophist.core.Teacher
-import com.tiquionophist.ui.common.ContentWithBottomPane
+import com.tiquionophist.ui.common.ContentWithPane
+import com.tiquionophist.ui.common.PaneDirection
 
 // TODO add option to clear schedule configuration
 // TODO add scheduler option
 // TODO add schedule process timeout
 // TODO improve error states and help messages
-// TODO show weekly stat effects for class
 // TODO show weekly stat effects for each teacher
 // TODO investigate text field focus (cursor remains after unfocused)
 // TODO add window icon
@@ -79,48 +81,71 @@ fun main() {
                             }
                         )
                     }
-
-                    ContentWithBottomPane(
-                        content = {
-                            // TODO find a way to have the table fill and still allow scrollbars
-                            Box(contentAlignment = Alignment.Center) {
-                                val verticalScrollState = rememberScrollState(0)
-                                val horizontalScrollState = rememberScrollState(0)
-
-                                Box(
-                                    modifier = Modifier
-                                        .verticalScroll(verticalScrollState)
-                                        .horizontalScroll(horizontalScrollState)
-                                ) {
-                                    ScheduleConfigurationTable(
-                                        scheduleConfigurationState = scheduleConfigurationState,
-                                        customTeachers = customTeachersState.value,
-                                    )
-                                }
-
-                                VerticalScrollbar(
-                                    adapter = rememberScrollbarAdapter(verticalScrollState),
-                                    modifier = Modifier.align(Alignment.CenterEnd),
-                                )
-
-                                HorizontalScrollbar(
-                                    adapter = rememberScrollbarAdapter(horizontalScrollState),
-                                    modifier = Modifier.align(Alignment.BottomCenter),
-                                )
-                            }
-                        },
-                        bottomPane = {
-                            SettingsPane(
-                                scheduleConfigurationState = scheduleConfigurationState,
-                                onComputedSchedule = { computedSchedule ->
-                                    computedSchedulesState.value = computedSchedulesState.value
-                                        .plus(computedSchedule)
-                                }
-                            )
-                        }
-                    )
                 }
+
+                MainContent(
+                    scheduleConfigurationState = scheduleConfigurationState,
+                    customTeachers = customTeachersState.value,
+                    onComputedSchedule = { computedSchedule ->
+                        computedSchedulesState.value = computedSchedulesState.value
+                            .plus(computedSchedule)
+                    }
+                )
             }
         }
     }
+}
+
+@ExperimentalComposeUiApi
+@Composable
+private fun MainContent(
+    scheduleConfigurationState: MutableState<ScheduleConfiguration>,
+    customTeachers: List<Teacher>,
+    onComputedSchedule: (ComputedSchedule) -> Unit,
+) {
+    ContentWithPane(
+        direction = PaneDirection.BOTTOM,
+        content = {
+            ContentWithPane(
+                direction = PaneDirection.RIGHT,
+                content = {
+                    // TODO find a way to have the table fill and still allow scrollbars
+                    Box(contentAlignment = Alignment.Center) {
+                        val verticalScrollState = rememberScrollState(0)
+                        val horizontalScrollState = rememberScrollState(0)
+
+                        Box(
+                            modifier = Modifier
+                                .verticalScroll(verticalScrollState)
+                                .horizontalScroll(horizontalScrollState)
+                        ) {
+                            ScheduleConfigurationTable(
+                                scheduleConfigurationState = scheduleConfigurationState,
+                                customTeachers = customTeachers,
+                            )
+                        }
+
+                        VerticalScrollbar(
+                            adapter = rememberScrollbarAdapter(verticalScrollState),
+                            modifier = Modifier.align(Alignment.CenterEnd),
+                        )
+
+                        HorizontalScrollbar(
+                            adapter = rememberScrollbarAdapter(horizontalScrollState),
+                            modifier = Modifier.align(Alignment.BottomCenter),
+                        )
+                    }
+                },
+                pane = {
+                    StatsPane(configuration = scheduleConfigurationState.value)
+                }
+            )
+        },
+        pane = {
+            SettingsPane(
+                scheduleConfigurationState = scheduleConfigurationState,
+                onComputedSchedule = onComputedSchedule
+            )
+        }
+    )
 }
