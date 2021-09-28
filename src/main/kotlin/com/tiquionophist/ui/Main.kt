@@ -27,7 +27,6 @@ import com.tiquionophist.ui.common.ContentWithPane
 import com.tiquionophist.ui.common.PaneDirection
 import java.io.File
 
-// TODO add option to clear schedule configuration
 // TODO add scheduler option
 // TODO add schedule process timeout
 // TODO improve error states and help messages
