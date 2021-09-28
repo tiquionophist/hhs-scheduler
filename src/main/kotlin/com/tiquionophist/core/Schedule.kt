@@ -1,7 +1,6 @@
 package com.tiquionophist.core
 
 import com.tiquionophist.util.prettyName
-import com.tiquionophist.util.toTableString
 import java.util.EnumMap
 import java.util.EnumSet
 
@@ -31,29 +30,9 @@ data class Schedule(val lessons: List<List<Lesson>>) {
     }
 
     /**
-     * Generates a table-formatted display of each class's schedule.
-     */
-    fun toTableString(includeTeacher: Boolean, includeClassroom: Boolean, config: ScheduleConfiguration): List<String> {
-        return lessons.map { classSchedule ->
-            classSchedule
-                .map { cls ->
-                    StringBuilder().apply {
-                        append(cls.subject.prettyName)
-                        if (includeClassroom) {
-                            cls.classroom?.let { append(" in ${it.prettyName}") }
-                        }
-                        if (includeTeacher) {
-                            cls.teacher?.let { append(" by ${it.fullName}") }
-                        }
-                    }.toString()
-                }
-                .chunked(config.periodsPerDay)
-                .toTableString()
-        }
-    }
-
-    /**
      * Verifies that this schedule is valid, throwing an [IllegalArgumentException] if it is not.
+     *
+     * TODO use in UI
      */
     fun verify(config: ScheduleConfiguration) {
         require(lessons.size == config.classes) { "wrong number of classes" }
