@@ -6,43 +6,53 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.Checkbox
+import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.BitmapPainter
 import androidx.compose.ui.text.style.TextAlign
 import com.tiquionophist.core.ScheduleConfiguration
 import com.tiquionophist.core.Subject
 import com.tiquionophist.core.Teacher
+import com.tiquionophist.ui.Colors.enabledIf
 import com.tiquionophist.ui.common.ColumnWithHeader
 import com.tiquionophist.ui.common.NumberPicker
 import com.tiquionophist.ui.common.Table
 import com.tiquionophist.ui.common.TableDivider
 import com.tiquionophist.util.prettyName
 
-private val subjects = Subject.values()
+/**
+ * Subjects displayed in the table, in order.
+ */
+private val subjects: List<Subject> = Subject.values()
     .filter { it != Subject.EMPTY }
     .sortedBy { it.prettyName }
     .plus(Subject.EMPTY)
 
-private const val DISABLED_ALPHA = 0.3f
-
-private fun Modifier.enabledIf(enabled: Boolean) = alpha(if (enabled) 1f else DISABLED_ALPHA)
-
+/**
+ * Whether [teacher] should be shown as enabled for this [ScheduleConfiguration], i.e. if it has any assignments.
+ */
 private fun ScheduleConfiguration.teacherEnabled(teacher: Teacher): Boolean {
     return teacherAssignments[teacher]?.isNotEmpty() == true
 }
 
+/**
+ * Whether [subject] should be shown as enabled for this [ScheduleConfiguration], i.e. if it has non-zero frequency in
+ * the schedule or has any teachers assigned to it.
+ */
 private fun ScheduleConfiguration.subjectEnabled(subject: Subject): Boolean {
     return subjectFrequency[subject]?.let { it > 0 } == true || subjectAssignments[subject]?.isNotEmpty() == true
 }
 
-private class SubjectIconColumn(private val scheduleConfiguration: ScheduleConfiguration) : ColumnWithHeader<Subject> {
+/**
+ * A column displaying the icon for each [Subject].
+ */
+private class SubjectIconColumn(private val configuration: ScheduleConfiguration) : ColumnWithHeader<Subject> {
     @Composable
     override fun itemContent(value: Subject) {
         value.imageBitmap?.let { imageBitmap ->
@@ -51,13 +61,16 @@ private class SubjectIconColumn(private val scheduleConfiguration: ScheduleConfi
                 contentDescription = value.prettyName,
                 modifier = Modifier
                     .padding(horizontal = Dimens.SPACING_2)
-                    .enabledIf(scheduleConfiguration.subjectEnabled(value)),
+                    .enabledIf(configuration.subjectEnabled(value)),
             )
         }
     }
 }
 
-private class SubjectNameColumn(private val scheduleConfiguration: ScheduleConfiguration) : ColumnWithHeader<Subject> {
+/**
+ * A column displaying the name of each [Subject].
+ */
+private class SubjectNameColumn(private val configuration: ScheduleConfiguration) : ColumnWithHeader<Subject> {
     override val itemHorizontalAlignment = Alignment.Start
 
     @Composable
@@ -66,11 +79,14 @@ private class SubjectNameColumn(private val scheduleConfiguration: ScheduleConfi
             text = value.prettyName,
             modifier = Modifier
                 .padding(Dimens.SPACING_2)
-                .enabledIf(scheduleConfiguration.subjectEnabled(value)),
+                .enabledIf(configuration.subjectEnabled(value)),
         )
     }
 }
 
+/**
+ * A column displaying a number picker for the frequency of each [Subject] in the schedule.
+ */
 private class SubjectFrequencyPickerColumn(
     private val scheduleConfigurationState: MutableState<ScheduleConfiguration>
 ) : ColumnWithHeader<Subject> {
@@ -111,6 +127,9 @@ private class SubjectFrequencyPickerColumn(
     }
 }
 
+/**
+ * A column displaying the total number of teachers assigned to each [Subject].
+ */
 private class TotalTeacherAssignmentsColumn(val configuration: ScheduleConfiguration) : ColumnWithHeader<Subject> {
     override val itemHorizontalAlignment = Alignment.Start
 
@@ -118,6 +137,7 @@ private class TotalTeacherAssignmentsColumn(val configuration: ScheduleConfigura
     override fun itemContent(value: Subject) {
         if (value == Subject.EMPTY) return
 
+        // TODO consolidate pluralization
         val numTeachers = configuration.subjectAssignments[value]?.size ?: 0
         val teachersPlural = numTeachers != 1
 
@@ -126,12 +146,16 @@ private class TotalTeacherAssignmentsColumn(val configuration: ScheduleConfigura
 
         Text(
             text = "$numTeachers teacher${if (teachersPlural) "s" else ""}",
-            color = if (error) Color.Red else Color.Unspecified,
+            color = if (error) MaterialTheme.colors.error else Color.Unspecified,
             modifier = Modifier.padding(Dimens.SPACING_2).enabledIf(configuration.subjectEnabled(value)),
         )
     }
 }
 
+/**
+ * A column displaying the subject assignments for each teacher, with a header showing the teacher image and name and a
+ * checkbox toggling whether the teacher is assigned for each subject row.
+ */
 private class SubjectTeacherAssignmentsColumn(
     private val teacher: Teacher,
     private val scheduleConfigurationState: MutableState<ScheduleConfiguration>
@@ -171,6 +195,7 @@ private class SubjectTeacherAssignmentsColumn(
 
         val config = scheduleConfigurationState.value
         val currentAssignments = config.teacherAssignments.getOrDefault(teacher, emptySet())
+        // TODO improve hitbox
         Checkbox(
             checked = currentAssignments.contains(value),
             onCheckedChange = { checked ->

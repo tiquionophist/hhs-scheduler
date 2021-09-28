@@ -10,6 +10,8 @@ object FilePicker {
     /**
      * Opens a file chooser to save a file, starting in [startingDirectory], and returns the chosen file if the user
      * selected one.
+     *
+     * TODO polish (add confirm dialog on overwrite, etc)
      */
     fun save(startingDirectory: File? = File(".")): File? {
         val fc = JFileChooser(startingDirectory)
@@ -24,6 +26,8 @@ object FilePicker {
     /**
      * Opens a file chooser to load a file, starting in [startingDirectory], and returns the chosen file if the user
      * selected one.
+     *
+     * TODO polish (add confirm dialog on overwrite, etc)
      */
     fun load(startingDirectory: File? = File(".")): File? {
         val fc = JFileChooser(startingDirectory)

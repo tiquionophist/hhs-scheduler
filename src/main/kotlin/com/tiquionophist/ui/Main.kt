@@ -48,6 +48,10 @@ import com.tiquionophist.ui.common.topBorder
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
+/**
+ * Wraps a [schedule] computed from a certain [configuration], along with an [index] incremented each time a new object
+ * is created.
+ */
 data class ComputedSchedule(
     val configuration: ScheduleConfiguration,
     val schedule: Schedule,
@@ -58,6 +62,14 @@ data class ComputedSchedule(
     }
 }
 
+// TODO add option to clear schedule configuration
+// TODO add scheduler option
+// TODO add schedule process timeout
+// TODO improve error states and help messages
+// TODO show weekly stat effects for class
+// TODO show weekly stat effects for each teacher
+// TODO investigate text field focus (cursor remains after unfocused)
+// TODO add window icon
 @ExperimentalComposeUiApi
 @ExperimentalFoundationApi
 fun main() {

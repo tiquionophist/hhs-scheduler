@@ -19,6 +19,9 @@ import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.WindowPosition
 import androidx.compose.ui.window.rememberWindowState
 
+/**
+ * A pop-up window which displays a [computedSchedule].
+ */
 @Composable
 fun ScheduleWindow(
     computedSchedule: ComputedSchedule,
@@ -71,6 +74,8 @@ fun ScheduleWindow(
                     val tablePlaceable = tableMeasurable.measure(constraints)
                     val width = tablePlaceable.width
 
+                    // button row matches the table width
+                    // TODO ideally we might use the min intrinsic width of the button row for cases with many classes
                     val buttonRowPlaceable = buttonRowMeasurable.measure(
                         constraints.copy(minWidth = width, maxWidth = width)
                     )

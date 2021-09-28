@@ -18,6 +18,14 @@ import androidx.compose.ui.window.WindowSize
 import androidx.compose.ui.window.rememberDialogState
 import com.tiquionophist.core.Teacher
 
+/**
+ * Wraps a [Dialog] which allows the user to create a new [Teacher] with a custom first/last name.
+ *
+ * [visible] determines whether the dialog is currently being shown. When the dialog is closed, [onClose] is invoked,
+ * with a non-null [Teacher] if it was submitted successfully, or null if it was cancelled.
+ *
+ * TODO improve tab navigation and allow enter to submit
+ */
 @Composable
 fun CustomTeacherDialog(visible: Boolean, onClose: (Teacher?) -> Unit) {
     Dialog(

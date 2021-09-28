@@ -19,6 +19,9 @@ import com.tiquionophist.ui.common.Table
 import com.tiquionophist.ui.common.TableDivider
 import com.tiquionophist.util.prettyName
 
+/**
+ * A column which displays the period number for each period index row.
+ */
 private object PeriodNamesColumn : ColumnWithHeader<Int> {
     override fun horizontalAlignment(rowIndex: Int) = Alignment.End
 
@@ -31,6 +34,9 @@ private object PeriodNamesColumn : ColumnWithHeader<Int> {
     }
 }
 
+/**
+ * A column which displays the set of [lessons] on a certain day.
+ */
 private class ScheduleDayColumn(
     private val dayName: String,
     private val lessons: List<Lesson>
@@ -49,6 +55,7 @@ private class ScheduleDayColumn(
     override fun itemContent(value: Int) {
         val lesson = lessons[value]
 
+        // TODO polish schedule lesson content
         Column(
             modifier = Modifier
                 .padding(Dimens.SPACING_2)
@@ -80,6 +87,9 @@ private class ScheduleDayColumn(
     }
 }
 
+/**
+ * A grid-based view of the lessons in a [schedule] for the class at [classIndex].
+ */
 @Composable
 fun ScheduleTable(configuration: ScheduleConfiguration, schedule: Schedule, classIndex: Int) {
     val dayNames = remember(configuration.daysPerWeek) {
@@ -109,9 +119,11 @@ fun ScheduleTable(configuration: ScheduleConfiguration, schedule: Schedule, clas
     Table(
         columns = columns,
         rows = rows,
+        // strong divider after the header row, weak dividers between each period row
         horizontalDividers = List(rows.size - 1) { rowIndex ->
             rowIndex + 1 to TableDivider(color = if (rowIndex == 0) Colors.divider else Colors.weakDivider)
         }.toMap(),
+        // strong divider after the period name column, weak dividers between each day column
         verticalDividers = List(columns.size - 1) { colIndex ->
             colIndex + 1 to TableDivider(color = if (colIndex == 0) Colors.divider else Colors.weakDivider)
         }.toMap(),

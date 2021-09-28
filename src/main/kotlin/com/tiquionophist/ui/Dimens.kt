@@ -2,14 +2,38 @@ package com.tiquionophist.ui
 
 import androidx.compose.ui.unit.dp
 
+/**
+ * Dimension constants used throughout the application.
+ */
 object Dimens {
+    /**
+     * Width of borders and dividers.
+     */
     val BORDER_WIDTH = 1.dp
 
+    /**
+     * Small spacing.
+     */
     val SPACING_1 = 4.dp
+
+    /**
+     * Medium spacing.
+     */
     val SPACING_2 = 8.dp
+
+    /**
+     * Large spacing.
+     */
     val SPACING_3 = 16.dp
 
+    /**
+     * Standard elevation for drop shadows.
+     */
     val SHADOW_ELEVATION = 4.dp
+
+    /**
+     * Standard rounding for corners.
+     */
     val CORNER_ROUNDING = 4.dp
 
     object NumberPicker {
