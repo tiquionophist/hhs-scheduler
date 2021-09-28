@@ -53,6 +53,8 @@ import kotlinx.coroutines.launch
 
 private const val MAX_CLASSES = 100
 
+private val PRIMARY_COLOR = Color(42, 149, 232)
+
 data class ComputedSchedule(
     val configuration: ScheduleConfiguration,
     val schedule: Schedule,
@@ -121,7 +123,13 @@ fun main() {
                 }
             }
 
-            DesktopMaterialTheme(colors = if (darkThemeState.value) darkColors() else lightColors()) {
+            val colors = if (darkThemeState.value) {
+                darkColors(primary = PRIMARY_COLOR)
+            } else {
+                lightColors(primary = PRIMARY_COLOR)
+            }
+
+            DesktopMaterialTheme(colors = colors) {
                 Surface {
                     CustomTeacherDialog(
                         visible = customTeacherDialogVisibleState.value,
