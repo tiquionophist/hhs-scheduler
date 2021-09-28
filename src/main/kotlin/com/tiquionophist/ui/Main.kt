@@ -156,6 +156,7 @@ fun main() {
 
                     ContentWithBottomPane(
                         content = {
+                            // TODO find a way to have the table fill and still allow scrollbars
                             Box(contentAlignment = Alignment.Center) {
                                 Box(
                                     modifier = Modifier

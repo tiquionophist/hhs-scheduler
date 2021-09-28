@@ -109,7 +109,8 @@ private class TotalTeacherAssignmentsColumn(val configuration: ScheduleConfigura
 
         Text(
             text = "$numTeachers teacher${if (teachersPlural) "s" else ""}",
-            color = if (error) Color.Red else Color.Unspecified
+            modifier = Modifier.padding(8.dp),
+            color = if (error) Color.Red else Color.Unspecified,
         )
     }
 }

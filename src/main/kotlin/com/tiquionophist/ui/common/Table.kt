@@ -108,7 +108,7 @@ sealed class ColumnWidth {
      * Fill all remaining space in the table. If multiple columns have [Fill] width, space will be distributed relative
      * to their [weight].
      */
-    data class Fill(val weight: Int = 1) : ColumnWidth()
+    data class Fill(val weight: Int = 1, val maxWidth: Dp? = null, val minWidth: Dp? = null) : ColumnWidth()
 }
 
 /**
@@ -227,14 +227,18 @@ fun <T> Table(
             val fillColumns = columns.filter { it.width is ColumnWidth.Fill }
             if (fillColumns.isNotEmpty()) {
                 val totalFillWeight = fillColumns.sumOf { (it.width as ColumnWidth.Fill).weight }
-                val usedWidth = colWidths.sumOf { it ?: 0 }
+                val usedWidth = colWidths.sumOf { it ?: 0 } + verticalDividers.values.sumOf { it.totalSize.roundToPx() }
                 val remainingWidth = constraints.maxWidth - usedWidth
 
                 columns.forEachIndexed { colIndex, column ->
-                    if (column.width is ColumnWidth.Fill) {
-                        val colWidth =
-                            ((remainingWidth * (column.width as ColumnWidth.Fill).weight).toDouble() / totalFillWeight)
-                                .roundToInt()
+                    val columnWidth = column.width
+                    if (columnWidth is ColumnWidth.Fill) {
+                        val minPx = columnWidth.minWidth?.roundToPx() ?: 0
+                        val maxPx = columnWidth.maxWidth?.roundToPx() ?: Int.MAX_VALUE
+                        val colWidth = ((remainingWidth * columnWidth.weight).toDouble() / totalFillWeight)
+                            .roundToInt()
+                            .coerceAtLeast(minPx)
+                            .coerceAtMost(maxPx)
 
                         val colMeasurables = measurablesByColumn[colIndex]
                         colMeasurables.forEachIndexed { rowIndex, measurable ->
