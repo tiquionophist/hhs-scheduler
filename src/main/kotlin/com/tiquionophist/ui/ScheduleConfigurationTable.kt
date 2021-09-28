@@ -69,6 +69,16 @@ private class SubjectFrequencyPickerColumn(
 ) : ColumnWithHeader<Subject> {
     override val items = subjects
 
+    override val headerVerticalAlignment = Alignment.Bottom
+
+    @Composable
+    override fun header() {
+        Text(
+            modifier = Modifier.padding(vertical = 8.dp),
+            text = "Times taught per week",
+        )
+    }
+
     @Composable
     override fun itemContent(value: Subject) {
         val config = scheduleConfigurationState.value
