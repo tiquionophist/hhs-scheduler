@@ -121,6 +121,7 @@ fun main() {
                 Menu("Edit") {
                     Item(
                         text = "Add custom teacher",
+                        shortcut = KeyShortcut(Key.Equals, ctrl = true),
                         onClick = {
                             customTeacherDialogVisibleState.value = true
                         }
@@ -130,15 +131,15 @@ fun main() {
 
             DesktopMaterialTheme(colors = Colors.materialColors(light = !darkThemeState.value)) {
                 Surface {
-                    CustomTeacherDialog(
-                        visible = customTeacherDialogVisibleState.value,
-                        onClose = { teacher ->
+                    if (customTeacherDialogVisibleState.value) {
+                        CustomTeacherDialog { teacher ->
                             customTeacherDialogVisibleState.value = false
                             teacher?.let {
+                                // TODO handle duplicate teachers (since it is a data class)
                                 customTeachersState.value = customTeachersState.value.plus(teacher)
                             }
                         }
-                    )
+                    }
 
                     computedSchedulesState.value.forEach { computedSchedule ->
                         ScheduleWindow(
