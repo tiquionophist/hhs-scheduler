@@ -104,7 +104,8 @@ private class SubjectFrequencyPickerColumn(
                         )
                     )
                 },
-                range = IntRange(0, config.periodsPerWeek)
+                min = 0,
+                max = config.periodsPerWeek,
             )
         }
     }

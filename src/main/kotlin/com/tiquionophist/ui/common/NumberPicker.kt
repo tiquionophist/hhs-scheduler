@@ -26,19 +26,25 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.tiquionophist.ui.Dimens
 import java.lang.Integer.max
+import java.lang.Integer.min
 
 @Composable
 fun NumberPicker(
     value: Int,
     onValueChange: (Int) -> Unit,
     modifier: Modifier = Modifier,
-    range: IntRange? = null,
+    min: Int? = null,
+    max: Int? = null,
     cornerRounding: Dp = Dimens.CORNER_ROUNDING,
     buttonWidth: Dp = Dimens.NumberPicker.BUTTON_WIDTH,
     textFieldWidth: Dp = Dimens.NumberPicker.TEXT_FIELD_WIDTH,
 ) {
     fun setValue(newValue: Int) {
-        onValueChange(range?.let { newValue.coerceIn(it) } ?: newValue)
+        var adjusted = newValue
+        min?.let { adjusted = max(adjusted, min) }
+        max?.let { adjusted = min(adjusted, max) }
+
+        onValueChange(adjusted)
     }
 
     // if the text field has been cleared, to avoid jankiness
@@ -49,7 +55,7 @@ fun NumberPicker(
         content = {
             Button(
                 modifier = Modifier.widthIn(max = buttonWidth),
-                enabled = range?.let { value > it.first } != false,
+                enabled = min?.let { value > it } != false,
                 onClick = { setValue(value - 1) },
                 shape = AbsoluteRoundedCornerShape(topLeft = cornerRounding, bottomLeft = cornerRounding),
                 contentPadding = PaddingValues(0.dp),
@@ -81,7 +87,7 @@ fun NumberPicker(
 
             Button(
                 modifier = Modifier.widthIn(max = buttonWidth),
-                enabled = range?.let { value < it.last } != false,
+                enabled = max?.let { value < it } != false,
                 onClick = { setValue(value + 1) },
                 shape = AbsoluteRoundedCornerShape(topRight = cornerRounding, bottomRight = cornerRounding),
                 contentPadding = PaddingValues(0.dp),

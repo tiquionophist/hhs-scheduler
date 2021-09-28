@@ -48,8 +48,6 @@ import com.tiquionophist.ui.common.topBorder
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
-private const val MAX_CLASSES = 100
-
 data class ComputedSchedule(
     val configuration: ScheduleConfiguration,
     val schedule: Schedule,
@@ -192,7 +190,7 @@ fun main() {
                                                     classes = newValue
                                                 )
                                             },
-                                            range = IntRange(1, MAX_CLASSES),
+                                            min = 1,
                                         )
                                     }
                                 }
