@@ -22,7 +22,7 @@ data class Teacher(val firstName: String, val lastName: String) {
             CARMEN_SMITH,
             Teacher("Claire", "Fuzushi"),
             Teacher("Jessica", "Underwood"),
-            Teacher("Nina", "Parkeer"),
+            Teacher("Nina", "Parker"),
             RONDA_BELLS,
             SAMANTHA_KELLER,
         )
