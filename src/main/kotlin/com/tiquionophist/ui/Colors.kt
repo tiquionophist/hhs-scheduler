@@ -40,7 +40,7 @@ object Colors {
      * The set of material [Colors] to be applied application-wide; based on either the light theme if [light] is true
      * or the dark theme otherwise.
      */
-    fun materialColors(light: Boolean): Colors {
+    fun materialColors(light: Boolean = true): Colors {
         return if (light) {
             lightColors(primary = PRIMARY)
         } else {
