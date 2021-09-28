@@ -6,7 +6,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.Checkbox
-import androidx.compose.material.LocalContentColor
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
@@ -200,9 +199,6 @@ fun ScheduleConfigurationTable(
             .sortedBy { it.fullName }
     }
 
-    val strongDividerColor = LocalContentColor.current
-    val weakDividerColor = strongDividerColor.copy(alpha = 0.25f)
-
     val fixedColumns = listOf(
         SubjectIconColumn(scheduleConfigurationState.value),
         SubjectNameColumn(scheduleConfigurationState.value),
@@ -229,7 +225,7 @@ fun ScheduleConfigurationTable(
                 TableDivider(
                     paddingBefore = Dimens.SPACING_2,
                     paddingAfter = Dimens.SPACING_1,
-                    color = strongDividerColor
+                    color = Colors.divider
                 )
             ),
             // strong divider before total teacher assignments column
@@ -238,13 +234,13 @@ fun ScheduleConfigurationTable(
                 TableDivider(
                     paddingBefore = Dimens.SPACING_2,
                     paddingAfter = Dimens.SPACING_2,
-                    color = strongDividerColor
+                    color = Colors.divider
                 )
             ),
         ).plus(
             // weak dividers between each teacher column
             List(teachers.size - 1) { teacherIndex ->
-                Pair(teacherIndex + fixedColumns.size + 1, TableDivider(color = weakDividerColor))
+                Pair(teacherIndex + fixedColumns.size + 1, TableDivider(color = Colors.weakDivider))
             }
         ),
         horizontalDividers = mapOf(
@@ -252,12 +248,12 @@ fun ScheduleConfigurationTable(
             fixedRows.size to TableDivider(
                 paddingBefore = Dimens.SPACING_2,
                 paddingAfter = Dimens.SPACING_1,
-                color = strongDividerColor
+                color = Colors.divider
             ),
         ).plus(
             // weak dividers between each subject row
             List(subjects.size) { subjectIndex ->
-                Pair(subjectIndex + fixedRows.size + 1, TableDivider(color = weakDividerColor))
+                Pair(subjectIndex + fixedRows.size + 1, TableDivider(color = Colors.weakDivider))
             }
         ),
     )

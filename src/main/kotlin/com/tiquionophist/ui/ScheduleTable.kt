@@ -5,7 +5,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.material.LocalContentColor
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
@@ -107,17 +106,14 @@ fun ScheduleTable(configuration: ScheduleConfiguration, schedule: Schedule, clas
         listOf(null).plus(List(configuration.periodsPerDay) { it })
     }
 
-    val strongDividerColor = LocalContentColor.current
-    val weakDividerColor = strongDividerColor.copy(alpha = 0.25f)
-
     Table(
         columns = columns,
         rows = rows,
         horizontalDividers = List(rows.size - 1) { rowIndex ->
-            rowIndex + 1 to TableDivider(color = if (rowIndex == 0) strongDividerColor else weakDividerColor)
+            rowIndex + 1 to TableDivider(color = if (rowIndex == 0) Colors.divider else Colors.weakDivider)
         }.toMap(),
         verticalDividers = List(columns.size - 1) { colIndex ->
-            colIndex + 1 to TableDivider(color = if (colIndex == 0) strongDividerColor else weakDividerColor)
+            colIndex + 1 to TableDivider(color = if (colIndex == 0) Colors.divider else Colors.weakDivider)
         }.toMap(),
     )
 }

@@ -20,10 +20,8 @@ import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.Icon
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
-import androidx.compose.material.darkColors
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Warning
-import androidx.compose.material.lightColors
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -51,8 +49,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 private const val MAX_CLASSES = 100
-
-private val PRIMARY_COLOR = Color(42, 149, 232)
 
 data class ComputedSchedule(
     val configuration: ScheduleConfiguration,
@@ -122,13 +118,7 @@ fun main() {
                 }
             }
 
-            val colors = if (darkThemeState.value) {
-                darkColors(primary = PRIMARY_COLOR)
-            } else {
-                lightColors(primary = PRIMARY_COLOR)
-            }
-
-            DesktopMaterialTheme(colors = colors) {
+            DesktopMaterialTheme(colors = Colors.materialColors(light = !darkThemeState.value)) {
                 Surface {
                     CustomTeacherDialog(
                         visible = customTeacherDialogVisibleState.value,

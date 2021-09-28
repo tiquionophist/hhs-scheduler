@@ -7,7 +7,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
-import androidx.compose.material.LocalContentColor
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -19,6 +18,7 @@ import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import com.tiquionophist.ui.Colors
 import com.tiquionophist.ui.Dimens
 import kotlin.math.max
 import kotlin.math.roundToInt
@@ -153,7 +153,7 @@ fun <T> Table(
                         .padding(top = divider.paddingBefore, bottom = divider.paddingAfter)
                         .fillMaxWidth()
                         .height(divider.dividerSize)
-                        .background(divider.color ?: LocalContentColor.current)
+                        .background(divider.color ?: Colors.divider)
                 )
             }
 
@@ -163,7 +163,7 @@ fun <T> Table(
                         .padding(start = divider.paddingBefore, end = divider.paddingAfter)
                         .fillMaxHeight()
                         .width(divider.dividerSize)
-                        .background(divider.color ?: LocalContentColor.current)
+                        .background(divider.color ?: Colors.divider)
                 )
             }
 
