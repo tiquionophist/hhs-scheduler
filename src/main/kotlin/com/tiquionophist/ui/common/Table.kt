@@ -1,4 +1,4 @@
-package com.tiquionophist.ui
+package com.tiquionophist.ui.common
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.runtime.Composable
@@ -24,16 +24,14 @@ interface Column<T> {
         get() = ColumnWidth.MatchContent
 
     /**
-     * Specifies how items are placed horizontally within the bounding box for their cell.
+     * Specifies how the item at [rowIndex] is placed horizontally within the bounding box for its cell.
      */
-    val horizontalAlignment: Alignment.Horizontal
-        get() = Alignment.CenterHorizontally
+    fun horizontalAlignment(rowIndex: Int): Alignment.Horizontal = Alignment.CenterHorizontally
 
     /**
-     * Specifies how items are placed vertically within the bounding box for their cell.
+     * Specifies how the item at [rowIndex] is placed vertically within the bounding box for its cell.
      */
-    val verticalAlignment: Alignment.Vertical
-        get() = Alignment.CenterVertically
+    fun verticalAlignment(rowIndex: Int): Alignment.Vertical = Alignment.CenterVertically
 
     /**
      * The contents of the column, each of which is rendered by [content].
@@ -56,6 +54,26 @@ interface ColumnWithHeader<T : Any> : Column<T?> {
      * The non-header items in the column.
      */
     val items: List<T>
+
+    val headerHorizontalAlignment: Alignment.Horizontal
+        get() = Alignment.CenterHorizontally
+
+    val headerVerticalAlignment: Alignment.Vertical
+        get() = Alignment.CenterVertically
+
+    val itemHorizontalAlignment: Alignment.Horizontal
+        get() = Alignment.CenterHorizontally
+
+    val itemVerticalAlignment: Alignment.Vertical
+        get() = Alignment.CenterVertically
+
+    override fun verticalAlignment(rowIndex: Int): Alignment.Vertical {
+        return if (rowIndex == 0) headerVerticalAlignment else itemVerticalAlignment
+    }
+
+    override fun horizontalAlignment(rowIndex: Int): Alignment.Horizontal {
+        return if (rowIndex == 0) headerHorizontalAlignment else itemHorizontalAlignment
+    }
 
     override val rows: List<T?>
         get() = listOf(null).plus(items)
@@ -198,12 +216,15 @@ fun Table(columns: List<Column<*>>, modifier: Modifier = Modifier) {
                         val placeable = requireNotNull(placeables[colIndex][rowIndex]) { "null placeable" }
 
                         placeable.place(
-                            x + column.horizontalAlignment.align(
+                            x + column.horizontalAlignment(rowIndex = rowIndex).align(
                                 size = placeable.width,
                                 space = colWidth,
                                 layoutDirection = layoutDirection
                             ),
-                            y + column.verticalAlignment.align(size = placeable.height, space = rowHeight),
+                            y + column.verticalAlignment(rowIndex = rowIndex).align(
+                                size = placeable.height,
+                                space = rowHeight
+                            ),
                         )
                         x += colWidth
                     }

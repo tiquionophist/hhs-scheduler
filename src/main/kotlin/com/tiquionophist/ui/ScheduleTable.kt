@@ -9,6 +9,8 @@ import androidx.compose.ui.unit.dp
 import com.tiquionophist.core.Lesson
 import com.tiquionophist.core.Schedule
 import com.tiquionophist.core.ScheduleConfiguration
+import com.tiquionophist.ui.common.ColumnWithHeader
+import com.tiquionophist.ui.common.Table
 import com.tiquionophist.util.prettyName
 
 private class PeriodNamesColumn(periodsPerDay: Int) : ColumnWithHeader<Int> {

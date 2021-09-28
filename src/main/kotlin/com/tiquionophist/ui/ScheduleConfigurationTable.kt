@@ -19,7 +19,9 @@ import androidx.compose.ui.unit.dp
 import com.tiquionophist.core.ScheduleConfiguration
 import com.tiquionophist.core.Subject
 import com.tiquionophist.core.Teacher
+import com.tiquionophist.ui.common.ColumnWithHeader
 import com.tiquionophist.ui.common.NumberPicker
+import com.tiquionophist.ui.common.Table
 import com.tiquionophist.ui.common.loadImageBitmapOrNull
 import com.tiquionophist.util.prettyName
 import java.util.Locale
@@ -51,7 +53,7 @@ private object SubjectIconColumn : ColumnWithHeader<Subject> {
 private object SubjectNameColumn : ColumnWithHeader<Subject> {
     override val items = subjects
 
-    override val horizontalAlignment = Alignment.Start
+    override val itemHorizontalAlignment = Alignment.Start
 
     @Composable
     override fun itemContent(value: Subject) {
@@ -96,7 +98,7 @@ private class SubjectFrequencyPickerColumn(
 private class TotalTeacherAssignmentsColumn(val configuration: ScheduleConfiguration) : ColumnWithHeader<Subject> {
     override val items = subjects
 
-    override val horizontalAlignment = Alignment.Start
+    override val itemHorizontalAlignment = Alignment.Start
 
     @Composable
     override fun itemContent(value: Subject) {
@@ -121,7 +123,7 @@ private class SubjectTeacherAssignmentsColumn(
 ) : ColumnWithHeader<Subject> {
     override val items = subjects
 
-    override val verticalAlignment = Alignment.Bottom
+    override val headerVerticalAlignment = Alignment.Bottom
 
     @Composable
     override fun header() {
