@@ -1,12 +1,15 @@
 package com.tiquionophist.ui
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.Checkbox
 import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
@@ -161,6 +164,10 @@ private class SubjectTeacherAssignmentsColumn(
 ) : ColumnWithHeader<Subject> {
     override val headerVerticalAlignment = Alignment.Bottom
 
+    override fun fillCell(value: Subject?): Boolean {
+        return value != null
+    }
+
     @Composable
     override fun header() {
         val config = scheduleConfigurationState.value
@@ -193,19 +200,35 @@ private class SubjectTeacherAssignmentsColumn(
         if (value == Subject.EMPTY) return
 
         val config = scheduleConfigurationState.value
-        val currentAssignments = config.teacherAssignments.getOrDefault(teacher, emptySet())
-        // TODO improve hitbox
-        Checkbox(
-            checked = currentAssignments.contains(value),
-            onCheckedChange = { checked ->
-                val newAssignments = if (checked) currentAssignments.plus(value) else currentAssignments.minus(value)
-                scheduleConfigurationState.value = config.copy(
-                    teacherAssignments = config.teacherAssignments
-                        .plus(teacher to newAssignments)
-                        .filterValues { it.isNotEmpty() }
-                )
-            }
-        )
+        val currentAssignments = remember(config) {
+            config.teacherAssignments.getOrDefault(teacher, emptySet())
+        }
+        val contains = remember(currentAssignments) { currentAssignments.contains(value) }
+
+        Surface(
+            modifier = Modifier
+                .clickable {
+                    val newAssignments = if (contains) {
+                        currentAssignments.minus(value)
+                    } else {
+                        currentAssignments.plus(value)
+                    }
+
+                    scheduleConfigurationState.value = config.copy(
+                        teacherAssignments = config.teacherAssignments
+                            .plus(teacher to newAssignments)
+                            .filterValues { it.isNotEmpty() }
+                    )
+                }
+                .fillMaxSize(),
+            color = if (contains) {
+                MaterialTheme.colors.secondary.copy(alpha = Colors.DISABLED_ALPHA)
+            } else {
+                Color.Unspecified
+            },
+        ) {
+            Checkbox(checked = contains, onCheckedChange = null)
+        }
     }
 }
 
@@ -249,7 +272,6 @@ fun ScheduleConfigurationTable(
                 fixedColumns.size,
                 TableDivider(
                     paddingBefore = Dimens.SPACING_2,
-                    paddingAfter = Dimens.SPACING_1,
                     color = Colors.divider
                 )
             ),
@@ -257,7 +279,6 @@ fun ScheduleConfigurationTable(
             Pair(
                 fixedColumns.size + teachers.size,
                 TableDivider(
-                    paddingBefore = Dimens.SPACING_2,
                     paddingAfter = Dimens.SPACING_2,
                     color = Colors.divider
                 )
@@ -272,7 +293,6 @@ fun ScheduleConfigurationTable(
             // strong divider after header row
             fixedRows.size to TableDivider(
                 paddingBefore = Dimens.SPACING_2,
-                paddingAfter = Dimens.SPACING_1,
                 color = Colors.divider
             ),
         ).plus(

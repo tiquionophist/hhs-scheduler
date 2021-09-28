@@ -13,7 +13,7 @@ import androidx.compose.ui.graphics.Color
  * Color constants used throughout the application.
  */
 object Colors {
-    private const val DISABLED_ALPHA = 0.3f
+    const val DISABLED_ALPHA = 0.3f
 
     private val PRIMARY = Color(42, 149, 232)
 

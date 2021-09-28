@@ -45,6 +45,13 @@ interface Column<T> {
     fun verticalAlignment(rowIndex: Int): Alignment.Vertical = Alignment.CenterVertically
 
     /**
+     * Whether the cell with the given row [value] should fill its space, i.e. have its max width and height determined
+     * by the other values in the row/column. This means that there must be at least one value where this is false in
+     * each row and column (to determine the column/row size).
+     */
+    fun fillCell(value: T): Boolean = false
+
+    /**
      * Renders the content of the cell for the given row containing [value]. May be empty. Will automatically be aligned
      * within the cell by [horizontalAlignment] and [verticalAlignment].
      */
@@ -211,6 +218,9 @@ fun <T> Table(
             val placeables = Array(numCols) { arrayOfNulls<Placeable>(numRows) }
             val colWidths = arrayOfNulls<Int>(numCols)
 
+            // set of cells that should fill their rows/columns as (colIndex, rowIndex)
+            val filledCells = mutableSetOf<Pair<Int, Int>>()
+
             columns.forEachIndexed { colIndex, column ->
                 val width = column.width
                 if (width is ColumnWidth.Fixed) {
@@ -219,16 +229,24 @@ fun <T> Table(
 
                     val colMeasurables = measurablesByColumn[colIndex]
                     colMeasurables.forEachIndexed { rowIndex, measurable ->
-                        val placeable = measurable.measure(Constraints(maxWidth = fixedWidth))
-                        placeables[colIndex][rowIndex] = placeable
+                        if (column.fillCell(rows[rowIndex])) {
+                            filledCells.add(Pair(colIndex, rowIndex))
+                        } else {
+                            val placeable = measurable.measure(Constraints(maxWidth = fixedWidth))
+                            placeables[colIndex][rowIndex] = placeable
+                        }
                     }
                 } else if (width is ColumnWidth.MatchContent) {
                     var maxWidth = 0
                     val colMeasurables = measurablesByColumn[colIndex]
                     colMeasurables.forEachIndexed { rowIndex, measurable ->
-                        val placeable = measurable.measure(Constraints())
-                        placeables[colIndex][rowIndex] = placeable
-                        maxWidth = max(maxWidth, placeable.width)
+                        if (column.fillCell(rows[rowIndex])) {
+                            filledCells.add(Pair(colIndex, rowIndex))
+                        } else {
+                            val placeable = measurable.measure(Constraints())
+                            placeables[colIndex][rowIndex] = placeable
+                            maxWidth = max(maxWidth, placeable.width)
+                        }
                     }
 
                     colWidths[colIndex] = maxWidth
@@ -253,8 +271,12 @@ fun <T> Table(
 
                         val colMeasurables = measurablesByColumn[colIndex]
                         colMeasurables.forEachIndexed { rowIndex, measurable ->
-                            val placeable = measurable.measure(Constraints(maxWidth = colWidth))
-                            placeables[colIndex][rowIndex] = placeable
+                            if (column.fillCell(rows[rowIndex])) {
+                                filledCells.add(Pair(colIndex, rowIndex))
+                            } else {
+                                val placeable = measurable.measure(Constraints(maxWidth = colWidth))
+                                placeables[colIndex][rowIndex] = placeable
+                            }
                         }
 
                         colWidths[colIndex] = colWidth
@@ -265,9 +287,17 @@ fun <T> Table(
             // [rowIndex -> height of the row in px]
             val rowHeights = Array(numRows) { rowIndex ->
                 columns.indices.maxOf { colIndex ->
-                    val placeable = requireNotNull(placeables[colIndex][rowIndex]) { "null placeable" }
-                    placeable.height
+                    placeables[colIndex][rowIndex]?.height ?: 0
                 }
+            }
+
+            // place filled cells, which need the cell width and height to be pre-determined
+            filledCells.forEach { (colIndex, rowIndex) ->
+                val measurable = measurablesByColumn[colIndex][rowIndex]
+                val colWidth = requireNotNull(colWidths[colIndex])
+                val rowHeight = rowHeights[rowIndex]
+                val placeable = measurable.measure(Constraints(maxWidth = colWidth, maxHeight = rowHeight))
+                placeables[colIndex][rowIndex] = placeable
             }
 
             // we need to compute these width/heights before measuring the dividers themselves so that we know the total
