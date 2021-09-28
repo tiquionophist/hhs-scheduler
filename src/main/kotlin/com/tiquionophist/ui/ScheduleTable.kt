@@ -11,6 +11,7 @@ import com.tiquionophist.core.Schedule
 import com.tiquionophist.core.ScheduleConfiguration
 import com.tiquionophist.ui.common.ColumnWithHeader
 import com.tiquionophist.ui.common.Table
+import com.tiquionophist.ui.common.TableDivider
 import com.tiquionophist.util.prettyName
 
 private object PeriodNamesColumn : ColumnWithHeader<Int> {
@@ -70,6 +71,12 @@ fun ScheduleTable(configuration: ScheduleConfiguration, schedule: Schedule, clas
 
     Table(
         columns = columns,
-        rows = listOf(null).plus(List(configuration.periodsPerDay) { it })
+        rows = listOf(null).plus(List(configuration.periodsPerDay) { it }),
+        horizontalDividers = mapOf(
+            1 to TableDivider(),
+        ),
+        verticalDividers = mapOf(
+            1 to TableDivider(),
+        )
     )
 }

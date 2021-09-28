@@ -1,15 +1,23 @@
 package com.tiquionophist.ui.common
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.layout.Measurable
 import androidx.compose.ui.layout.Placeable
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.dp
 import kotlin.math.max
 import kotlin.math.roundToInt
 
@@ -102,10 +110,33 @@ sealed class ColumnWidth {
     data class Fill(val weight: Int = 1) : ColumnWidth()
 }
 
+/**
+ * Represents a horizontal or vertical divider between columns/rows in a [Table].
+ */
+data class TableDivider(
+    val paddingBefore: Dp = 0.dp,
+    val paddingAfter: Dp = 0.dp,
+    val dividerSize: Dp = 1.dp,
+    val dividerColor: Color = Color.Black, // TODO use color from theme
+) {
+    val totalSize = paddingBefore + paddingAfter + dividerSize
+}
+
+// verticalDividers: [colIndex -> divider BEFORE that column]
+// horizontalDivider: [rowIndex -> divider BEFORE that row]
 @Composable
-fun <T> Table(columns: List<Column<T>>, rows: List<T>, modifier: Modifier = Modifier) {
+fun <T> Table(
+    columns: List<Column<T>>,
+    rows: List<T>,
+    verticalDividers: Map<Int, TableDivider> = mapOf(),
+    horizontalDividers: Map<Int, TableDivider> = mapOf(),
+    modifier: Modifier = Modifier
+) {
     val numCols = columns.size
     val numRows = rows.size
+
+    val numHorizontalDividers = horizontalDividers.size
+    val numVerticalDividers = verticalDividers.size
 
     require(numCols > 0) { "Table() must have non-empty columns" }
     require(numRows > 0) { "Table() must have non-empty rows" }
@@ -114,6 +145,26 @@ fun <T> Table(columns: List<Column<T>>, rows: List<T>, modifier: Modifier = Modi
 
     Layout(
         content = {
+            horizontalDividers.forEach { (_, divider) ->
+                Box(
+                    modifier = Modifier
+                        .padding(top = divider.paddingBefore, bottom = divider.paddingAfter)
+                        .fillMaxWidth()
+                        .height(divider.dividerSize)
+                        .background(divider.dividerColor)
+                )
+            }
+
+            verticalDividers.forEach { (_, divider) ->
+                Box(
+                    modifier = Modifier
+                        .padding(start = divider.paddingBefore, end = divider.paddingAfter)
+                        .fillMaxHeight()
+                        .width(divider.dividerSize)
+                        .background(divider.dividerColor)
+                )
+            }
+
             columns.forEach { column ->
                 rows.forEach { item ->
                     Box { column.content(item) }
@@ -122,8 +173,28 @@ fun <T> Table(columns: List<Column<T>>, rows: List<T>, modifier: Modifier = Modi
         },
         modifier = modifier,
         measurePolicy = { measurables: List<Measurable>, constraints: Constraints ->
+            val horizontalDividerMeasurables = measurables.take(numHorizontalDividers)
+            val verticalDividerMeasurables = measurables.subList(
+                fromIndex = numHorizontalDividers,
+                toIndex = numHorizontalDividers + numVerticalDividers
+            )
+            val itemMeasurables = measurables.subList(
+                fromIndex = numHorizontalDividers + numVerticalDividers,
+                toIndex = measurables.size
+            )
+
+            // TODO optimize
+            val horizontalDividerMeasurablesByRow = horizontalDividers
+                .toList()
+                .mapIndexed { index, pair -> pair.first to horizontalDividerMeasurables[index] }
+                .toMap()
+            val verticalDividerMeasurablesByCol = verticalDividers
+                .toList()
+                .mapIndexed { index, pair -> pair.first to verticalDividerMeasurables[index] }
+                .toMap()
+
             // [colIndex -> [measurables in that column]]
-            val measurablesByColumn = measurables.chunked(numRows)
+            val measurablesByColumn = itemMeasurables.chunked(numRows)
 
             val placeables = Array(numCols) { arrayOfNulls<Placeable>(numRows) }
             val colWidths = arrayOfNulls<Int>(numCols)
@@ -182,16 +253,37 @@ fun <T> Table(columns: List<Column<T>>, rows: List<T>, modifier: Modifier = Modi
                 }
             }
 
-            val totalWidth = colWidths.sumOf { it!! }
-            val totalHeight = rowHeights.sum()
+            val verticalDividerWidths = verticalDividers.mapValues { it.value.totalSize.roundToPx() }
+            val horizontalDividerHeights = horizontalDividers.mapValues { it.value.totalSize.roundToPx() }
+
+            val totalWidth = colWidths.sumOf { it!! } + verticalDividerWidths.values.sum()
+            val totalHeight = rowHeights.sum() + horizontalDividerHeights.values.sum()
+
+            val horizontalDividerPlaceables = horizontalDividerMeasurablesByRow.mapValues { (_, measurable) ->
+                measurable.measure(Constraints(maxWidth = totalWidth, maxHeight = totalHeight))
+            }
+
+            val verticalDividerPlaceables = verticalDividerMeasurablesByCol.mapValues { (_, measurable) ->
+                measurable.measure(Constraints(maxWidth = totalWidth, maxHeight = totalHeight))
+            }
 
             layout(totalWidth, totalHeight) {
                 var y = 0
                 repeat(numRows) { rowIndex ->
+                    horizontalDividerPlaceables[rowIndex]?.place(x = 0, y = y)
+
+                    horizontalDividerHeights[rowIndex]?.let { y += it }
+
                     val rowHeight = rowHeights[rowIndex]
 
                     var x = 0
                     repeat(numCols) { colIndex ->
+                        if (rowIndex == 0) {
+                            verticalDividerPlaceables[colIndex]?.place(x = x, y = 0)
+                        }
+
+                        verticalDividerWidths[colIndex]?.let { x += it }
+
                         val column = columns[colIndex]
                         val colWidth = requireNotNull(colWidths[colIndex]) { "null col width" }
                         val placeable = requireNotNull(placeables[colIndex][rowIndex]) { "null placeable" }

@@ -22,6 +22,7 @@ import com.tiquionophist.core.Teacher
 import com.tiquionophist.ui.common.ColumnWithHeader
 import com.tiquionophist.ui.common.NumberPicker
 import com.tiquionophist.ui.common.Table
+import com.tiquionophist.ui.common.TableDivider
 import com.tiquionophist.ui.common.loadImageBitmapOrNull
 import com.tiquionophist.util.prettyName
 import java.util.Locale
@@ -204,6 +205,13 @@ fun ScheduleConfigurationTable(
         ).plus(
             TotalTeacherAssignmentsColumn(scheduleConfigurationState.value)
         ),
-        rows = listOf(null).plus(subjects)
+        rows = listOf(null).plus(subjects),
+        verticalDividers = mapOf(
+            3 to TableDivider(paddingBefore = 8.dp, paddingAfter = 4.dp),
+            3 + teachers.size to TableDivider(paddingBefore = 8.dp, paddingAfter = 8.dp),
+        ),
+        horizontalDividers = mapOf(
+            1 to TableDivider(paddingBefore = 8.dp, paddingAfter = 4.dp),
+        ),
     )
 }
