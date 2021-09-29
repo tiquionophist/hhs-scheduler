@@ -4,7 +4,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.input.key.Key
 import androidx.compose.ui.input.key.KeyShortcut
 import androidx.compose.ui.window.FrameWindowScope
@@ -22,7 +21,6 @@ private const val APPLICATION_VERSION = "1.0" // TODO integrate with gradle
 /**
  * The application menu bar.
  */
-@ExperimentalComposeUiApi
 @Composable
 fun FrameWindowScope.MenuBar(
     scheduleConfigurationState: MutableState<ScheduleConfiguration>,
