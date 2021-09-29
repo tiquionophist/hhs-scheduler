@@ -3,6 +3,7 @@ package com.tiquionophist.scheduler
 import com.tiquionophist.core.ScheduleConfiguration
 import com.tiquionophist.core.Subject
 import com.tiquionophist.core.Teacher
+import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.Assertions.assertNotNull
 import org.junit.jupiter.api.Test
 
@@ -23,7 +24,7 @@ internal class RandomizedSchedulerTest {
 
         val scheduler = RandomizedScheduler(attemptsPerRound = null, rounds = 1)
 
-        val schedule = scheduler.schedule(configuration)
+        val schedule = runBlocking { scheduler.schedule(configuration) }
 
         assertNotNull(schedule)
     }
