@@ -24,6 +24,7 @@ import com.tiquionophist.core.ScheduleConfiguration
 import com.tiquionophist.core.Subject
 import com.tiquionophist.core.Teacher
 import com.tiquionophist.ui.Colors.enabledIf
+import com.tiquionophist.ui.common.ColumnWidth
 import com.tiquionophist.ui.common.ColumnWithHeader
 import com.tiquionophist.ui.common.NumberPicker
 import com.tiquionophist.ui.common.Table
@@ -165,6 +166,10 @@ private class SubjectTeacherAssignmentsColumn(
 ) : ColumnWithHeader<Subject> {
     override val headerVerticalAlignment = Alignment.Bottom
 
+    override val width = ColumnWidth.Fill(
+        minWidth = Dimens.ScheduleConfigurationTable.TEACHER_IMAGE_WIDTH + Dimens.SPACING_2 * 2
+    )
+
     override fun fillCell(value: Subject?): Boolean {
         return value != null
     }
@@ -272,6 +277,7 @@ fun ScheduleConfigurationTable(
                 TotalTeacherAssignmentsColumn(scheduleConfigurationState.value)
             ),
         rows = fixedRows.plus(subjects),
+        fillMaxHeight = true,
         verticalDividers = mapOf(
             // strong divider after fixed columns
             Pair(

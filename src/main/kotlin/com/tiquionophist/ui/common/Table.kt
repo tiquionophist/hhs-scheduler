@@ -21,6 +21,7 @@ import androidx.compose.ui.layout.MeasureScope
 import androidx.compose.ui.layout.Placeable
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.unit.Constraints
+import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.tiquionophist.ui.Colors
@@ -148,6 +149,8 @@ data class TableDivider(
  * [verticalDividers] and [horizontalDividers] may also be added between columns and rows, respectively. They are
  * specified as a map from the index of the column/row BEFORE which the divider should be placed to the [TableDivider]
  * value.
+ *
+ * TODO min intrinsic width/height are always a bit below what they should be, so content is cut off when scrolling
  */
 @Composable
 fun <T> Table(
@@ -155,6 +158,7 @@ fun <T> Table(
     rows: List<T>,
     verticalDividers: Map<Int, TableDivider> = mapOf(),
     horizontalDividers: Map<Int, TableDivider> = mapOf(),
+    fillMaxHeight: Boolean = false,
     modifier: Modifier = Modifier
 ) {
     val numCols = columns.size
@@ -299,6 +303,24 @@ fun <T> Table(
                     }
                 }
 
+                // we need to compute these width/heights before measuring the dividers themselves so that we know the
+                // total width and height
+                val verticalDividerWidths = verticalDividers.mapValues { it.value.totalSize.roundToPx() }
+                val horizontalDividerHeights = horizontalDividers.mapValues { it.value.totalSize.roundToPx() }
+
+                if (fillMaxHeight) {
+                    val totalRowHeight = rowHeights.sum()
+                    val baseTotalHeight = totalRowHeight + horizontalDividerHeights.values.sum()
+                    val missing = constraints.maxHeight - baseTotalHeight
+                    if (missing > 0) {
+                        // TODO not pixel-perfect: might under/over round some pixels
+                        val ratio = (totalRowHeight + missing).toFloat() / totalRowHeight
+                        repeat(numRows) { rowIndex ->
+                            rowHeights[rowIndex] = (rowHeights[rowIndex] * ratio).roundToInt()
+                        }
+                    }
+                }
+
                 // place filled cells, which need the cell width and height to be pre-determined
                 filledCells.forEach { (colIndex, rowIndex) ->
                     val measurable = measurablesByColumn[colIndex][rowIndex]
@@ -307,11 +329,6 @@ fun <T> Table(
                     val placeable = measurable.measure(Constraints(maxWidth = colWidth, maxHeight = rowHeight))
                     placeables[colIndex][rowIndex] = placeable
                 }
-
-                // we need to compute these width/heights before measuring the dividers themselves so that we know the
-                // total width and height
-                val verticalDividerWidths = verticalDividers.mapValues { it.value.totalSize.roundToPx() }
-                val horizontalDividerHeights = horizontalDividers.mapValues { it.value.totalSize.roundToPx() }
 
                 val totalWidth = colWidths.sumOf { requireNotNull(it) { "null col width" } } +
                         verticalDividerWidths.values.sum()
@@ -372,27 +389,89 @@ fun <T> Table(
             ): Int {
                 var totalWidth = 0
 
+                val measurablesByColumn = if (columns.any { it.width is ColumnWidth.MatchContent }) {
+                    val itemMeasurables = measurables.subList(
+                        fromIndex = numHorizontalDividers + numVerticalDividers,
+                        toIndex = measurables.size
+                    )
+                    itemMeasurables.chunked(numRows)
+                } else {
+                    null
+                }
+
                 columns.forEachIndexed { colIndex, column ->
-                    totalWidth += when (val width = column.width) {
-                        is ColumnWidth.Fixed -> width.width.roundToPx()
-                        is ColumnWidth.MatchContent -> {
-                            val itemMeasurables = measurables.subList(
-                                fromIndex = numHorizontalDividers + numVerticalDividers,
-                                toIndex = measurables.size
-                            )
-
-                            val measurablesByColumn = itemMeasurables.chunked(numRows)
-                            val columnMeasurables = measurablesByColumn[colIndex]
-
-                            columnMeasurables.maxOf { it.maxIntrinsicWidth(height) }
-                        }
-                        is ColumnWidth.Fill -> width.minWidth?.roundToPx() ?: 0
-                    }
+                    totalWidth += columnWidth(
+                        column = column,
+                        rows = rows,
+                        columnMeasurables = if (column.width is ColumnWidth.MatchContent) {
+                            measurablesByColumn!![colIndex]
+                        } else {
+                            null
+                        },
+                    )
                 }
 
                 totalWidth += verticalDividers.values.sumOf { it.totalSize.roundToPx() }
 
                 return totalWidth
+            }
+
+            override fun IntrinsicMeasureScope.minIntrinsicHeight(
+                measurables: List<IntrinsicMeasurable>,
+                width: Int
+            ): Int {
+                var totalHeight = 0
+
+                val itemMeasurables = measurables.subList(
+                    fromIndex = numHorizontalDividers + numVerticalDividers,
+                    toIndex = measurables.size
+                )
+                val measurablesByColumn = itemMeasurables.chunked(numRows)
+
+                val columnWidths = Array(numCols) { colIndex ->
+                    columnWidth(columns[colIndex], rows, measurablesByColumn[colIndex])
+                }
+
+                repeat(numRows) { rowIndex ->
+                    var maxRowHeight = 0
+                    repeat(numCols) { colIndex ->
+                        if (!columns[colIndex].fillCell(rows[rowIndex])) {
+                            maxRowHeight = max(
+                                maxRowHeight,
+                                measurablesByColumn[colIndex][rowIndex]
+                                    .minIntrinsicHeight(width = columnWidths[colIndex])
+                            )
+                        }
+                    }
+                    totalHeight += maxRowHeight
+                }
+
+                totalHeight += horizontalDividers.values.sumOf { it.totalSize.roundToPx() }
+
+                return totalHeight
+            }
+
+            private fun <T> Density.columnWidth(
+                column: Column<T>,
+                rows: List<T>,
+                columnMeasurables: List<IntrinsicMeasurable>?,
+            ): Int {
+                return when (val width = column.width) {
+                    is ColumnWidth.Fixed -> width.width.roundToPx()
+                    is ColumnWidth.MatchContent -> {
+                        var maxWidth = 0
+                        repeat(rows.size) { rowIndex ->
+                            if (!column.fillCell(rows[rowIndex])) {
+                                maxWidth = max(
+                                    columnMeasurables!![rowIndex].maxIntrinsicWidth(Constraints.Infinity),
+                                    maxWidth
+                                )
+                            }
+                        }
+                        maxWidth
+                    }
+                    is ColumnWidth.Fill -> width.minWidth?.roundToPx() ?: 0
+                }
             }
         }
     )

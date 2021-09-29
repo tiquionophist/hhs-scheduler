@@ -2,11 +2,9 @@ package com.tiquionophist.ui
 
 import androidx.compose.foundation.HorizontalScrollbar
 import androidx.compose.foundation.VerticalScrollbar
-import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.rememberScrollbarAdapter
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.runtime.Composable
@@ -26,6 +24,8 @@ import com.tiquionophist.ui.common.ContentWithPane
 import com.tiquionophist.ui.common.Notification
 import com.tiquionophist.ui.common.NotificationContainer
 import com.tiquionophist.ui.common.PaneDirection
+import com.tiquionophist.ui.common.fillMaxHeightVerticalScroll
+import com.tiquionophist.ui.common.fillMaxWidthHorizontalScroll
 import java.io.File
 
 // TODO investigate text field focus (cursor remains after unfocused)
@@ -106,15 +106,14 @@ private fun MainContent(
                 direction = PaneDirection.RIGHT,
                 content = {
                     NotificationContainer(notificationState = notificationState) {
-                        // TODO find a way to have the table fill and still allow scrollbars
                         Box(contentAlignment = Alignment.Center) {
-                            val verticalScrollState = rememberScrollState(0)
-                            val horizontalScrollState = rememberScrollState(0)
+                            val verticalScrollState = rememberScrollState()
+                            val horizontalScrollState = rememberScrollState()
 
                             Box(
                                 modifier = Modifier
-                                    .verticalScroll(verticalScrollState)
-                                    .horizontalScroll(horizontalScrollState)
+                                    .fillMaxHeightVerticalScroll(verticalScrollState)
+                                    .fillMaxWidthHorizontalScroll(horizontalScrollState)
                             ) {
                                 ScheduleConfigurationTable(
                                     scheduleConfigurationState = scheduleConfigurationState,
