@@ -1,7 +1,8 @@
 package com.tiquionophist.ui
 
-import androidx.compose.foundation.BoxWithTooltip
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.TooltipArea
+import androidx.compose.foundation.TooltipPlacement
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -24,11 +25,12 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.unit.DpOffset
+import androidx.compose.ui.unit.dp
 import com.tiquionophist.core.ScheduleConfiguration
 import com.tiquionophist.ui.common.ErrorDialog
 import com.tiquionophist.ui.common.IconAndTextButton
@@ -59,7 +61,6 @@ private const val EXCEPTION_MESSAGE =
  *
  * If a schedule is successfully found, [onComputedSchedule] will be invoked with the resulting [ComputedSchedule].
  */
-@ExperimentalComposeUiApi
 @Composable
 fun RunScheduleButton(
     configuration: ScheduleConfiguration,
@@ -103,7 +104,7 @@ fun RunScheduleButton(
         val validationErrors = remember(configuration) { configuration.validationErrors() }
 
         if (validationErrors.isNotEmpty()) {
-            BoxWithTooltip(
+            TooltipArea(
                 tooltip = {
                     Surface(modifier = Modifier.shadow(Dimens.SHADOW_ELEVATION)) {
                         Column(
@@ -116,6 +117,9 @@ fun RunScheduleButton(
                         }
                     }
                 },
+                tooltipPlacement = TooltipPlacement.CursorPoint(
+                    offset = DpOffset(0.dp, Dimens.SPACING_3)
+                )
             ) {
                 Icon(
                     painter = painterResource("icons/error.svg"),

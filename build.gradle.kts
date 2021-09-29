@@ -1,11 +1,11 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
-    kotlin("jvm") version "1.5.30"
+    kotlin("jvm") version "1.5.31"
     kotlin("plugin.serialization") version "1.5.30"
     jacoco
     id("io.gitlab.arturbosch.detekt") version "1.18.1"
-    id("org.jetbrains.compose") version "1.0.0-alpha4-build344"
+    id("org.jetbrains.compose") version "1.0.0-alpha4-build366"
 }
 
 repositories {
@@ -32,6 +32,8 @@ tasks.withType<KotlinCompile>().configureEach {
         freeCompilerArgs = listOf(
             "-Xopt-in=kotlin.time.ExperimentalTime",
             "-Xopt-in=kotlinx.serialization.ExperimentalSerializationApi",
+            "-Xopt-in=androidx.compose.foundation.ExperimentalFoundationApi",
+            "-Xopt-in=androidx.compose.ui.ExperimentalComposeUiApi",
         )
     }
 }

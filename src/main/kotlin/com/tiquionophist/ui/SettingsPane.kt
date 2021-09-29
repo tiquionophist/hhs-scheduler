@@ -14,7 +14,6 @@ import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.res.painterResource
@@ -27,7 +26,6 @@ import com.tiquionophist.ui.common.topBorder
 /**
  * Row of scheduling-wide settings, placed at the bottom of the window.
  */
-@ExperimentalComposeUiApi
 @Composable
 fun SettingsPane(
     lightModeState: MutableState<Boolean>,

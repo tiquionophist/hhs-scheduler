@@ -10,7 +10,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.key.Key
 import androidx.compose.ui.input.key.KeyEventType
@@ -30,7 +29,6 @@ import com.tiquionophist.ui.common.withInitialFocus
  * When the dialog is closed, [onClose] is invoked, with a non-null [Teacher] if it was submitted successfully, or null
  * if it was cancelled.
  */
-@ExperimentalComposeUiApi
 @Composable
 fun CustomTeacherDialog(onClose: (Teacher?) -> Unit) {
     val firstNameState = remember { mutableStateOf("") }

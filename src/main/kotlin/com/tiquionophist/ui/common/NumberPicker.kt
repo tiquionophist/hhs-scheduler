@@ -97,7 +97,7 @@ fun NumberPicker(
                 decorationBox = { innerTextField ->
                     Box(
                         contentAlignment = Alignment.CenterStart,
-                        modifier = Modifier.padding(horizontal = Dimens.SPACING_2)
+                        modifier = Modifier.padding(Dimens.SPACING_2),
                     ) {
                         innerTextField()
                     }
@@ -126,15 +126,17 @@ fun NumberPicker(
             val rightButtonMeasurable = measurables[2]
             val textFieldMeasurable = measurables[1]
 
-            val leftButtonPlaceable = leftButtonMeasurable.measure(constraints)
-            val rightButtonPlaceable = rightButtonMeasurable.measure(constraints)
-
-            val height = max(leftButtonPlaceable.height, rightButtonPlaceable.height)
-
-            // text field's height matches the maximum of the buttons (which should be the same)
-            val textFieldPlaceable = textFieldMeasurable.measure(
-                constraints.copy(minHeight = height, maxHeight = height)
+            val height = minOf(
+                leftButtonMeasurable.minIntrinsicHeight(constraints.maxWidth),
+                rightButtonMeasurable.minIntrinsicHeight(constraints.maxWidth),
+                textFieldMeasurable.minIntrinsicHeight(constraints.maxWidth),
             )
+
+            val constraintsWithHeight = constraints.copy(minHeight = height, maxHeight = height)
+
+            val leftButtonPlaceable = leftButtonMeasurable.measure(constraintsWithHeight)
+            val rightButtonPlaceable = rightButtonMeasurable.measure(constraintsWithHeight)
+            val textFieldPlaceable = textFieldMeasurable.measure(constraintsWithHeight)
 
             val totalWidth = leftButtonPlaceable.width + rightButtonPlaceable.width + textFieldPlaceable.width
 

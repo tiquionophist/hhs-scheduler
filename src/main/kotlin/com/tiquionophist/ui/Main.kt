@@ -1,7 +1,5 @@
 package com.tiquionophist.ui
 
-import androidx.compose.desktop.DesktopMaterialTheme
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.HorizontalScrollbar
 import androidx.compose.foundation.VerticalScrollbar
 import androidx.compose.foundation.horizontalScroll
@@ -9,13 +7,13 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.rememberScrollbarAdapter
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.window.Window
@@ -31,8 +29,6 @@ import com.tiquionophist.ui.common.PaneDirection
 import java.io.File
 
 // TODO investigate text field focus (cursor remains after unfocused)
-@ExperimentalComposeUiApi
-@ExperimentalFoundationApi
 fun main() {
     // load from config.json by default on startup, if it exists, for convenience
     val initialConfiguration = ScheduleConfiguration.loadOrNull(File("config.json")) ?: ScheduleConfiguration.EMPTY
@@ -59,7 +55,7 @@ fun main() {
                 }
             )
 
-            DesktopMaterialTheme(colors = Colors.materialColors(light = lightModeState.value)) {
+            MaterialTheme(colors = Colors.materialColors(light = lightModeState.value)) {
                 Dimens.apply {
                     Surface {
                         if (customTeacherDialogVisibleState.value) {
@@ -98,7 +94,6 @@ fun main() {
     }
 }
 
-@ExperimentalComposeUiApi
 @Composable
 private fun MainContent(
     lightModeState: MutableState<Boolean>,
