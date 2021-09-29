@@ -1,4 +1,7 @@
+
+import org.jetbrains.compose.desktop.application.dsl.TargetFormat
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+import java.util.Properties
 
 plugins {
     kotlin("jvm") version "1.5.31"
@@ -53,8 +56,18 @@ detekt {
     buildUponDefaultConfig = true
 }
 
+val resourcesDir = sourceSets["main"].resources.sourceDirectories.first()
+val appProperties = resourcesDir.resolve("app.properties")
+    .bufferedReader()
+    .use { Properties().apply { load(it) } }
+
 compose.desktop {
     application {
         mainClass = "com.tiquionophist.ui.MainKt"
+
+        nativeDistributions {
+            packageVersion = appProperties.getProperty("version")
+            targetFormats(TargetFormat.Exe)
+        }
     }
 }
