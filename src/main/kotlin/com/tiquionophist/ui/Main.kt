@@ -17,6 +17,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.WindowPlacement
 import androidx.compose.ui.window.application
@@ -32,7 +33,6 @@ import java.io.File
 // TODO improve error states and help messages
 // TODO show weekly stat effects for each teacher
 // TODO investigate text field focus (cursor remains after unfocused)
-// TODO add window icon
 @ExperimentalComposeUiApi
 @ExperimentalFoundationApi
 fun main() {
@@ -43,6 +43,7 @@ fun main() {
         Window(
             onCloseRequest = ::exitApplication,
             title = "HHS+ Scheduler",
+            icon = painterResource("app_icon.png"),
             state = rememberWindowState(placement = WindowPlacement.Maximized),
         ) {
             val lightModeState = remember { mutableStateOf(true) }
