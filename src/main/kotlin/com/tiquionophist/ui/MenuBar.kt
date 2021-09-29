@@ -14,9 +14,15 @@ import com.tiquionophist.ui.common.FilePicker
 import com.tiquionophist.ui.common.Notification
 import java.awt.Desktop
 import java.net.URI
+import java.util.Properties
 
-private const val GITHUB_URL = "https://github.com/tiquionophist/hhs-scheduler"
-private const val APPLICATION_VERSION = "1.0" // TODO integrate with gradle
+private val appProperties: Properties? by lazy {
+    ApplicationPreferences::class.java.classLoader.getResourceAsStream("app.properties")
+        ?.use { Properties().apply { load(it) } }
+}
+
+private val githubUrl: String? by lazy { appProperties?.getProperty("github") }
+private val appVersion: String? by lazy { appProperties?.getProperty("version") }
 
 /**
  * The application menu bar.
@@ -86,16 +92,18 @@ fun FrameWindowScope.MenuBar(
 
         Menu("About") {
             Item(
-                text = "HHS+ Scheduler version $APPLICATION_VERSION",
+                text = "HHS+ Scheduler version ${appVersion ?: "unknown"}",
                 enabled = false,
                 onClick = {},
             )
 
             Item(
                 text = "View project on GitHub",
-                enabled = Desktop.isDesktopSupported() && Desktop.getDesktop().isSupported(Desktop.Action.BROWSE),
+                enabled = Desktop.isDesktopSupported() &&
+                        Desktop.getDesktop().isSupported(Desktop.Action.BROWSE) &&
+                        githubUrl != null,
                 onClick = {
-                    Desktop.getDesktop().browse(URI(GITHUB_URL))
+                    githubUrl?.let { Desktop.getDesktop().browse(URI(it)) }
                 }
             )
         }
