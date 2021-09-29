@@ -55,7 +55,6 @@ fun ContentWithPane(
             )
 
             layout(width = constraints.maxWidth, height = constraints.maxHeight) {
-                // TODO alignment
                 when (direction) {
                     PaneDirection.TOP -> {
                         panePlaceable.place(x = 0, y = 0)
