@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.material.Button
+import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -32,30 +33,32 @@ fun ConfirmationDialog(
         title = windowTitle ?: "Confirmation",
         onCloseRequest = onDecline,
     ) {
-        Column(
-            modifier = Modifier
-                .padding(Dimens.SPACING_2)
-                .widthIn(min = Dimens.Dialog.MIN_WIDTH, max = Dimens.Dialog.MAX_WIDTH),
-            verticalArrangement = Arrangement.spacedBy(Dimens.SPACING_2),
-        ) {
-            title?.let { Text(title, fontSize = Dimens.Dialog.TITLE_FONT_SIZE) }
-
-            message?.let { Text(message) }
-
-            Row(
-                modifier = Modifier.align(Alignment.End),
-                horizontalArrangement = Arrangement.spacedBy(Dimens.SPACING_2)
+        Surface {
+            Column(
+                modifier = Modifier
+                    .padding(Dimens.SPACING_2)
+                    .widthIn(min = Dimens.Dialog.MIN_WIDTH, max = Dimens.Dialog.MAX_WIDTH),
+                verticalArrangement = Arrangement.spacedBy(Dimens.SPACING_2),
             ) {
-                Button(
-                    onClick = onDecline
-                ) {
-                    Text(cancelText)
-                }
+                title?.let { Text(title, fontSize = Dimens.Dialog.TITLE_FONT_SIZE) }
 
-                Button(
-                    onClick = onAccept,
+                message?.let { Text(message) }
+
+                Row(
+                    modifier = Modifier.align(Alignment.End),
+                    horizontalArrangement = Arrangement.spacedBy(Dimens.SPACING_2)
                 ) {
-                    Text(acceptText)
+                    Button(
+                        onClick = onDecline
+                    ) {
+                        Text(cancelText)
+                    }
+
+                    Button(
+                        onClick = onAccept,
+                    ) {
+                        Text(acceptText)
+                    }
                 }
             }
         }

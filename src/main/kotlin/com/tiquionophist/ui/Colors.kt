@@ -23,14 +23,14 @@ object Colors {
      */
     val divider: Color
         @Composable
-        get() = LocalContentColor.current.copy(alpha = 0.65f)
+        get() = LocalContentColor.current.copy(alpha = 0.4f)
 
     /**
      * The color of weak dividers between elements.
      */
     val weakDivider: Color
         @Composable
-        get() = divider.copy(alpha = 0.25f)
+        get() = divider.copy(alpha = 0.2f)
 
     /**
      * Applies an alpha to this element if [enabled] is false.
@@ -41,7 +41,7 @@ object Colors {
      * The set of material [Colors] to be applied application-wide; based on either the light theme if [light] is true
      * or the dark theme otherwise.
      */
-    fun materialColors(light: Boolean = true): Colors {
+    fun materialColors(light: Boolean): Colors {
         return if (light) {
             lightColors(primary = PRIMARY)
         } else {

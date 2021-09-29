@@ -45,6 +45,7 @@ fun main() {
             title = "HHS+ Scheduler",
             state = rememberWindowState(placement = WindowPlacement.Maximized),
         ) {
+            val lightModeState = remember { mutableStateOf(true) }
             val scheduleConfigurationState = remember { mutableStateOf(initialConfiguration) }
             val customTeachersState = remember { mutableStateOf(listOf<Teacher>()) }
             val customTeacherDialogVisibleState = remember { mutableStateOf(false) }
@@ -57,8 +58,7 @@ fun main() {
                 }
             )
 
-            // TODO add toggle for light/dark theme
-            DesktopMaterialTheme(colors = Colors.materialColors()) {
+            DesktopMaterialTheme(colors = Colors.materialColors(light = lightModeState.value)) {
                 Surface {
                     if (customTeacherDialogVisibleState.value) {
                         CustomTeacherDialog { teacher ->
@@ -78,16 +78,17 @@ fun main() {
                             }
                         )
                     }
-                }
 
-                MainContent(
-                    scheduleConfigurationState = scheduleConfigurationState,
-                    customTeachers = customTeachersState.value,
-                    onComputedSchedule = { computedSchedule ->
-                        computedSchedulesState.value = computedSchedulesState.value
-                            .plus(computedSchedule)
-                    }
-                )
+                    MainContent(
+                        lightModeState = lightModeState,
+                        scheduleConfigurationState = scheduleConfigurationState,
+                        customTeachers = customTeachersState.value,
+                        onComputedSchedule = { computedSchedule ->
+                            computedSchedulesState.value = computedSchedulesState.value
+                                .plus(computedSchedule)
+                        }
+                    )
+                }
             }
         }
     }
@@ -96,6 +97,7 @@ fun main() {
 @ExperimentalComposeUiApi
 @Composable
 private fun MainContent(
+    lightModeState: MutableState<Boolean>,
     scheduleConfigurationState: MutableState<ScheduleConfiguration>,
     customTeachers: List<Teacher>,
     onComputedSchedule: (ComputedSchedule) -> Unit,
@@ -140,6 +142,7 @@ private fun MainContent(
         },
         pane = {
             SettingsPane(
+                lightModeState = lightModeState,
                 scheduleConfigurationState = scheduleConfigurationState,
                 onComputedSchedule = onComputedSchedule
             )

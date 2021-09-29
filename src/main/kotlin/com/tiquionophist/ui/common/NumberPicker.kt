@@ -1,25 +1,29 @@
 package com.tiquionophist.ui.common
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.shape.AbsoluteRoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material.Button
+import androidx.compose.material.LocalContentAlpha
 import androidx.compose.material.LocalContentColor
 import androidx.compose.material.LocalTextStyle
 import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.layout.Measurable
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Dp
@@ -40,7 +44,7 @@ fun NumberPicker(
     min: Int? = null,
     max: Int? = null,
     cornerRounding: Dp = Dimens.CORNER_ROUNDING,
-    buttonWidth: Dp = Dimens.NumberPicker.BUTTON_WIDTH,
+    buttonIconSize: Dp = Dimens.NumberPicker.BUTTON_ICON_SIZE,
     textFieldWidth: Dp = Dimens.NumberPicker.TEXT_FIELD_WIDTH,
 ) {
     fun setValue(newValue: Int) {
@@ -58,13 +62,19 @@ fun NumberPicker(
         modifier = modifier,
         content = {
             Button(
-                modifier = Modifier.widthIn(max = buttonWidth),
+                modifier = Modifier.widthIn(max = buttonIconSize + Dimens.SPACING_2 * 2),
                 enabled = min?.let { value > it } != false,
                 onClick = { setValue(value - 1) },
                 shape = AbsoluteRoundedCornerShape(topLeft = cornerRounding, bottomLeft = cornerRounding),
                 contentPadding = PaddingValues(0.dp),
             ) {
-                Text("-")
+                Image(
+                    modifier = Modifier.size(buttonIconSize),
+                    painter = painterResource("icons/minus.svg"),
+                    contentDescription = "Minus",
+                    colorFilter = ColorFilter.tint(LocalContentColor.current),
+                    alpha = LocalContentAlpha.current,
+                )
             }
 
             BasicTextField(
@@ -90,13 +100,19 @@ fun NumberPicker(
             )
 
             Button(
-                modifier = Modifier.widthIn(max = buttonWidth),
+                modifier = Modifier.widthIn(max = buttonIconSize + Dimens.SPACING_2 * 2),
                 enabled = max?.let { value < it } != false,
                 onClick = { setValue(value + 1) },
                 shape = AbsoluteRoundedCornerShape(topRight = cornerRounding, bottomRight = cornerRounding),
                 contentPadding = PaddingValues(0.dp),
             ) {
-                Text("+")
+                Image(
+                    modifier = Modifier.size(buttonIconSize),
+                    painter = painterResource("icons/plus.svg"),
+                    contentDescription = "Plus",
+                    colorFilter = ColorFilter.tint(LocalContentColor.current),
+                    alpha = LocalContentAlpha.current,
+                )
             }
         },
         measurePolicy = { measurables: List<Measurable>, constraints: Constraints ->

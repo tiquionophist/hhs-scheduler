@@ -5,11 +5,10 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.Button
+import androidx.compose.material.IconButton
+import androidx.compose.material.LocalContentAlpha
 import androidx.compose.material.LocalContentColor
 import androidx.compose.material.Text
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Clear
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
@@ -18,8 +17,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.res.painterResource
 import com.tiquionophist.core.ScheduleConfiguration
 import com.tiquionophist.ui.common.ConfirmationDialog
+import com.tiquionophist.ui.common.IconAndTextButton
 import com.tiquionophist.ui.common.NumberPicker
 import com.tiquionophist.ui.common.topBorder
 
@@ -29,6 +30,7 @@ import com.tiquionophist.ui.common.topBorder
 @ExperimentalComposeUiApi
 @Composable
 fun SettingsPane(
+    lightModeState: MutableState<Boolean>,
     scheduleConfigurationState: MutableState<ScheduleConfiguration>,
     onComputedSchedule: (ComputedSchedule) -> Unit,
 ) {
@@ -41,6 +43,16 @@ fun SettingsPane(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(Dimens.SPACING_3)
         ) {
+            IconButton(onClick = { lightModeState.value = !lightModeState.value }) {
+                val filename = if (lightModeState.value) "light_mode" else "dark_mode"
+                Image(
+                    painter = painterResource("icons/$filename.svg"),
+                    contentDescription = "Light/dark mode",
+                    colorFilter = ColorFilter.tint(LocalContentColor.current),
+                    alpha = LocalContentAlpha.current,
+                )
+            }
+
             val confirmDialogVisible = remember { mutableStateOf(false) }
             if (confirmDialogVisible.value) {
                 ConfirmationDialog(
@@ -57,15 +69,11 @@ fun SettingsPane(
                 )
             }
 
-            Button(onClick = { confirmDialogVisible.value = true }) {
-                Image(
-                    imageVector = Icons.Default.Clear,
-                    contentDescription = "Reset",
-                    colorFilter = ColorFilter.tint(LocalContentColor.current)
-                )
-
-                Text("Clear schedule")
-            }
+            IconAndTextButton(
+                text = "Clear schedule",
+                iconFilename = "delete",
+                onClick = { confirmDialogVisible.value = true }
+            )
 
             Row(
                 horizontalArrangement = Arrangement.spacedBy(Dimens.SPACING_1),

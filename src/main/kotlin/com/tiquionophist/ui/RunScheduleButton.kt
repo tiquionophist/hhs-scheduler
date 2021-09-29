@@ -12,14 +12,11 @@ import androidx.compose.material.Button
 import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.Icon
+import androidx.compose.material.LocalContentAlpha
 import androidx.compose.material.LocalContentColor
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Close
-import androidx.compose.material.icons.filled.PlayArrow
-import androidx.compose.material.icons.filled.Warning
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -29,9 +26,11 @@ import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.res.painterResource
 import com.tiquionophist.core.ScheduleConfiguration
 import com.tiquionophist.scheduler.RandomizedScheduler
 import com.tiquionophist.ui.common.ErrorDialog
+import com.tiquionophist.ui.common.IconAndTextButton
 import com.tiquionophist.ui.common.LiveDurationState
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -97,8 +96,8 @@ fun RunScheduleButton(
                 },
             ) {
                 Icon(
-                    imageVector = Icons.Default.Warning,
-                    contentDescription = "Warning",
+                    painter = painterResource("icons/error.svg"),
+                    contentDescription = "Error",
                     tint = MaterialTheme.colors.error,
                 )
             }
@@ -108,23 +107,15 @@ fun RunScheduleButton(
         val loading = jobState.value != null
 
         if (loading) {
-            Button(
+            IconAndTextButton(
+                text = "Cancel",
+                iconFilename = "stop",
                 colors = ButtonDefaults.buttonColors(backgroundColor = MaterialTheme.colors.error),
                 onClick = {
                     jobState.value?.cancel()
                     jobState.value = null
                 }
-            ) {
-                Image(
-                    imageVector = Icons.Default.Close,
-                    contentDescription = "Stop",
-                    colorFilter = ColorFilter.tint(LocalContentColor.current)
-                )
-
-                Spacer(Modifier.width(Dimens.SPACING_2))
-
-                Text("Cancel")
-            }
+            )
         }
 
         val coroutineScope = rememberCoroutineScope { Dispatchers.Default }
@@ -187,9 +178,10 @@ fun RunScheduleButton(
                     Text("Running for %.1fs".format(seconds))
                 } else {
                     Image(
-                        imageVector = Icons.Default.PlayArrow,
-                        contentDescription = "Run",
-                        colorFilter = ColorFilter.tint(LocalContentColor.current)
+                        painter = painterResource("icons/play.svg"),
+                        contentDescription = null,
+                        colorFilter = ColorFilter.tint(LocalContentColor.current),
+                        alpha = LocalContentAlpha.current,
                     )
 
                     Spacer(Modifier.width(Dimens.SPACING_2))
