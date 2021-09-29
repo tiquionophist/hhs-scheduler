@@ -13,7 +13,7 @@ internal class ScheduleConfigurationTest {
         file.deleteOnExit()
 
         config.save(file)
-        val loaded = ScheduleConfiguration.load(file)
+        val loaded = ScheduleConfiguration.loadOrNull(file)
 
         assertEquals(config, loaded)
     }

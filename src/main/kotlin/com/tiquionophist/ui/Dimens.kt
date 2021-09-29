@@ -31,6 +31,8 @@ object Dimens {
      */
     val PROGRESS_INDICATOR_STROKE_WIDTH = 2.dp
 
+    val NOTIFICATION_MARGIN = 35.dp
+
     object NumberPicker {
         val BUTTON_ICON_SIZE = 18.dp
         val TEXT_FIELD_WIDTH = 50.dp

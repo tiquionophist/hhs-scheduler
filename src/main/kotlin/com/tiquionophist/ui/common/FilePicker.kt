@@ -59,7 +59,7 @@ object FilePicker {
 
         val result = fc.showOpenDialog(null)
         return if (result == JFileChooser.APPROVE_OPTION) {
-            fc.selectedFile
+            fc.selectedFile.takeIf { it.exists() }
         } else {
             null
         }

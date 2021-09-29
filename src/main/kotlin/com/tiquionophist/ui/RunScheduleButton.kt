@@ -3,6 +3,7 @@ package com.tiquionophist.ui
 import androidx.compose.foundation.BoxWithTooltip
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.padding
@@ -80,18 +81,20 @@ fun RunScheduleButton(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(Dimens.SPACING_3)
     ) {
-        val validationError = remember(configuration) {
-            runCatching { configuration.verify() }.exceptionOrNull()?.message
-        }
+        val validationErrors = remember(configuration) { configuration.validationErrors() }
 
-        if (validationError != null) {
+        if (validationErrors.isNotEmpty()) {
             BoxWithTooltip(
                 tooltip = {
                     Surface(modifier = Modifier.shadow(Dimens.SHADOW_ELEVATION)) {
-                        Text(
-                            text = validationError,
+                        Column(
                             modifier = Modifier.padding(Dimens.SPACING_2),
-                        )
+                            verticalArrangement = Arrangement.spacedBy(Dimens.SPACING_2),
+                        ) {
+                            validationErrors.forEach { error ->
+                                Text(error)
+                            }
+                        }
                     }
                 },
             ) {
@@ -120,7 +123,7 @@ fun RunScheduleButton(
 
         val coroutineScope = rememberCoroutineScope { Dispatchers.Default }
         Button(
-            enabled = validationError == null && !loading,
+            enabled = validationErrors.isEmpty() && !loading,
             onClick = {
                 jobState.value = coroutineScope.launch {
                     val scheduler = RandomizedScheduler(

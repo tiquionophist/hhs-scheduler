@@ -25,17 +25,18 @@ import androidx.compose.ui.window.rememberWindowState
 import com.tiquionophist.core.ScheduleConfiguration
 import com.tiquionophist.core.Teacher
 import com.tiquionophist.ui.common.ContentWithPane
+import com.tiquionophist.ui.common.Notification
+import com.tiquionophist.ui.common.NotificationContainer
 import com.tiquionophist.ui.common.PaneDirection
 import java.io.File
 
 // TODO add scheduler option
-// TODO improve error states and help messages
 // TODO investigate text field focus (cursor remains after unfocused)
 @ExperimentalComposeUiApi
 @ExperimentalFoundationApi
 fun main() {
     // load from config.json by default on startup, if it exists, for convenience
-    val initialConfiguration = ScheduleConfiguration.load(File("config.json")) ?: ScheduleConfiguration.EMPTY
+    val initialConfiguration = ScheduleConfiguration.loadOrNull(File("config.json")) ?: ScheduleConfiguration.EMPTY
 
     application {
         Window(
@@ -49,9 +50,11 @@ fun main() {
             val customTeachersState = remember { mutableStateOf(listOf<Teacher>()) }
             val customTeacherDialogVisibleState = remember { mutableStateOf(false) }
             val computedSchedulesState = remember { mutableStateOf(listOf<ComputedSchedule>()) }
+            val notificationState = remember { mutableStateOf<Notification?>(null) }
 
             MenuBar(
                 scheduleConfigurationState = scheduleConfigurationState,
+                notificationState = notificationState,
                 showCustomTeacherDialog = {
                     customTeacherDialogVisibleState.value = true
                 }
@@ -80,6 +83,7 @@ fun main() {
 
                     MainContent(
                         lightModeState = lightModeState,
+                        notificationState = notificationState,
                         scheduleConfigurationState = scheduleConfigurationState,
                         customTeachers = customTeachersState.value,
                         onComputedSchedule = { computedSchedule ->
@@ -97,6 +101,7 @@ fun main() {
 @Composable
 private fun MainContent(
     lightModeState: MutableState<Boolean>,
+    notificationState: MutableState<Notification?>,
     scheduleConfigurationState: MutableState<ScheduleConfiguration>,
     customTeachers: List<Teacher>,
     onComputedSchedule: (ComputedSchedule) -> Unit,
@@ -107,31 +112,33 @@ private fun MainContent(
             ContentWithPane(
                 direction = PaneDirection.RIGHT,
                 content = {
-                    // TODO find a way to have the table fill and still allow scrollbars
-                    Box(contentAlignment = Alignment.Center) {
-                        val verticalScrollState = rememberScrollState(0)
-                        val horizontalScrollState = rememberScrollState(0)
+                    NotificationContainer(notificationState = notificationState) {
+                        // TODO find a way to have the table fill and still allow scrollbars
+                        Box(contentAlignment = Alignment.Center) {
+                            val verticalScrollState = rememberScrollState(0)
+                            val horizontalScrollState = rememberScrollState(0)
 
-                        Box(
-                            modifier = Modifier
-                                .verticalScroll(verticalScrollState)
-                                .horizontalScroll(horizontalScrollState)
-                        ) {
-                            ScheduleConfigurationTable(
-                                scheduleConfigurationState = scheduleConfigurationState,
-                                customTeachers = customTeachers,
+                            Box(
+                                modifier = Modifier
+                                    .verticalScroll(verticalScrollState)
+                                    .horizontalScroll(horizontalScrollState)
+                            ) {
+                                ScheduleConfigurationTable(
+                                    scheduleConfigurationState = scheduleConfigurationState,
+                                    customTeachers = customTeachers,
+                                )
+                            }
+
+                            VerticalScrollbar(
+                                adapter = rememberScrollbarAdapter(verticalScrollState),
+                                modifier = Modifier.align(Alignment.CenterEnd),
+                            )
+
+                            HorizontalScrollbar(
+                                adapter = rememberScrollbarAdapter(horizontalScrollState),
+                                modifier = Modifier.align(Alignment.BottomCenter),
                             )
                         }
-
-                        VerticalScrollbar(
-                            adapter = rememberScrollbarAdapter(verticalScrollState),
-                            modifier = Modifier.align(Alignment.CenterEnd),
-                        )
-
-                        HorizontalScrollbar(
-                            adapter = rememberScrollbarAdapter(horizontalScrollState),
-                            modifier = Modifier.align(Alignment.BottomCenter),
-                        )
                     }
                 },
                 pane = {

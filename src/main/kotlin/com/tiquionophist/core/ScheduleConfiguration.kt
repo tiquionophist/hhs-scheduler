@@ -1,5 +1,6 @@
 package com.tiquionophist.core
 
+import com.tiquionophist.util.prettyName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
 import kotlinx.serialization.decodeFromString
@@ -79,27 +80,37 @@ data class ScheduleConfiguration(
     val classStats: StatSet = subjectFrequency.flatMap { (subject, times) -> List(times) { subject.stats } }.sum()
 
     /**
-     * Verifies that this configuration is valid, throwing an [IllegalArgumentException] if it is not.
+     * Verifies that this configuration is valid, returning a list of user-readable error messages for any issues.
      */
-    fun verify() {
-        require(classes > 0) { "number of classes must be > 0" }
+    fun validationErrors(): List<String> {
+        val errors = mutableListOf<String>()
 
-        require(subjectFrequency.values.sum() == periodsPerWeek) {
-            "must have $periodsPerWeek subjects per week, found ${subjectFrequency.values.sum()}"
+        if (classes <= 0) {
+            errors += "Must have >0 classes"
+        }
+
+        if (subjectFrequency.values.sum() != periodsPerWeek) {
+            errors += "${subjectFrequency.values.sum()} subjects assigned per week; must be $periodsPerWeek."
         }
 
         teacherAssignments.forEach { (teacher, subjects) ->
-            require(subjects.isNotEmpty()) { "${teacher.fullName} has no assigned subjects" }
+            if (subjects.isEmpty()) {
+                errors += "${teacher.fullName} has no assigned subjects."
+            }
         }
 
         val missingSubjects = subjectFrequency.keys.minus(teacherAssignments.values.flatten()).minus(Subject.EMPTY)
-        require(missingSubjects.isEmpty()) { "$missingSubjects are in the schedule but not taught by any teachers" }
+        missingSubjects.forEach { subject ->
+            errors += "${subject.prettyName} is not taught by any teachers."
+        }
 
         minClassesTaughtPerTeacher.forEach { (teacher, minClasses) ->
-            require(minClasses <= periodsPerWeek) {
-                "${teacher.fullName} must teach at least $minClasses classes per week, which is impossible"
+            if (minClasses > periodsPerWeek) {
+                errors += "${teacher.fullName} must teach at least $minClasses classes per week, which is impossible."
             }
         }
+
+        return errors
     }
 
     fun save(file: File) {
@@ -121,11 +132,13 @@ data class ScheduleConfiguration(
             allowStructuredMapKeys = true
         }
 
-        fun load(file: File): ScheduleConfiguration? {
-            return runCatching {
-                val lines = file.readLines().joinToString(separator = "\n")
-                json.decodeFromString<ScheduleConfiguration>(lines)
-            }.getOrNull()
+        fun loadOrError(file: File): ScheduleConfiguration {
+            val lines = file.readLines().joinToString(separator = "\n")
+            return json.decodeFromString(lines)
+        }
+
+        fun loadOrNull(file: File): ScheduleConfiguration? {
+            return runCatching { loadOrError(file) }.getOrNull()
         }
 
         /**
