@@ -29,9 +29,7 @@ import com.tiquionophist.ui.common.PaneDirection
 import java.io.File
 
 // TODO add scheduler option
-// TODO add schedule process timeout
 // TODO improve error states and help messages
-// TODO show weekly stat effects for each teacher
 // TODO investigate text field focus (cursor remains after unfocused)
 @ExperimentalComposeUiApi
 @ExperimentalFoundationApi
