@@ -13,6 +13,11 @@ import com.tiquionophist.core.ScheduleConfiguration
 import com.tiquionophist.ui.common.ErrorDialog
 import com.tiquionophist.ui.common.FilePicker
 import com.tiquionophist.ui.common.Notification
+import java.awt.Desktop
+import java.net.URI
+
+private const val GITHUB_URL = "https://github.com/tiquionophist/hhs-scheduler"
+private const val APPLICATION_VERSION = "1.0" // TODO integrate with gradle
 
 /**
  * The application menu bar.
@@ -78,6 +83,22 @@ fun FrameWindowScope.MenuBar(
                 text = "Add custom teacher",
                 shortcut = KeyShortcut(Key.Equals, ctrl = true),
                 onClick = showCustomTeacherDialog,
+            )
+        }
+
+        Menu("About") {
+            Item(
+                text = "HHS+ Scheduler version $APPLICATION_VERSION",
+                enabled = false,
+                onClick = {},
+            )
+
+            Item(
+                text = "View project on GitHub",
+                enabled = Desktop.isDesktopSupported() && Desktop.getDesktop().isSupported(Desktop.Action.BROWSE),
+                onClick = {
+                    Desktop.getDesktop().browse(URI(GITHUB_URL))
+                }
             )
         }
     }
