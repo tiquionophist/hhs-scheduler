@@ -40,7 +40,6 @@ fun main() {
             icon = painterResource("app_icon.png"),
             state = rememberWindowState(placement = WindowPlacement.Maximized),
         ) {
-            val lightModeState = remember { mutableStateOf(true) }
             val scheduleConfigurationState = remember { mutableStateOf(initialConfiguration) }
             val customTeachersState = remember { mutableStateOf(listOf<Teacher>()) }
             val customTeacherDialogVisibleState = remember { mutableStateOf(false) }
@@ -55,7 +54,7 @@ fun main() {
                 }
             )
 
-            MaterialTheme(colors = Colors.materialColors(light = lightModeState.value)) {
+            MaterialTheme(colors = Colors.materialColors(light = ApplicationPreferences.lightMode)) {
                 Dimens.apply {
                     Surface {
                         if (customTeacherDialogVisibleState.value) {
@@ -78,7 +77,6 @@ fun main() {
                         }
 
                         MainContent(
-                            lightModeState = lightModeState,
                             notificationState = notificationState,
                             scheduleConfigurationState = scheduleConfigurationState,
                             customTeachers = customTeachersState.value,
@@ -96,7 +94,6 @@ fun main() {
 
 @Composable
 private fun MainContent(
-    lightModeState: MutableState<Boolean>,
     notificationState: MutableState<Notification?>,
     scheduleConfigurationState: MutableState<ScheduleConfiguration>,
     customTeachers: List<Teacher>,
@@ -144,7 +141,6 @@ private fun MainContent(
         },
         pane = {
             SettingsPane(
-                lightModeState = lightModeState,
                 scheduleConfigurationState = scheduleConfigurationState,
                 onComputedSchedule = onComputedSchedule
             )

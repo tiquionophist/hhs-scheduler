@@ -28,7 +28,6 @@ import com.tiquionophist.ui.common.topBorder
  */
 @Composable
 fun SettingsPane(
-    lightModeState: MutableState<Boolean>,
     scheduleConfigurationState: MutableState<ScheduleConfiguration>,
     onComputedSchedule: (ComputedSchedule) -> Unit,
 ) {
@@ -41,8 +40,8 @@ fun SettingsPane(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(Dimens.SPACING_3)
         ) {
-            IconButton(onClick = { lightModeState.value = !lightModeState.value }) {
-                val filename = if (lightModeState.value) "light_mode" else "dark_mode"
+            IconButton(onClick = { ApplicationPreferences.lightMode = !ApplicationPreferences.lightMode }) {
+                val filename = if (ApplicationPreferences.lightMode) "light_mode" else "dark_mode"
                 Image(
                     painter = painterResource("icons/$filename.svg"),
                     contentDescription = "Light/dark mode",
