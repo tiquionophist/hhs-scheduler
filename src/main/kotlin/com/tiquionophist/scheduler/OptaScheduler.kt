@@ -32,6 +32,7 @@ import java.util.EnumMap
  * schedule is found.
  *
  * TODO OptaScheduler does not allow cooperative cancelling of its schedule() function
+ * TODO missing no-arg constructor
  */
 class OptaScheduler(private val timeoutSeconds: Int? = null) : Scheduler {
     override suspend fun schedule(configuration: ScheduleConfiguration): Schedule? {

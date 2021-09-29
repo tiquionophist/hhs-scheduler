@@ -10,10 +10,10 @@ import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.shape.AbsoluteRoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material.Button
+import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.LocalContentAlpha
 import androidx.compose.material.LocalContentColor
 import androidx.compose.material.LocalTextStyle
-import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -41,6 +41,7 @@ fun NumberPicker(
     value: Int,
     onValueChange: (Int) -> Unit,
     modifier: Modifier = Modifier,
+    enabled: Boolean = true,
     min: Int? = null,
     max: Int? = null,
     cornerRounding: Dp = Dimens.CORNER_ROUNDING,
@@ -58,13 +59,16 @@ fun NumberPicker(
     // if the text field has been cleared, to avoid jankiness
     val clearedState = remember { mutableStateOf(false) }
 
+    val buttonColors = ButtonDefaults.buttonColors()
+
     Layout(
         modifier = modifier,
         content = {
             Button(
                 modifier = Modifier.widthIn(max = buttonIconSize + Dimens.SPACING_2 * 2),
-                enabled = min?.let { value > it } != false,
+                enabled = enabled && min?.let { value > it } != false,
                 onClick = { setValue(value - 1) },
+                colors = buttonColors,
                 shape = AbsoluteRoundedCornerShape(topLeft = cornerRounding, bottomLeft = cornerRounding),
                 contentPadding = PaddingValues(0.dp),
             ) {
@@ -80,9 +84,10 @@ fun NumberPicker(
             BasicTextField(
                 modifier = Modifier
                     .widthIn(max = textFieldWidth)
-                    .border(width = Dimens.BORDER_WIDTH, color = MaterialTheme.colors.primary),
+                    .border(width = Dimens.BORDER_WIDTH, color = buttonColors.backgroundColor(enabled).value),
                 value = if (clearedState.value) "" else value.toString(),
                 singleLine = true,
+                enabled = enabled,
                 cursorBrush = SolidColor(LocalContentColor.current),
                 textStyle = LocalTextStyle.current.merge(TextStyle(color = LocalContentColor.current)),
                 onValueChange = { newValue ->
@@ -101,8 +106,9 @@ fun NumberPicker(
 
             Button(
                 modifier = Modifier.widthIn(max = buttonIconSize + Dimens.SPACING_2 * 2),
-                enabled = max?.let { value < it } != false,
+                enabled = enabled && max?.let { value < it } != false,
                 onClick = { setValue(value + 1) },
+                colors = buttonColors,
                 shape = AbsoluteRoundedCornerShape(topRight = cornerRounding, bottomRight = cornerRounding),
                 contentPadding = PaddingValues(0.dp),
             ) {

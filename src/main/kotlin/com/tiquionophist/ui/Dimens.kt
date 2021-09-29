@@ -36,6 +36,7 @@ object Dimens {
     object NumberPicker {
         val BUTTON_ICON_SIZE = 18.dp
         val TEXT_FIELD_WIDTH = 50.dp
+        val LARGE_TEXT_FIELD_WIDTH = 100.dp
     }
 
     object ScheduleConfigurationTable {

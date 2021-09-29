@@ -13,6 +13,7 @@ import androidx.compose.material.Button
 import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.Icon
+import androidx.compose.material.IconButton
 import androidx.compose.material.LocalContentAlpha
 import androidx.compose.material.LocalContentColor
 import androidx.compose.material.MaterialTheme
@@ -29,7 +30,6 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.res.painterResource
 import com.tiquionophist.core.ScheduleConfiguration
-import com.tiquionophist.scheduler.RandomizedScheduler
 import com.tiquionophist.ui.common.ErrorDialog
 import com.tiquionophist.ui.common.IconAndTextButton
 import com.tiquionophist.ui.common.LiveDurationState
@@ -81,6 +81,25 @@ fun RunScheduleButton(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(Dimens.SPACING_3)
     ) {
+        val schedulerSettingsState = remember { mutableStateOf(SchedulerSettings.default) }
+
+        val schedulerSettingsDialogVisibleState = remember { mutableStateOf(false) }
+        IconButton(onClick = { schedulerSettingsDialogVisibleState.value = true }) {
+            Image(
+                painter = painterResource("icons/settings.svg"),
+                contentDescription = "Scheduler settings",
+                colorFilter = ColorFilter.tint(LocalContentColor.current),
+                alpha = LocalContentAlpha.current,
+            )
+        }
+
+        if (schedulerSettingsDialogVisibleState.value) {
+            SchedulerSettingsDialog(initialSchedulerSettings = schedulerSettingsState.value) { newScheduler ->
+                newScheduler?.let { schedulerSettingsState.value = it }
+                schedulerSettingsDialogVisibleState.value = false
+            }
+        }
+
         val validationErrors = remember(configuration) { configuration.validationErrors() }
 
         if (validationErrors.isNotEmpty()) {
@@ -126,10 +145,7 @@ fun RunScheduleButton(
             enabled = validationErrors.isEmpty() && !loading,
             onClick = {
                 jobState.value = coroutineScope.launch {
-                    val scheduler = RandomizedScheduler(
-                        attemptsPerRound = 1_000,
-                        rounds = 1_000,
-                    )
+                    val scheduler = schedulerSettingsState.value.create()
 
                     val result = runCatching {
                         scheduler.schedule(configuration)?.also { it.verify(configuration) }

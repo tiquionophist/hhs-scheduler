@@ -30,7 +30,6 @@ import com.tiquionophist.ui.common.NotificationContainer
 import com.tiquionophist.ui.common.PaneDirection
 import java.io.File
 
-// TODO add scheduler option
 // TODO investigate text field focus (cursor remains after unfocused)
 @ExperimentalComposeUiApi
 @ExperimentalFoundationApi
