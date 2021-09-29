@@ -16,8 +16,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.Dp
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.WindowSize
 import androidx.compose.ui.window.rememberDialogState
@@ -40,10 +38,12 @@ fun ErrorDialog(
         onCloseRequest = onClose,
     ) {
         Column(
-            modifier = Modifier.padding(Dimens.SPACING_2).widthIn(min = 200.dp, max = 500.dp),
+            modifier = Modifier
+                .padding(Dimens.SPACING_2)
+                .widthIn(min = Dimens.Dialog.MIN_WIDTH, max = Dimens.Dialog.MAX_WIDTH),
             verticalArrangement = Arrangement.spacedBy(Dimens.SPACING_2),
         ) {
-            Text(title, fontSize = 20.sp)
+            Text(title, fontSize = Dimens.Dialog.TITLE_FONT_SIZE)
 
             Text(message)
 

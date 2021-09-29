@@ -37,7 +37,7 @@ import java.io.File
 @ExperimentalFoundationApi
 fun main() {
     // load from config.json by default on startup, if it exists, for convenience
-    val initialConfiguration = ScheduleConfiguration.load(File("config.json")) ?: ScheduleConfiguration(classes = 2)
+    val initialConfiguration = ScheduleConfiguration.load(File("config.json")) ?: ScheduleConfiguration.EMPTY
 
     application {
         Window(

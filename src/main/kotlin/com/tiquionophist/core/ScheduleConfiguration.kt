@@ -110,6 +110,11 @@ data class ScheduleConfiguration(
     }
 
     companion object {
+        /**
+         * The default configuration used when starting the application.
+         */
+        val EMPTY = ScheduleConfiguration(classes = 2)
+
         private val json = Json {
             prettyPrint = true
             encodeDefaults = true

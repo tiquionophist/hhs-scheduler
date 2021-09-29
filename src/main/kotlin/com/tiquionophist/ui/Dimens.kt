@@ -1,6 +1,7 @@
 package com.tiquionophist.ui
 
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 
 /**
  * Dimension constants used throughout the application.
@@ -11,19 +12,8 @@ object Dimens {
      */
     val BORDER_WIDTH = 1.dp
 
-    /**
-     * Small spacing.
-     */
     val SPACING_1 = 4.dp
-
-    /**
-     * Medium spacing.
-     */
     val SPACING_2 = 8.dp
-
-    /**
-     * Large spacing.
-     */
     val SPACING_3 = 16.dp
 
     /**
@@ -52,5 +42,11 @@ object Dimens {
 
     object ScheduleTable {
         val MIN_CELL_WIDTH = 250.dp
+    }
+
+    object Dialog {
+        val MIN_WIDTH = 200.dp
+        val MAX_WIDTH = 500.dp
+        val TITLE_FONT_SIZE = 20.sp
     }
 }

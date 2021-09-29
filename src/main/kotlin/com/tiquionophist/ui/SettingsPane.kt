@@ -12,11 +12,14 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Clear
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.ColorFilter
 import com.tiquionophist.core.ScheduleConfiguration
+import com.tiquionophist.ui.common.ConfirmationDialog
 import com.tiquionophist.ui.common.NumberPicker
 import com.tiquionophist.ui.common.topBorder
 
@@ -38,12 +41,23 @@ fun SettingsPane(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(Dimens.SPACING_3)
         ) {
-            // TODO add confirm dialog to clear configuration
-            Button(
-                onClick = {
-                    scheduleConfigurationState.value = ScheduleConfiguration(classes = 2)
-                }
-            ) {
+            val confirmDialogVisible = remember { mutableStateOf(false) }
+            if (confirmDialogVisible.value) {
+                ConfirmationDialog(
+                    windowTitle = "Clear schedule",
+                    message = "Reset schedule configuration?",
+                    acceptText = "Clear",
+                    onAccept = {
+                        scheduleConfigurationState.value = ScheduleConfiguration.EMPTY
+                        confirmDialogVisible.value = false
+                    },
+                    onDecline = {
+                        confirmDialogVisible.value = false
+                    }
+                )
+            }
+
+            Button(onClick = { confirmDialogVisible.value = true }) {
                 Image(
                     imageVector = Icons.Default.Clear,
                     contentDescription = "Reset",
