@@ -40,10 +40,11 @@ import com.tiquionophist.scheduler.RandomizedScheduler
 import com.tiquionophist.ui.common.ContentWithPane
 import com.tiquionophist.ui.common.NumberPicker
 import com.tiquionophist.ui.common.PaneDirection
+import com.tiquionophist.ui.common.topBorder
 import com.tiquionophist.util.prettyName
 
 private val DIALOG_WIDTH = 500.dp
-private val DIALOG_HEIGHT = 750.dp
+private val DIALOG_HEIGHT = 900.dp
 
 sealed class SchedulerSettings(val type: SchedulerType) {
     abstract fun create(): Scheduler
@@ -179,7 +180,7 @@ fun SchedulerSettingsDialog(
                 },
                 pane = {
                     Row(
-                        modifier = Modifier.padding(Dimens.SPACING_2).fillMaxWidth(),
+                        modifier = Modifier.topBorder().padding(Dimens.SPACING_2).fillMaxWidth(),
                         horizontalArrangement = Arrangement.End
                     ) {
                         Button(onClick = { onClose(settingsState.value) }) {
