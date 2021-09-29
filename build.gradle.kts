@@ -20,7 +20,7 @@ dependencies {
     implementation(compose.desktop.currentOs)
 
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.2.2")
-    implementation("org.optaplanner:optaplanner-core:8.11.0.Final")
+    implementation("org.optaplanner:optaplanner-core:8.11.1.Final")
 
     testImplementation(platform("org.junit:junit-bom:5.7.2"))
     testImplementation("org.junit.jupiter:junit-jupiter:5.7.2")
