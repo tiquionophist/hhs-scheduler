@@ -36,6 +36,11 @@ object Dimens {
      */
     val CORNER_ROUNDING = 4.dp
 
+    /**
+     * Stroke width of loading spinners.
+     */
+    val PROGRESS_INDICATOR_STROKE_WIDTH = 2.dp
+
     object NumberPicker {
         val BUTTON_WIDTH = 32.dp
         val TEXT_FIELD_WIDTH = 50.dp

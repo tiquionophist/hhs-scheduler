@@ -1,16 +1,24 @@
 package com.tiquionophist.ui
 
 import androidx.compose.foundation.BoxWithTooltip
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.material.Button
+import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.Icon
+import androidx.compose.material.LocalContentColor
+import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.Warning
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
@@ -20,29 +28,61 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
-import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorFilter
 import com.tiquionophist.core.ScheduleConfiguration
 import com.tiquionophist.scheduler.RandomizedScheduler
+import com.tiquionophist.ui.common.ErrorDialog
+import com.tiquionophist.ui.common.LiveDurationState
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
+import kotlin.time.DurationUnit
+
+private class ErrorDialogState(
+    val title: String,
+    val message: String,
+    val throwable: Throwable?
+)
+
+private const val SCHEDULE_NOT_FOUND_TITLE = "No schedule found"
+private const val SCHEDULE_NOT_FOUND_MESSAGE =
+    "No schedule could be found. This could mean that no schedule is possible for these settings, or that the " +
+            "scheduler could not find it under the provided settings."
+
+private const val EXCEPTION_TITLE = "Exception thrown!"
+private const val EXCEPTION_MESSAGE =
+    "An exception was thrown. Consider reporting this (with the stack trace) on the project's GitHub page or try again."
 
 /**
  * The button to run the scheduler (and the validation warning icon, etc) for the given [configuration].
+ *
+ * If a schedule is successfully found, [onComputedSchedule] will be invoked with the resulting [ComputedSchedule].
  */
 @ExperimentalComposeUiApi
 @Composable
 fun RunScheduleButton(
     configuration: ScheduleConfiguration,
-    onComputedSchedule: (ComputedSchedule) -> Unit
+    onComputedSchedule: (ComputedSchedule) -> Unit,
 ) {
+    val dialogState = remember { mutableStateOf<Set<ErrorDialogState>>(emptySet()) }
+    dialogState.value.forEach { errorDialogState ->
+        ErrorDialog(
+            title = errorDialogState.title,
+            message = errorDialogState.message,
+            throwable = errorDialogState.throwable,
+            onClose = {
+                dialogState.value = dialogState.value.minus(errorDialogState)
+            }
+        )
+    }
+
     Row(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(Dimens.SPACING_3)
     ) {
         val validationError = remember(configuration) {
-            runCatching { configuration.verify() }
-                .exceptionOrNull()
-                ?.message
+            runCatching { configuration.verify() }.exceptionOrNull()?.message
         }
 
         if (validationError != null) {
@@ -58,54 +98,105 @@ fun RunScheduleButton(
             ) {
                 Icon(
                     imageVector = Icons.Default.Warning,
-                    contentDescription = null,
-                    tint = Color.Red,
+                    contentDescription = "Warning",
+                    tint = MaterialTheme.colors.error,
                 )
             }
         }
 
-        val loading = remember { mutableStateOf(false) }
+        val jobState = remember { mutableStateOf<Job?>(null) }
+        val loading = jobState.value != null
+
+        if (loading) {
+            Button(
+                colors = ButtonDefaults.buttonColors(backgroundColor = MaterialTheme.colors.error),
+                onClick = {
+                    jobState.value?.cancel()
+                    jobState.value = null
+                }
+            ) {
+                Image(
+                    imageVector = Icons.Default.Close,
+                    contentDescription = "Stop",
+                    colorFilter = ColorFilter.tint(LocalContentColor.current)
+                )
+
+                Spacer(Modifier.width(Dimens.SPACING_2))
+
+                Text("Cancel")
+            }
+        }
+
         val coroutineScope = rememberCoroutineScope { Dispatchers.Default }
         Button(
-            enabled = validationError == null && !loading.value,
+            enabled = validationError == null && !loading,
             onClick = {
-                loading.value = true
-                coroutineScope.launch {
+                jobState.value = coroutineScope.launch {
                     val scheduler = RandomizedScheduler(
                         attemptsPerRound = 1_000,
-                        rounds = 1_000
+                        rounds = 1_000,
                     )
 
                     val result = runCatching {
                         scheduler.schedule(configuration)?.also { it.verify(configuration) }
                     }
-                    if (result.isSuccess) {
-                        val schedule = result.getOrThrow()
-                        if (schedule == null) {
-                            // TODO show as dialog
-                            println("No schedule found")
-                        } else {
-                            val computedSchedule = ComputedSchedule(
-                                configuration = configuration,
-                                schedule = schedule
-                            )
 
-                            onComputedSchedule(computedSchedule)
+                    // TODO this doesn't show the result if the job was cancelled, but doesn't actually cancel the
+                    //  computation. Need to make that cooperative:
+                    //  https://kotlinlang.org/docs/cancellation-and-timeouts.html#making-computation-code-cancellable
+                    if (isActive) {
+                        if (result.isSuccess) {
+                            val schedule = result.getOrThrow()
+                            if (schedule == null) {
+                                val errorDialogState = ErrorDialogState(
+                                    title = SCHEDULE_NOT_FOUND_TITLE,
+                                    message = SCHEDULE_NOT_FOUND_MESSAGE,
+                                    throwable = null,
+                                )
+                                dialogState.value = dialogState.value.plus(errorDialogState)
+                            } else {
+                                val computedSchedule = ComputedSchedule(
+                                    configuration = configuration,
+                                    schedule = schedule
+                                )
+
+                                onComputedSchedule(computedSchedule)
+                            }
+                        } else {
+                            val errorDialogState = ErrorDialogState(
+                                title = EXCEPTION_TITLE,
+                                message = EXCEPTION_MESSAGE,
+                                throwable = result.exceptionOrNull(),
+                            )
+                            dialogState.value = dialogState.value.plus(errorDialogState)
                         }
-                    } else {
-                        // TODO show as dialog
-                        val throwable = result.exceptionOrNull()
-                        println("Error: $throwable")
                     }
 
-                    loading.value = false
+                    jobState.value = null // can't use the job isCompleted since it would not refresh the composition
                 }
             },
             content = {
-                // TODO improve loading state (show elapsed time, etc)
-                if (loading.value) {
-                    CircularProgressIndicator(Modifier.size(Dimens.SPACING_3))
+                if (loading) {
+                    CircularProgressIndicator(
+                        modifier = Modifier.size(Dimens.SPACING_3),
+                        strokeWidth = Dimens.PROGRESS_INDICATOR_STROKE_WIDTH,
+                    )
+
+                    Spacer(Modifier.width(Dimens.SPACING_2))
+
+                    val loadingCoroutineScope = rememberCoroutineScope { Dispatchers.Main }
+                    val durationState = remember { LiveDurationState(loadingCoroutineScope) }
+                    val seconds = durationState.value.toDouble(DurationUnit.SECONDS)
+                    Text("Running for %.1fs".format(seconds))
                 } else {
+                    Image(
+                        imageVector = Icons.Default.PlayArrow,
+                        contentDescription = "Run",
+                        colorFilter = ColorFilter.tint(LocalContentColor.current)
+                    )
+
+                    Spacer(Modifier.width(Dimens.SPACING_2))
+
                     Text("Run")
                 }
             }
