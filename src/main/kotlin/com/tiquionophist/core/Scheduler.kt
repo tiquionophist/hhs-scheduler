@@ -4,5 +4,5 @@ interface Scheduler {
     /**
      * Attempts to generate a schedule based on [configuration], returning null if no schedule could be found.
      */
-    fun schedule(configuration: ScheduleConfiguration): Schedule?
+    suspend fun schedule(configuration: ScheduleConfiguration): Schedule?
 }

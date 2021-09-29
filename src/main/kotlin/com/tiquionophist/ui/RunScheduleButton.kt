@@ -141,9 +141,6 @@ fun RunScheduleButton(
                         scheduler.schedule(configuration)?.also { it.verify(configuration) }
                     }
 
-                    // TODO this doesn't show the result if the job was cancelled, but doesn't actually cancel the
-                    //  computation. Need to make that cooperative:
-                    //  https://kotlinlang.org/docs/cancellation-and-timeouts.html#making-computation-code-cancellable
                     if (isActive) {
                         if (result.isSuccess) {
                             val schedule = result.getOrThrow()

@@ -7,6 +7,7 @@ import com.tiquionophist.core.ScheduleConfiguration
 import com.tiquionophist.core.Scheduler
 import com.tiquionophist.core.Subject
 import com.tiquionophist.core.Teacher
+import kotlinx.coroutines.yield
 import java.util.EnumMap
 import java.util.EnumSet
 import kotlin.random.Random
@@ -32,8 +33,10 @@ class RandomizedScheduler(
      */
     private val randomSeed: (Int) -> Long? = { it.toLong() }
 ) : Scheduler {
-    override fun schedule(configuration: ScheduleConfiguration): Schedule? {
+    override suspend fun schedule(configuration: ScheduleConfiguration): Schedule? {
         repeat(rounds) { round ->
+            yield() // yield computation after each round to allow cancellation
+
             scheduleRecursive(
                 current = PartialSchedule(
                     configuration = configuration,

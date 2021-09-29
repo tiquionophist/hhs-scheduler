@@ -30,9 +30,11 @@ import java.util.EnumMap
  *
  * [timeoutSeconds] sets the maximum number of seconds that the scheduler will run for before aborting if no valid
  * schedule is found.
+ *
+ * TODO OptaScheduler does not allow cooperative cancelling of its schedule() function
  */
 class OptaScheduler(private val timeoutSeconds: Int? = null) : Scheduler {
-    override fun schedule(configuration: ScheduleConfiguration): Schedule? {
+    override suspend fun schedule(configuration: ScheduleConfiguration): Schedule? {
         val subjectToTeacher: EnumMap<Subject, List<WrappedTeacher>> = Subject.values()
             .associateWith { subject ->
                 configuration.teacherAssignments.filterValues { it.contains(subject) }.keys.map { WrappedTeacher(it) }
