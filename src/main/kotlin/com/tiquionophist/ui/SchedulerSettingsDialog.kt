@@ -92,7 +92,7 @@ sealed class SchedulerSettings(val type: SchedulerType) {
         val default: SchedulerSettings = defaultSettingsFor(SchedulerType.RANDOMIZED)
 
         fun defaultSettingsFor(type: SchedulerType): SchedulerSettings {
-            return when(type) {
+            return when (type) {
                 SchedulerType.EXHAUSTIVE -> Exhaustive()
                 SchedulerType.RANDOMIZED -> Randomized()
                 SchedulerType.OPTA -> Opta()
@@ -389,7 +389,6 @@ private fun StandardRow(content: @Composable RowScope.() -> Unit) {
         content = content
     )
 }
-
 
 @Composable
 private fun SettingWithDescription(

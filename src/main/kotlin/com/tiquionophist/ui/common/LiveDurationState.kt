@@ -14,9 +14,9 @@ import kotlin.time.TimeSource
  * Runs on the given [coroutineScope], which should be attached to a specific point in the composition to make sure the
  * coroutine is cleaned up when it is no longer needed.
  */
-fun LiveDurationState(
+fun liveDurationState(
     coroutineScope: CoroutineScope,
-    increment: Duration = Duration.milliseconds(100)
+    increment: Duration = @Suppress("MagicNumber") Duration.milliseconds(100),
 ): State<Duration> {
     val state = mutableStateOf(Duration.ZERO)
     val start = TimeSource.Monotonic.markNow()

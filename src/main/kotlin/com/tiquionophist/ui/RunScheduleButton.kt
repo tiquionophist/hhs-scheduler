@@ -32,7 +32,7 @@ import androidx.compose.ui.res.painterResource
 import com.tiquionophist.core.ScheduleConfiguration
 import com.tiquionophist.ui.common.ErrorDialog
 import com.tiquionophist.ui.common.IconAndTextButton
-import com.tiquionophist.ui.common.LiveDurationState
+import com.tiquionophist.ui.common.liveDurationState
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.isActive
@@ -192,7 +192,7 @@ fun RunScheduleButton(
                     Spacer(Modifier.width(Dimens.SPACING_2))
 
                     val loadingCoroutineScope = rememberCoroutineScope { Dispatchers.Main }
-                    val durationState = remember { LiveDurationState(loadingCoroutineScope) }
+                    val durationState = remember { liveDurationState(loadingCoroutineScope) }
                     val seconds = durationState.value.toDouble(DurationUnit.SECONDS)
                     Text("Running for %.1fs".format(seconds))
                 } else {

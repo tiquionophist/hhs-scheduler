@@ -8,16 +8,6 @@ import androidx.compose.ui.layout.Measurable
 import androidx.compose.ui.unit.Constraints
 
 /**
- * The relative direction of the pane, e.g. [PaneDirection.TOP] places the pane above the content.
- */
-enum class PaneDirection(val vertical: Boolean) {
-    TOP(vertical = true),
-    BOTTOM(vertical = true),
-    LEFT(vertical = false),
-    RIGHT(vertical = false),
-}
-
-/**
  * A simple layout which places [pane] relative to [content], allocating [pane] as much width/height as it needs
  * (depending on [direction]) and the rest to [content].
  */

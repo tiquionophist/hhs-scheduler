@@ -1,5 +1,8 @@
 package com.tiquionophist.ui
 
+import androidx.compose.material.ProvideTextStyle
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
@@ -7,6 +10,10 @@ import androidx.compose.ui.unit.sp
  * Dimension constants used throughout the application.
  */
 object Dimens {
+    val FONT_SMALL = 12.sp
+    private val FONT_NORMAL = 14.sp
+    val FONT_LARGE = 16.sp
+
     /**
      * Width of borders and dividers.
      */
@@ -32,6 +39,11 @@ object Dimens {
     val PROGRESS_INDICATOR_STROKE_WIDTH = 2.dp
 
     val NOTIFICATION_MARGIN = 35.dp
+
+    @Composable
+    fun apply(content: @Composable () -> Unit) {
+        ProvideTextStyle(TextStyle(fontSize = FONT_NORMAL), content)
+    }
 
     object NumberPicker {
         val BUTTON_ICON_SIZE = 18.dp

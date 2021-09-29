@@ -9,7 +9,6 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.LocalContentColor
-import androidx.compose.material.LocalTextStyle
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
@@ -90,26 +89,14 @@ private class ScheduleDayColumn(
                 }
 
                 Column {
-                    val largeSize = LocalTextStyle.current.fontSize.times(1.1f)
-                    val smallSize = LocalTextStyle.current.fontSize.times(0.9f)
-                    Text(
-                        text = subject.prettyName,
-                        //fontWeight = FontWeight.Bold,
-                        fontSize = largeSize,
-                    )
+                    Text(text = subject.prettyName, fontSize = Dimens.FONT_LARGE)
 
                     lesson.teacher?.let { teacher ->
-                        Text(
-                            text = "by ${teacher.fullName}",
-                            fontSize = smallSize,
-                        )
+                        Text(text = "by ${teacher.fullName}", fontSize = Dimens.FONT_SMALL)
                     }
 
                     lesson.classroom?.let { classroom ->
-                        Text(
-                            text = "in ${classroom.prettyName}",
-                            fontSize = smallSize,
-                        )
+                        Text(text = "in ${classroom.prettyName}", fontSize = Dimens.FONT_SMALL)
                     }
                 }
             }

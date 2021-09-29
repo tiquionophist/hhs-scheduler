@@ -68,7 +68,9 @@ fun ErrorDialog(
                         Button(
                             onClick = {
                                 val stringSelection = StringSelection(throwable.stackTraceToString())
-                                Toolkit.getDefaultToolkit().systemClipboard.setContents(stringSelection, stringSelection)
+                                Toolkit.getDefaultToolkit()
+                                    .systemClipboard
+                                    .setContents(stringSelection, stringSelection)
                             }
                         ) {
                             Text("Copy stack trace")

@@ -60,36 +60,38 @@ fun main() {
             )
 
             DesktopMaterialTheme(colors = Colors.materialColors(light = lightModeState.value)) {
-                Surface {
-                    if (customTeacherDialogVisibleState.value) {
-                        CustomTeacherDialog { teacher ->
-                            customTeacherDialogVisibleState.value = false
-                            teacher?.takeUnless { customTeachersState.value.contains(it) }?.let {
-                                customTeachersState.value = customTeachersState.value.plus(teacher)
+                Dimens.apply {
+                    Surface {
+                        if (customTeacherDialogVisibleState.value) {
+                            CustomTeacherDialog { teacher ->
+                                customTeacherDialogVisibleState.value = false
+                                teacher?.takeUnless { customTeachersState.value.contains(it) }?.let {
+                                    customTeachersState.value = customTeachersState.value.plus(teacher)
+                                }
                             }
                         }
-                    }
 
-                    computedSchedulesState.value.forEach { computedSchedule ->
-                        ScheduleWindow(
-                            computedSchedule = computedSchedule,
-                            onClose = {
+                        computedSchedulesState.value.forEach { computedSchedule ->
+                            ScheduleWindow(
+                                computedSchedule = computedSchedule,
+                                onClose = {
+                                    computedSchedulesState.value = computedSchedulesState.value
+                                        .minus(computedSchedule)
+                                }
+                            )
+                        }
+
+                        MainContent(
+                            lightModeState = lightModeState,
+                            notificationState = notificationState,
+                            scheduleConfigurationState = scheduleConfigurationState,
+                            customTeachers = customTeachersState.value,
+                            onComputedSchedule = { computedSchedule ->
                                 computedSchedulesState.value = computedSchedulesState.value
-                                    .minus(computedSchedule)
+                                    .plus(computedSchedule)
                             }
                         )
                     }
-
-                    MainContent(
-                        lightModeState = lightModeState,
-                        notificationState = notificationState,
-                        scheduleConfigurationState = scheduleConfigurationState,
-                        customTeachers = customTeachersState.value,
-                        onComputedSchedule = { computedSchedule ->
-                            computedSchedulesState.value = computedSchedulesState.value
-                                .plus(computedSchedule)
-                        }
-                    )
                 }
             }
         }

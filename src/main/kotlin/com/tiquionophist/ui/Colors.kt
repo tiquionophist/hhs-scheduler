@@ -12,6 +12,7 @@ import androidx.compose.ui.graphics.Color
 /**
  * Color constants used throughout the application.
  */
+@Suppress("MagicNumber")
 object Colors {
     const val DISABLED_ALPHA = 0.3f
 
