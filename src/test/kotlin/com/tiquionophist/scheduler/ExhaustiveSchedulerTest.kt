@@ -2,25 +2,30 @@ package com.tiquionophist.scheduler
 
 import com.tiquionophist.core.ScheduleConfiguration
 import kotlinx.coroutines.runBlocking
-import org.junit.jupiter.api.Assertions.assertNotNull
+import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.assertDoesNotThrow
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.MethodSource
 
-internal class RandomizedSchedulerTest {
+internal class ExhaustiveSchedulerTest {
     @ParameterizedTest
     @MethodSource("possibleConfiguration")
     fun testPossibleConfigurations(configuration: ScheduleConfiguration) {
-        val scheduler = RandomizedScheduler(attemptsPerRound = 1_000, rounds = 1_000)
+        val scheduler = ExhaustiveScheduler(fillOrder = RandomizedScheduler.ScheduleFillOrder.CLASS_BY_CLASS)
 
         val schedule = runBlocking { scheduler.schedule(configuration) }
 
-        assertNotNull(schedule)
+        Assertions.assertNotNull(schedule)
         assertDoesNotThrow { schedule!!.verify(configuration) }
     }
 
     companion object {
         @JvmStatic
-        fun possibleConfiguration() = ScheduleConfigurationFixtures.possibleConfigurations
+        fun possibleConfiguration(): List<ScheduleConfiguration> {
+            return listOf(
+                ScheduleConfigurationFixtures.trivialConfiguration,
+                ScheduleConfigurationFixtures.easyConfiguration,
+            )
+        }
     }
 }

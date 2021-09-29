@@ -18,27 +18,34 @@ data class Teacher(val firstName: String, val lastName: String) {
         get() = imageCache.getOrPut(this) { loadImageBitmapOrNull(imageFilename) }
 
     companion object {
-        // a few hardcoded teachers are used in unit tests
+        val APRIL_RAYMUND = Teacher("April", "Raymund")
         val BETH_MANILI = Teacher("Beth", "Manili")
+        val CARL_WALKER = Teacher("Carl", "Walker")
         val CARMEN_SMITH = Teacher("Carmen", "Smith")
+        val CLAIRE_FUZUSHI = Teacher("Claire", "Fuzushi")
+        val JESSICA_UNDERWOOD = Teacher("Jessica", "Underwood")
+        val NINA_PARKER = Teacher("Nina", "Parker")
         val RONDA_BELLS = Teacher("Ronda", "Bells")
         val SAMANTHA_KELLER = Teacher("Samantha", "Keller")
 
+        val ANNA_MILLER = Teacher("Anna", "Miller")
+        val LARA_ELLIS = Teacher("Lara", "Ellis")
+
         val DEFAULT_TEACHERS = listOf(
-            Teacher("April", "Raymund"),
+            APRIL_RAYMUND,
             BETH_MANILI,
-            Teacher("Carl", "Walker"),
+            CARL_WALKER,
             CARMEN_SMITH,
-            Teacher("Claire", "Fuzushi"),
-            Teacher("Jessica", "Underwood"),
-            Teacher("Nina", "Parker"),
+            CLAIRE_FUZUSHI,
+            JESSICA_UNDERWOOD,
+            NINA_PARKER,
             RONDA_BELLS,
             SAMANTHA_KELLER,
         )
 
         val LEXVILLE_TEACHERS = listOf(
-            Teacher("Anna", "Miller"),
-            Teacher("Lara", "Ellis"),
+            ANNA_MILLER,
+            LARA_ELLIS,
         )
 
         private val imageCache = mutableMapOf<Teacher, ImageBitmap?>()

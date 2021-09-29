@@ -32,7 +32,6 @@ import java.util.EnumMap
  * schedule is found.
  *
  * TODO OptaScheduler does not allow cooperative cancelling of its schedule() function
- * TODO missing no-arg constructor
  */
 class OptaScheduler(private val timeoutSeconds: Int? = null) : Scheduler {
     override suspend fun schedule(configuration: ScheduleConfiguration): Schedule? {
@@ -40,6 +39,7 @@ class OptaScheduler(private val timeoutSeconds: Int? = null) : Scheduler {
             .associateWith { subject ->
                 configuration.teacherAssignments.filterValues { it.contains(subject) }.keys.map { WrappedTeacher(it) }
             }
+            .plus(Subject.EMPTY to listOf(WrappedTeacher(null)))
             .let { EnumMap(it) }
 
         val initial = OptaSolution(
@@ -77,7 +77,7 @@ class OptaScheduler(private val timeoutSeconds: Int? = null) : Scheduler {
             .buildSolver()
             .solve(initial)
 
-        return solution.schedule.takeIf { solution.score?.hardScore == 0 }
+        return if (solution.score?.hardScore == 0) solution.schedule else null
     }
 
     /**
@@ -160,7 +160,7 @@ class OptaScheduler(private val timeoutSeconds: Int? = null) : Scheduler {
      */
     @PlanningSolution
     class OptaSolution(
-        private val configuration: ScheduleConfiguration,
+        private val configuration: ScheduleConfiguration = ScheduleConfiguration(classes = 2),
 
         @PlanningEntityCollectionProperty
         val lessons: List<OptaLesson> = listOf()

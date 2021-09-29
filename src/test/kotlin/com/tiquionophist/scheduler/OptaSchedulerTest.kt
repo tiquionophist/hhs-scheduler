@@ -7,11 +7,11 @@ import org.junit.jupiter.api.assertDoesNotThrow
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.MethodSource
 
-internal class RandomizedSchedulerTest {
+internal class OptaSchedulerTest {
     @ParameterizedTest
     @MethodSource("possibleConfiguration")
     fun testPossibleConfigurations(configuration: ScheduleConfiguration) {
-        val scheduler = RandomizedScheduler(attemptsPerRound = 1_000, rounds = 1_000)
+        val scheduler = OptaScheduler(timeoutSeconds = 10)
 
         val schedule = runBlocking { scheduler.schedule(configuration) }
 
@@ -21,6 +21,11 @@ internal class RandomizedSchedulerTest {
 
     companion object {
         @JvmStatic
-        fun possibleConfiguration() = ScheduleConfigurationFixtures.possibleConfigurations
+        fun possibleConfiguration(): List<ScheduleConfiguration> {
+            return listOf(
+                ScheduleConfigurationFixtures.trivialConfiguration,
+                ScheduleConfigurationFixtures.easyConfiguration,
+            )
+        }
     }
 }
