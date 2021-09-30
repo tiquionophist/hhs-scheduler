@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.Button
 import androidx.compose.material.OutlinedTextField
+import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
@@ -60,28 +61,30 @@ fun CustomTeacherDialog(onClose: (Teacher?) -> Unit) {
         },
         resizable = false,
     ) {
-        Column(Modifier.padding(Dimens.SPACING_2), verticalArrangement = Arrangement.spacedBy(Dimens.SPACING_2)) {
-            OutlinedTextField(
-                modifier = Modifier.withInitialFocus(),
-                value = firstNameState.value,
-                onValueChange = { firstNameState.value = it },
-                singleLine = true,
-                placeholder = { Text("First name") }
-            )
+        Surface {
+            Column(Modifier.padding(Dimens.SPACING_2), verticalArrangement = Arrangement.spacedBy(Dimens.SPACING_2)) {
+                OutlinedTextField(
+                    modifier = Modifier.withInitialFocus(),
+                    value = firstNameState.value,
+                    onValueChange = { firstNameState.value = it },
+                    singleLine = true,
+                    placeholder = { Text("First name") }
+                )
 
-            OutlinedTextField(
-                value = lastNameState.value,
-                onValueChange = { lastNameState.value = it },
-                singleLine = true,
-                placeholder = { Text("Last name") }
-            )
+                OutlinedTextField(
+                    value = lastNameState.value,
+                    onValueChange = { lastNameState.value = it },
+                    singleLine = true,
+                    placeholder = { Text("Last name") }
+                )
 
-            Button(
-                modifier = Modifier.align(Alignment.End),
-                enabled = firstNameState.value.isNotEmpty() && lastNameState.value.isNotEmpty(),
-                onClick = { submit() }
-            ) {
-                Text("Add")
+                Button(
+                    modifier = Modifier.align(Alignment.End),
+                    enabled = firstNameState.value.isNotEmpty() && lastNameState.value.isNotEmpty(),
+                    onClick = { submit() }
+                ) {
+                    Text("Add")
+                }
             }
         }
     }
