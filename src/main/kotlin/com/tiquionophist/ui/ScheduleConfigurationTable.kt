@@ -4,8 +4,10 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.Checkbox
 import androidx.compose.material.CheckboxDefaults
@@ -67,6 +69,7 @@ private class SubjectIconColumn(private val configuration: ScheduleConfiguration
                 contentDescription = value.prettyName,
                 modifier = Modifier
                     .padding(horizontal = Dimens.SPACING_2)
+                    .size(Dimens.ScheduleConfigurationTable.SUBJECT_ICON_SIZE)
                     .enabledIf(configuration.subjectEnabled(value)),
             )
         }
@@ -187,7 +190,10 @@ private class SubjectTeacherAssignmentsColumn(
                 Image(
                     painter = BitmapPainter(imageBitmap),
                     contentDescription = teacher.fullName,
-                    modifier = Modifier.width(Dimens.ScheduleConfigurationTable.TEACHER_IMAGE_WIDTH),
+                    modifier = Modifier
+                        .width(Dimens.ScheduleConfigurationTable.TEACHER_IMAGE_WIDTH)
+                        // set the aspect ratio so that the image has a minimum intrinsic height
+                        .aspectRatio(imageBitmap.width.toFloat() / imageBitmap.height)
                 )
             }
 

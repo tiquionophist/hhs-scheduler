@@ -149,8 +149,6 @@ data class TableDivider(
  * [verticalDividers] and [horizontalDividers] may also be added between columns and rows, respectively. They are
  * specified as a map from the index of the column/row BEFORE which the divider should be placed to the [TableDivider]
  * value.
- *
- * TODO min intrinsic width/height are always a bit below what they should be, so content is cut off when scrolling
  */
 @Composable
 fun <T> Table(
@@ -378,8 +376,16 @@ fun <T> Table(
                             x += colWidth
                         }
 
+                        if (rowIndex == 0) {
+                            // add final vertical divider after the last column
+                            verticalDividerPlaceables[numCols]?.place(x = x, y = 0)
+                        }
+
                         y += rowHeight
                     }
+
+                    // add final horizontal divider after the last row
+                    horizontalDividerPlaceables[numRows]?.place(x = 0, y = y)
                 }
             }
 

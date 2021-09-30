@@ -35,6 +35,8 @@ import java.lang.Integer.min
 /**
  * A component allowing the user to select a numeric value, either by incrementing/decrementing buttons or by a text
  * field between them.
+ *
+ * TODO min/max intrinsic width don't match actual button widths, leading to discrepancies in table sizing
  */
 @Composable
 fun NumberPicker(

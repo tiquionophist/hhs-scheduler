@@ -53,6 +53,7 @@ object Dimens {
     }
 
     object ScheduleConfigurationTable {
+        val SUBJECT_ICON_SIZE = 32.dp
         val TEACHER_IMAGE_WIDTH = 50.dp
     }
 
