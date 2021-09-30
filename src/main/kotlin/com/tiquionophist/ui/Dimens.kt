@@ -22,6 +22,7 @@ object Dimens {
     val SPACING_1 = 4.dp
     val SPACING_2 = 8.dp
     val SPACING_3 = 16.dp
+    val SPACING_4 = 32.dp
 
     /**
      * Standard elevation for drop shadows.

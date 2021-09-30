@@ -167,7 +167,7 @@ private class SubjectTeacherAssignmentsColumn(
     override val headerVerticalAlignment = Alignment.Bottom
 
     override val width = ColumnWidth.Fill(
-        minWidth = Dimens.ScheduleConfigurationTable.TEACHER_IMAGE_WIDTH + Dimens.SPACING_2 * 2
+        minWidth = Dimens.ScheduleConfigurationTable.TEACHER_IMAGE_WIDTH + (Dimens.SPACING_4 * 2)
     )
 
     override fun fillCell(value: Subject?): Boolean {
@@ -262,6 +262,7 @@ fun ScheduleConfigurationTable(
         SubjectIconColumn(scheduleConfigurationState.value),
         SubjectNameColumn(scheduleConfigurationState.value),
         SubjectFrequencyPickerColumn(scheduleConfigurationState),
+        TotalTeacherAssignmentsColumn(scheduleConfigurationState.value),
     )
 
     val fixedRows = listOf(null)
@@ -272,9 +273,6 @@ fun ScheduleConfigurationTable(
                 teachers.map { teacher ->
                     SubjectTeacherAssignmentsColumn(teacher, scheduleConfigurationState)
                 }
-            )
-            .plus(
-                TotalTeacherAssignmentsColumn(scheduleConfigurationState.value)
             ),
         rows = fixedRows.plus(subjects),
         fillMaxHeight = true,
@@ -284,14 +282,6 @@ fun ScheduleConfigurationTable(
                 fixedColumns.size,
                 TableDivider(
                     paddingBefore = Dimens.SPACING_2,
-                    color = Colors.divider
-                )
-            ),
-            // strong divider before total teacher assignments column
-            Pair(
-                fixedColumns.size + teachers.size,
-                TableDivider(
-                    paddingAfter = Dimens.SPACING_2,
                     color = Colors.divider
                 )
             ),
@@ -309,7 +299,7 @@ fun ScheduleConfigurationTable(
             ),
         ).plus(
             // weak dividers between each subject row
-            List(subjects.size) { subjectIndex ->
+            List(subjects.size - 1) { subjectIndex ->
                 Pair(subjectIndex + fixedRows.size + 1, TableDivider(color = Colors.weakDivider))
             }
         ),

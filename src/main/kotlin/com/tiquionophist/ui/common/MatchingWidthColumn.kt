@@ -2,6 +2,7 @@ package com.tiquionophist.ui.common
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.platform.LocalLayoutDirection
 
@@ -14,11 +15,13 @@ import androidx.compose.ui.platform.LocalLayoutDirection
  */
 @Composable
 fun MatchingWidthColumn(
+    modifier: Modifier = Modifier,
     horizontalAlignment: Alignment.Horizontal = Alignment.CenterHorizontally,
     content: @Composable () -> Unit,
 ) {
     val layoutDirection = LocalLayoutDirection.current
     Layout(
+        modifier = modifier,
         content = content,
         measurePolicy = { measurables, constraints ->
             val goalWidth = measurables.maxOf { it.minIntrinsicWidth(constraints.maxHeight) }
