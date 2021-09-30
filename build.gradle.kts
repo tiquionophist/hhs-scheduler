@@ -68,6 +68,10 @@ compose.desktop {
         nativeDistributions {
             packageVersion = appProperties.getProperty("version")
             targetFormats(TargetFormat.Exe)
+
+            windows {
+                iconFile.set(resourcesDir.resolve("app_icon.ico"))
+            }
         }
     }
 }
