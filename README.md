@@ -7,8 +7,10 @@ let this program figure out how to satisfy those requirements.
 
 ## Screenshots
 
-| <img src="screenshot-1.PNG" width="350" height="350" /> | <img src="screenshot-2.PNG" width="350" height="350" /> |
-| <img src="screenshot-3.PNG" width="350" height="350" /> | <img src="screenshot-4.PNG" width="350" height="350" /> |
+| | |
+| --- | --- |
+| <img src="screenshot-1.PNG" /> | <img src="screenshot-2.PNG" /> |
+| <img src="screenshot-3.PNG" /> | <img src="screenshot-4.PNG" /> |
 
 ## Installation
 
@@ -20,7 +22,7 @@ hhs-scheduler is distributed in three formats:
 the zip file, extract it, and run `hhs-scheduler.exe`, no installation necessary.
 2. `.msi` installer for Windows. For users who want to install the application permanently and
 access easily from the Start menu, etc. Bundled with a standard installer which will extract the
-application to `C:\Program File\` (or wherever you choose).
+application to `C:\Program Files\` (or wherever you choose).
 3. `.jar` executable JAR file for any platform. This is the smallest format since it does not need
 to bundle a Java runtime. For advanced users who have a JRE installed (15+ is required). Run with
 `java -jar hhs-scheduler.jar`. Note that I only test regularly against Windows.
