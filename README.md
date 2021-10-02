@@ -61,7 +61,9 @@ changing parameters might help find a solution.
 
 ## Miscellaneous
 
-Nerd note: the general solution to this kind of scheduling problem is known to be
+This application is licensed under the [MIT license](https://opensource.org/licenses/MIT).
+
+The general solution to this kind of scheduling problem is known to be
 [NP-complete](https://en.wikipedia.org/wiki/NP-completeness)!
 ([For example](https://math.stackexchange.com/q/2285015), as a reduction to k-coloring.)
 This means that there is no known (and likely no possible) efficient algorithm to deal with large
