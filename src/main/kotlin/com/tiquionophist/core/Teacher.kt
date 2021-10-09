@@ -14,6 +14,7 @@ data class Teacher(val firstName: String, val lastName: String) {
     @Transient
     val imageFilename = "teachers/${firstName.uppercase(Locale.US)}_${lastName.uppercase(Locale.US)}.png"
 
+    // TODO avoid retrying load every time if loadImageBitmapOrNull() returns null
     val imageBitmap: ImageBitmap?
         get() = imageCache.getOrPut(this) { loadImageBitmapOrNull(imageFilename) }
 
@@ -31,7 +32,7 @@ data class Teacher(val firstName: String, val lastName: String) {
         val ANNA_MILLER = Teacher("Anna", "Miller")
         val LARA_ELLIS = Teacher("Lara", "Ellis")
 
-        val DEFAULT_TEACHERS = listOf(
+        val DEFAULT_TEACHERS = setOf(
             APRIL_RAYMUND,
             BETH_MANILI,
             CARL_WALKER,
@@ -43,7 +44,7 @@ data class Teacher(val firstName: String, val lastName: String) {
             SAMANTHA_KELLER,
         )
 
-        val LEXVILLE_TEACHERS = listOf(
+        val LEXVILLE_TEACHERS = setOf(
             ANNA_MILLER,
             LARA_ELLIS,
         )

@@ -31,6 +31,7 @@ private val appVersion: String? by lazy { appProperties?.getProperty("version") 
 fun FrameWindowScope.MenuBar(
     scheduleConfigurationState: MutableState<ScheduleConfiguration>,
     notificationState: MutableState<Notification?>,
+    showLexvilleTeachersState: MutableState<Boolean>,
     showCustomTeacherDialog: () -> Unit
 ) {
     val throwableState = remember { mutableStateOf<Throwable?>(null) }
@@ -83,6 +84,12 @@ fun FrameWindowScope.MenuBar(
         }
 
         Menu("Edit") {
+            CheckboxItem(
+                text = "Include Lexville teachers",
+                checked = showLexvilleTeachersState.value,
+                onCheckedChange = { checked -> showLexvilleTeachersState.value = checked }
+            )
+
             Item(
                 text = "Add custom teacher",
                 shortcut = KeyShortcut(Key.Equals, ctrl = true),

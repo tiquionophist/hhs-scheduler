@@ -41,7 +41,8 @@ fun main() {
             state = rememberWindowState(placement = WindowPlacement.Maximized),
         ) {
             val scheduleConfigurationState = remember { mutableStateOf(initialConfiguration) }
-            val customTeachersState = remember { mutableStateOf(listOf<Teacher>()) }
+            val showLexvilleTeachersState = remember { mutableStateOf(false) }
+            val customTeachersState = remember { mutableStateOf(setOf<Teacher>()) }
             val customTeacherDialogVisibleState = remember { mutableStateOf(false) }
             val computedSchedulesState = remember { mutableStateOf(listOf<ComputedSchedule>()) }
             val notificationState = remember { mutableStateOf<Notification?>(null) }
@@ -49,6 +50,7 @@ fun main() {
             MenuBar(
                 scheduleConfigurationState = scheduleConfigurationState,
                 notificationState = notificationState,
+                showLexvilleTeachersState = showLexvilleTeachersState,
                 showCustomTeacherDialog = {
                     customTeacherDialogVisibleState.value = true
                 }
@@ -60,7 +62,7 @@ fun main() {
                         if (customTeacherDialogVisibleState.value) {
                             CustomTeacherDialog { teacher ->
                                 customTeacherDialogVisibleState.value = false
-                                teacher?.takeUnless { customTeachersState.value.contains(it) }?.let {
+                                teacher?.let {
                                     customTeachersState.value = customTeachersState.value.plus(teacher)
                                 }
                             }
@@ -80,6 +82,7 @@ fun main() {
                             notificationState = notificationState,
                             scheduleConfigurationState = scheduleConfigurationState,
                             customTeachers = customTeachersState.value,
+                            showLexvilleTeachers = showLexvilleTeachersState.value,
                             onComputedSchedule = { computedSchedule ->
                                 computedSchedulesState.value = computedSchedulesState.value
                                     .plus(computedSchedule)
@@ -96,7 +99,8 @@ fun main() {
 private fun MainContent(
     notificationState: MutableState<Notification?>,
     scheduleConfigurationState: MutableState<ScheduleConfiguration>,
-    customTeachers: List<Teacher>,
+    customTeachers: Set<Teacher>,
+    showLexvilleTeachers: Boolean,
     onComputedSchedule: (ComputedSchedule) -> Unit,
 ) {
     ContentWithPane(
@@ -118,6 +122,7 @@ private fun MainContent(
                                 ScheduleConfigurationTable(
                                     scheduleConfigurationState = scheduleConfigurationState,
                                     customTeachers = customTeachers,
+                                    showLexvilleTeachers = showLexvilleTeachers,
                                 )
                             }
 

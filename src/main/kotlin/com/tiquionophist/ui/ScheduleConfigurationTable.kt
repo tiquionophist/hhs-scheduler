@@ -212,7 +212,7 @@ private class SubjectTeacherAssignmentsColumn(
         if (value == Subject.EMPTY) return
 
         val config = scheduleConfigurationState.value
-        val currentAssignments = remember(config) {
+        val currentAssignments = remember(config, teacher) {
             config.teacherAssignments.getOrDefault(teacher, emptySet())
         }
         val contains = remember(currentAssignments) { currentAssignments.contains(value) }
@@ -254,13 +254,15 @@ private class SubjectTeacherAssignmentsColumn(
 @Composable
 fun ScheduleConfigurationTable(
     scheduleConfigurationState: MutableState<ScheduleConfiguration>,
-    customTeachers: List<Teacher>
+    customTeachers: Set<Teacher>,
+    showLexvilleTeachers: Boolean,
 ) {
-    val teachers = remember(customTeachers) {
+    val scheduledTeachers = scheduleConfigurationState.value.teacherAssignments.keys
+    val teachers = remember(scheduledTeachers, customTeachers, showLexvilleTeachers) {
         Teacher.DEFAULT_TEACHERS
-            .plus(Teacher.LEXVILLE_TEACHERS)
+            .plus(scheduledTeachers)
             .plus(customTeachers)
-            .distinct()
+            .plus(if (showLexvilleTeachers) Teacher.LEXVILLE_TEACHERS else emptySet())
             .sortedBy { it.fullName }
     }
 
