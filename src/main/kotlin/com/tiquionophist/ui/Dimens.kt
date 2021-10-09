@@ -58,7 +58,9 @@ object Dimens {
     }
 
     object ScheduleTable {
-        val MIN_CELL_WIDTH = 250.dp
+        // fix size of schedule table cells to avoid window size issues if schedule sizes are different between classes
+        val CELL_WIDTH = 250.dp
+        val CELL_HEIGHT = 75.dp
     }
 
     object Dialog {

@@ -6,7 +6,8 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.LocalContentColor
 import androidx.compose.material.Text
@@ -50,7 +51,7 @@ private class ScheduleDayColumn(
     override val itemHorizontalAlignment = Alignment.Start
     override val itemVerticalAlignment = Alignment.Top
 
-    override val width = ColumnWidth.Fill(minWidth = Dimens.ScheduleTable.MIN_CELL_WIDTH)
+    override val width = ColumnWidth.Fixed(width = Dimens.ScheduleTable.CELL_WIDTH)
 
     override fun fillCell(value: Int?): Boolean {
         return value != null && lessons[value].subject == Subject.EMPTY
@@ -70,7 +71,12 @@ private class ScheduleDayColumn(
         val subject = lesson.subject
 
         if (subject == Subject.EMPTY) {
-            Box(Modifier.fillMaxSize().background(LocalContentColor.current.copy(alpha = 0.05f))) {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(Dimens.ScheduleTable.CELL_HEIGHT)
+                    .background(LocalContentColor.current.copy(alpha = 0.05f))
+            ) {
                 Text(
                     text = subject.prettyName,
                     modifier = Modifier.align(Alignment.Center)
@@ -78,7 +84,7 @@ private class ScheduleDayColumn(
             }
         } else {
             Row(
-                modifier = Modifier.padding(Dimens.SPACING_2),
+                modifier = Modifier.height(Dimens.ScheduleTable.CELL_HEIGHT).padding(Dimens.SPACING_2),
                 horizontalArrangement = Arrangement.spacedBy(Dimens.SPACING_2)
             ) {
                 subject.imageBitmap?.let { imageBitmap ->
