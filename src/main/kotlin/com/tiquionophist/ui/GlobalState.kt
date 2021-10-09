@@ -19,9 +19,12 @@ object GlobalState {
         ?: ScheduleConfiguration.EMPTY
 
     var scheduleConfiguration by mutableStateOf(initialConfiguration)
-    var showLexvilleTeachers by mutableStateOf(false)
     var customTeachers by mutableStateOf(emptySet<Teacher>())
     var computedSchedules by mutableStateOf(listOf<ComputedSchedule>())
+
+    var showLexvilleTeachers by mutableStateOf(false)
+    var showUnusedSubjects by mutableStateOf(true)
+    var showUnusedTeachers by mutableStateOf(true)
 
     var currentNotification by mutableStateOf<Notification?>(null)
 }

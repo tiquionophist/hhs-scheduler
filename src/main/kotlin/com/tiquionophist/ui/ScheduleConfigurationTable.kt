@@ -261,11 +261,25 @@ private class SubjectTeacherAssignmentsColumn(private val teacher: Teacher) : Co
 fun ScheduleConfigurationTable() {
     val configuration = GlobalState.scheduleConfiguration
     val scheduledTeachers = configuration.teacherAssignments.keys
-    val teachers = remember(scheduledTeachers, GlobalState.customTeachers, GlobalState.showLexvilleTeachers) {
+
+    val teachers = remember(
+        scheduledTeachers,
+        GlobalState.customTeachers,
+        GlobalState.showLexvilleTeachers,
+        GlobalState.showUnusedTeachers,
+    ) {
         Teacher.DEFAULT_TEACHERS
             .plus(scheduledTeachers)
             .plus(GlobalState.customTeachers)
             .plus(if (GlobalState.showLexvilleTeachers) Teacher.LEXVILLE_TEACHERS else emptySet())
+            .let { teachers ->
+                if (GlobalState.showUnusedTeachers) {
+                    teachers
+                } else {
+                    teachers.filter { configuration.teacherEnabled(it) }
+                        .takeUnless { it.isEmpty() } ?: teachers // don't allow empty teachers
+                }
+            }
             .sortedBy { it.fullName }
     }
 
@@ -278,6 +292,15 @@ fun ScheduleConfigurationTable() {
 
     val fixedRows = listOf(null)
 
+    val subjectRows = remember(GlobalState.showUnusedSubjects, configuration) {
+        if (GlobalState.showUnusedSubjects) {
+            subjects
+        } else {
+            subjects.filter { configuration.subjectEnabled(it) }
+                .takeUnless { it.minus(Subject.EMPTY).isEmpty() } ?: subjects // don't allow empty subjects
+        }
+    }
+
     Table(
         columns = fixedColumns
             .plus(
@@ -285,7 +308,7 @@ fun ScheduleConfigurationTable() {
                     SubjectTeacherAssignmentsColumn(teacher)
                 }
             ),
-        rows = fixedRows.plus(subjects),
+        rows = fixedRows.plus(subjectRows),
         fillMaxHeight = true,
         verticalDividers = mapOf(
             // strong divider after fixed columns
@@ -310,7 +333,7 @@ fun ScheduleConfigurationTable() {
             ),
         ).plus(
             // weak dividers between each subject row
-            List(subjects.size - 1) { subjectIndex ->
+            List(subjectRows.size - 1) { subjectIndex ->
                 Pair(subjectIndex + fixedRows.size + 1, TableDivider(color = Colors.weakDivider))
             }
         ),

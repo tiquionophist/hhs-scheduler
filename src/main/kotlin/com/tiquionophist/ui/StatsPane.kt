@@ -2,8 +2,9 @@ package com.tiquionophist.ui
 
 import androidx.compose.foundation.VerticalScrollbar
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.rememberScrollbarAdapter
@@ -13,9 +14,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.tiquionophist.core.Stat
+import com.tiquionophist.ui.common.CheckboxWithLabel
 import com.tiquionophist.ui.common.Column
+import com.tiquionophist.ui.common.MatchingWidthColumn
 import com.tiquionophist.ui.common.Table
 import com.tiquionophist.ui.common.TableDivider
 import com.tiquionophist.ui.common.leftBorder
@@ -54,11 +58,12 @@ private object StatValueColumn : Column<Pair<Stat, BigDecimal>> {
 fun StatsPane() {
     Box(modifier = Modifier.fillMaxHeight().leftBorder()) {
         val scrollState = rememberScrollState()
-        Column(Modifier.verticalScroll(scrollState)) {
+        MatchingWidthColumn(Modifier.verticalScroll(scrollState), min = false) {
             Text(
                 maxLines = 1,
                 text = "Weekly class effects",
-                modifier = Modifier.padding(Dimens.SPACING_2).align(Alignment.CenterHorizontally)
+                textAlign = TextAlign.Center,
+                modifier = Modifier.padding(Dimens.SPACING_2),
             )
 
             val stats = remember(GlobalState.scheduleConfiguration) {
@@ -67,19 +72,38 @@ fun StatsPane() {
                     .sortedBy { it.first.prettyName }
             }
 
+            // TODO use new column width which fills remaining space but has minimum of ColumnWidth.MatchContent
             Table(
                 columns = listOf(StatNameColumn, StatValueColumn),
                 rows = stats,
-                modifier = Modifier.align(Alignment.CenterHorizontally),
                 verticalDividers = mapOf(
                     0 to TableDivider(dividerSize = 0.dp, paddingAfter = Dimens.SPACING_2),
                     1 to TableDivider(color = Colors.weakDivider),
                     2 to TableDivider(dividerSize = 0.dp, paddingAfter = Dimens.SPACING_2),
                 ),
                 horizontalDividers = List(stats.size + 1) { rowIndex ->
-                    rowIndex to TableDivider(color = Colors.weakDivider)
+                    val color = if (rowIndex == 0 || rowIndex == stats.size) Colors.divider else Colors.weakDivider
+                    rowIndex to TableDivider(color = color)
                 }.toMap()
             )
+
+            Spacer(Modifier.height(Dimens.SPACING_3))
+
+            CheckboxWithLabel(
+                checked = GlobalState.showUnusedSubjects,
+                onCheckedChange = { GlobalState.showUnusedSubjects = it },
+                modifier = Modifier.padding(Dimens.SPACING_2),
+            ) {
+                Text(text = "Show unused subjects", maxLines = 1)
+            }
+
+            CheckboxWithLabel(
+                checked = GlobalState.showUnusedTeachers,
+                onCheckedChange = { GlobalState.showUnusedTeachers = it },
+                modifier = Modifier.padding(Dimens.SPACING_2),
+            ) {
+                Text(text = "Show unused teachers", maxLines = 1)
+            }
         }
 
         VerticalScrollbar(
