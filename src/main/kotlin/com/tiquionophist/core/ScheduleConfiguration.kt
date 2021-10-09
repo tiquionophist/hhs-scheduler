@@ -3,9 +3,9 @@ package com.tiquionophist.core
 import com.tiquionophist.util.prettyName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
-import kotlinx.serialization.decodeFromString
-import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.decodeFromStream
+import kotlinx.serialization.json.encodeToStream
 import java.io.File
 import java.util.EnumMap
 
@@ -114,10 +114,7 @@ data class ScheduleConfiguration(
     }
 
     fun save(file: File) {
-        val jsonString = json.encodeToString(this)
-        file.bufferedWriter().use {
-            it.write(jsonString)
-        }
+        json.encodeToStream(this, file.outputStream())
     }
 
     companion object {
@@ -133,8 +130,7 @@ data class ScheduleConfiguration(
         }
 
         fun loadOrError(file: File): ScheduleConfiguration {
-            val lines = file.readLines().joinToString(separator = "\n")
-            return json.decodeFromString(lines)
+            return json.decodeFromStream(file.inputStream())
         }
 
         fun loadOrNull(file: File): ScheduleConfiguration? {
