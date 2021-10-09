@@ -31,7 +31,6 @@ import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
-import com.tiquionophist.core.ScheduleConfiguration
 import com.tiquionophist.ui.common.ErrorDialog
 import com.tiquionophist.ui.common.IconAndTextButton
 import com.tiquionophist.ui.common.liveDurationState
@@ -57,15 +56,11 @@ private const val EXCEPTION_MESSAGE =
     "An exception was thrown. Consider reporting this (with the stack trace) on the project's GitHub page or try again."
 
 /**
- * The button to run the scheduler (and the validation warning icon, etc) for the given [configuration].
- *
- * If a schedule is successfully found, [onComputedSchedule] will be invoked with the resulting [ComputedSchedule].
+ * The button to run the scheduler (and the validation warning icon, etc.) for the current
+ * [GlobalState.scheduleConfiguration].
  */
 @Composable
-fun RunScheduleButton(
-    configuration: ScheduleConfiguration,
-    onComputedSchedule: (ComputedSchedule) -> Unit,
-) {
+fun RunScheduleButton() {
     val dialogState = remember { mutableStateOf<Set<ErrorDialogState>>(emptySet()) }
     dialogState.value.forEach { errorDialogState ->
         ErrorDialog(
@@ -101,7 +96,9 @@ fun RunScheduleButton(
             }
         }
 
-        val validationErrors = remember(configuration) { configuration.validationErrors() }
+        val validationErrors = remember(GlobalState.scheduleConfiguration) {
+            GlobalState.scheduleConfiguration.validationErrors()
+        }
 
         if (validationErrors.isNotEmpty()) {
             TooltipArea(
@@ -151,6 +148,7 @@ fun RunScheduleButton(
                 jobState.value = coroutineScope.launch {
                     val scheduler = schedulerSettingsState.value.create()
 
+                    val configuration = GlobalState.scheduleConfiguration
                     val result = runCatching {
                         scheduler.schedule(configuration)?.also { it.verify(configuration) }
                     }
@@ -171,7 +169,7 @@ fun RunScheduleButton(
                                     schedule = schedule
                                 )
 
-                                onComputedSchedule(computedSchedule)
+                                GlobalState.computedSchedules = GlobalState.computedSchedules.plus(computedSchedule)
                             }
                         } else {
                             val errorDialogState = ErrorDialogState(

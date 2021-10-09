@@ -8,9 +8,6 @@ import androidx.compose.foundation.rememberScrollbarAdapter
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
@@ -18,21 +15,14 @@ import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.WindowPlacement
 import androidx.compose.ui.window.application
 import androidx.compose.ui.window.rememberWindowState
-import com.tiquionophist.core.ScheduleConfiguration
-import com.tiquionophist.core.Teacher
 import com.tiquionophist.ui.common.ContentWithPane
-import com.tiquionophist.ui.common.Notification
 import com.tiquionophist.ui.common.NotificationContainer
 import com.tiquionophist.ui.common.PaneDirection
 import com.tiquionophist.ui.common.fillMaxHeightVerticalScroll
 import com.tiquionophist.ui.common.fillMaxWidthHorizontalScroll
-import java.io.File
 
 // TODO investigate text field focus (cursor remains after unfocused)
 fun main() {
-    // load from config.json by default on startup, if it exists, for convenience
-    val initialConfiguration = ScheduleConfiguration.loadOrNull(File("config.json")) ?: ScheduleConfiguration.EMPTY
-
     application {
         Window(
             onCloseRequest = ::exitApplication,
@@ -40,54 +30,14 @@ fun main() {
             icon = painterResource("app_icon.png"),
             state = rememberWindowState(placement = WindowPlacement.Maximized),
         ) {
-            val scheduleConfigurationState = remember { mutableStateOf(initialConfiguration) }
-            val showLexvilleTeachersState = remember { mutableStateOf(false) }
-            val customTeachersState = remember { mutableStateOf(setOf<Teacher>()) }
-            val customTeacherDialogVisibleState = remember { mutableStateOf(false) }
-            val computedSchedulesState = remember { mutableStateOf(listOf<ComputedSchedule>()) }
-            val notificationState = remember { mutableStateOf<Notification?>(null) }
-
-            MenuBar(
-                scheduleConfigurationState = scheduleConfigurationState,
-                notificationState = notificationState,
-                showLexvilleTeachersState = showLexvilleTeachersState,
-                showCustomTeacherDialog = {
-                    customTeacherDialogVisibleState.value = true
-                }
-            )
-
             MaterialTheme(colors = Colors.materialColors(light = ApplicationPreferences.lightMode)) {
                 Dimens.apply {
+                    MenuBar()
+                    CustomTeacherDialogHandler.content()
+                    ScheduleWindowHandler.content()
+
                     Surface {
-                        if (customTeacherDialogVisibleState.value) {
-                            CustomTeacherDialog { teacher ->
-                                customTeacherDialogVisibleState.value = false
-                                teacher?.let {
-                                    customTeachersState.value = customTeachersState.value.plus(teacher)
-                                }
-                            }
-                        }
-
-                        computedSchedulesState.value.forEach { computedSchedule ->
-                            ScheduleWindow(
-                                computedSchedule = computedSchedule,
-                                onClose = {
-                                    computedSchedulesState.value = computedSchedulesState.value
-                                        .minus(computedSchedule)
-                                }
-                            )
-                        }
-
-                        MainContent(
-                            notificationState = notificationState,
-                            scheduleConfigurationState = scheduleConfigurationState,
-                            customTeachers = customTeachersState.value,
-                            showLexvilleTeachers = showLexvilleTeachersState.value,
-                            onComputedSchedule = { computedSchedule ->
-                                computedSchedulesState.value = computedSchedulesState.value
-                                    .plus(computedSchedule)
-                            }
-                        )
+                        MainContent()
                     }
                 }
             }
@@ -96,20 +46,14 @@ fun main() {
 }
 
 @Composable
-private fun MainContent(
-    notificationState: MutableState<Notification?>,
-    scheduleConfigurationState: MutableState<ScheduleConfiguration>,
-    customTeachers: Set<Teacher>,
-    showLexvilleTeachers: Boolean,
-    onComputedSchedule: (ComputedSchedule) -> Unit,
-) {
+private fun MainContent() {
     ContentWithPane(
         direction = PaneDirection.BOTTOM,
         content = {
             ContentWithPane(
                 direction = PaneDirection.RIGHT,
                 content = {
-                    NotificationContainer(notificationState = notificationState) {
+                    NotificationContainer {
                         Box(contentAlignment = Alignment.Center) {
                             val verticalScrollState = rememberScrollState()
                             val horizontalScrollState = rememberScrollState()
@@ -119,11 +63,7 @@ private fun MainContent(
                                     .fillMaxHeightVerticalScroll(verticalScrollState)
                                     .fillMaxWidthHorizontalScroll(horizontalScrollState)
                             ) {
-                                ScheduleConfigurationTable(
-                                    scheduleConfigurationState = scheduleConfigurationState,
-                                    customTeachers = customTeachers,
-                                    showLexvilleTeachers = showLexvilleTeachers,
-                                )
+                                ScheduleConfigurationTable()
                             }
 
                             VerticalScrollbar(
@@ -138,16 +78,9 @@ private fun MainContent(
                         }
                     }
                 },
-                pane = {
-                    StatsPane(configuration = scheduleConfigurationState.value)
-                }
+                pane = { StatsPane() }
             )
         },
-        pane = {
-            SettingsPane(
-                scheduleConfigurationState = scheduleConfigurationState,
-                onComputedSchedule = onComputedSchedule
-            )
-        }
+        pane = { SettingsPane() }
     )
 }

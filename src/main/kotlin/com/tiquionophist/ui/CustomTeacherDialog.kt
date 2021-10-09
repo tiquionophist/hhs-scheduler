@@ -8,8 +8,10 @@ import androidx.compose.material.OutlinedTextField
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.key.Key
@@ -25,13 +27,27 @@ import com.tiquionophist.core.Teacher
 import com.tiquionophist.ui.common.withInitialFocus
 
 /**
+ * Wraps global handling of the custom teacher dialog state and content.
+ */
+object CustomTeacherDialogHandler {
+    var visible by mutableStateOf(false)
+
+    @Composable
+    fun content() {
+        if (visible) {
+            CustomTeacherDialog { visible = false }
+        }
+    }
+}
+
+/**
  * Wraps a [Dialog] which allows the user to create a new [Teacher] with a custom first/last name.
  *
  * When the dialog is closed, [onClose] is invoked, with a non-null [Teacher] if it was submitted successfully, or null
  * if it was cancelled.
  */
 @Composable
-fun CustomTeacherDialog(onClose: (Teacher?) -> Unit) {
+fun CustomTeacherDialog(onClose: () -> Unit) {
     val firstNameState = remember { mutableStateOf("") }
     val lastNameState = remember { mutableStateOf("") }
 
@@ -40,13 +56,15 @@ fun CustomTeacherDialog(onClose: (Teacher?) -> Unit) {
         val firstName = firstNameState.value
         val lastName = lastNameState.value
         if (firstName.isNotEmpty() && lastName.isNotEmpty()) {
-            onClose(Teacher(firstName = firstName, lastName = lastName))
+            val teacher = Teacher(firstName = firstName, lastName = lastName)
+            GlobalState.customTeachers = GlobalState.customTeachers.plus(teacher)
+            onClose()
         }
     }
 
     Dialog(
         title = "Add custom teacher",
-        onCloseRequest = { onClose(null) },
+        onCloseRequest = { onClose() },
         state = rememberDialogState(
             position = WindowPosition(Alignment.Center),
             size = WindowSize(width = Dp.Unspecified, height = Dp.Unspecified),

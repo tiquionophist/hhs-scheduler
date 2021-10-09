@@ -1,7 +1,6 @@
 package com.tiquionophist.ui
 
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.input.key.Key
@@ -28,12 +27,7 @@ private val appVersion: String? by lazy { appProperties?.getProperty("version") 
  * The application menu bar.
  */
 @Composable
-fun FrameWindowScope.MenuBar(
-    scheduleConfigurationState: MutableState<ScheduleConfiguration>,
-    notificationState: MutableState<Notification?>,
-    showLexvilleTeachersState: MutableState<Boolean>,
-    showCustomTeacherDialog: () -> Unit
-) {
+fun FrameWindowScope.MenuBar() {
     val throwableState = remember { mutableStateOf<Throwable?>(null) }
 
     throwableState.value?.let { throwable ->
@@ -50,10 +44,10 @@ fun FrameWindowScope.MenuBar(
                 shortcut = KeyShortcut(Key.S, ctrl = true),
                 onClick = {
                     FilePicker.save()?.let { file ->
-                        val result = runCatching { scheduleConfigurationState.value.save(file) }
+                        val result = runCatching { GlobalState.scheduleConfiguration.save(file) }
 
                         if (result.isSuccess) {
-                            notificationState.value = Notification(
+                            GlobalState.currentNotification = Notification(
                                 title = "Configuration saved",
                                 message = "Successfully saved configuration to ${file.canonicalPath}.",
                                 iconFilename = "done",
@@ -74,7 +68,7 @@ fun FrameWindowScope.MenuBar(
                         val result = runCatching { ScheduleConfiguration.loadOrError(file) }
 
                         if (result.isSuccess) {
-                            scheduleConfigurationState.value = result.getOrThrow()
+                            GlobalState.scheduleConfiguration = result.getOrThrow()
                         } else {
                             throwableState.value = result.exceptionOrNull()
                         }
@@ -86,14 +80,14 @@ fun FrameWindowScope.MenuBar(
         Menu("Edit") {
             CheckboxItem(
                 text = "Include Lexville teachers",
-                checked = showLexvilleTeachersState.value,
-                onCheckedChange = { checked -> showLexvilleTeachersState.value = checked }
+                checked = GlobalState.showLexvilleTeachers,
+                onCheckedChange = { GlobalState.showLexvilleTeachers = it }
             )
 
             Item(
                 text = "Add custom teacher",
                 shortcut = KeyShortcut(Key.Equals, ctrl = true),
-                onClick = showCustomTeacherDialog,
+                onClick = { CustomTeacherDialogHandler.visible = true },
             )
         }
 
@@ -104,11 +98,14 @@ fun FrameWindowScope.MenuBar(
                 onClick = {},
             )
 
+            // remember since this is unlikely to change between recompositions
+            val browseSupported = remember {
+                Desktop.isDesktopSupported() && Desktop.getDesktop().isSupported(Desktop.Action.BROWSE)
+            }
+
             Item(
                 text = "View project on GitHub",
-                enabled = Desktop.isDesktopSupported() &&
-                        Desktop.getDesktop().isSupported(Desktop.Action.BROWSE) &&
-                        githubUrl != null,
+                enabled = browseSupported && githubUrl != null,
                 onClick = {
                     githubUrl?.let { Desktop.getDesktop().browse(URI(it)) }
                 }

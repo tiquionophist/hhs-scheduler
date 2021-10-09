@@ -14,7 +14,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.tiquionophist.core.ScheduleConfiguration
 import com.tiquionophist.core.Stat
 import com.tiquionophist.ui.common.Column
 import com.tiquionophist.ui.common.Table
@@ -49,10 +48,10 @@ private object StatValueColumn : Column<Pair<Stat, BigDecimal>> {
 }
 
 /**
- * Shows the weekly stat effects of [configuration], placed at the right of the window.
+ * Shows the weekly stat effects of [GlobalState.scheduleConfiguration], placed at the right of the window.
  */
 @Composable
-fun StatsPane(configuration: ScheduleConfiguration) {
+fun StatsPane() {
     Box(modifier = Modifier.fillMaxHeight().leftBorder()) {
         val scrollState = rememberScrollState()
         Column(Modifier.verticalScroll(scrollState)) {
@@ -62,8 +61,8 @@ fun StatsPane(configuration: ScheduleConfiguration) {
                 modifier = Modifier.padding(Dimens.SPACING_2).align(Alignment.CenterHorizontally)
             )
 
-            val stats = remember(configuration) {
-                configuration.classStats.stats
+            val stats = remember(GlobalState.scheduleConfiguration) {
+                GlobalState.scheduleConfiguration.classStats.stats
                     .toList()
                     .sortedBy { it.first.prettyName }
             }

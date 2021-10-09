@@ -14,30 +14,27 @@ import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.MutableState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.res.painterResource
 import com.tiquionophist.ui.Dimens
+import com.tiquionophist.ui.GlobalState
 import kotlinx.coroutines.delay
 
 @Composable
-fun NotificationContainer(
-    notificationState: MutableState<Notification?>,
-    content: @Composable () -> Unit,
-) {
+fun NotificationContainer(content: @Composable () -> Unit) {
     Box {
         content()
 
-        notificationState.value?.let { notification ->
+        GlobalState.currentNotification?.let { notification ->
             // auto-dismiss notification after its duration elapses, if it has one
             notification.duration?.let { duration ->
                 LaunchedEffect(notification) {
                     delay(duration.inWholeMilliseconds)
 
-                    if (notificationState.value == notification) {
-                        notificationState.value = null
+                    if (GlobalState.currentNotification == notification) {
+                        GlobalState.currentNotification = null
                     }
                 }
             }
@@ -49,7 +46,7 @@ fun NotificationContainer(
                 ) {
                     Column(
                         modifier = Modifier
-                            .clickable { notificationState.value = null }
+                            .clickable { GlobalState.currentNotification = null }
                             .padding(Dimens.SPACING_3),
                         verticalArrangement = Arrangement.spacedBy(Dimens.SPACING_2),
                     ) {

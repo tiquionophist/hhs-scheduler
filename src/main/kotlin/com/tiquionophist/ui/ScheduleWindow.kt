@@ -21,6 +21,23 @@ import androidx.compose.ui.window.rememberWindowState
 import com.tiquionophist.ui.common.MatchingWidthColumn
 
 /**
+ * Wraps global handling of the computed schedule dialog windows.
+ */
+object ScheduleWindowHandler {
+    @Composable
+    fun content() {
+        GlobalState.computedSchedules.forEach { computedSchedule ->
+            ScheduleWindow(
+                computedSchedule = computedSchedule,
+                onClose = {
+                    GlobalState.computedSchedules = GlobalState.computedSchedules.minus(computedSchedule)
+                }
+            )
+        }
+    }
+}
+
+/**
  * A pop-up window which displays a [computedSchedule].
  */
 @Composable

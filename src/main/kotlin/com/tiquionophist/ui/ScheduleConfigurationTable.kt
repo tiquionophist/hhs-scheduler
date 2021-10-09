@@ -15,7 +15,6 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -60,7 +59,7 @@ private fun ScheduleConfiguration.subjectEnabled(subject: Subject): Boolean {
 /**
  * A column displaying the icon for each [Subject].
  */
-private class SubjectIconColumn(private val configuration: ScheduleConfiguration) : ColumnWithHeader<Subject> {
+private object SubjectIconColumn : ColumnWithHeader<Subject> {
     @Composable
     override fun itemContent(value: Subject) {
         value.imageBitmap?.let { imageBitmap ->
@@ -70,7 +69,7 @@ private class SubjectIconColumn(private val configuration: ScheduleConfiguration
                 modifier = Modifier
                     .padding(horizontal = Dimens.SPACING_2)
                     .size(Dimens.ScheduleConfigurationTable.SUBJECT_ICON_SIZE)
-                    .enabledIf(configuration.subjectEnabled(value)),
+                    .enabledIf(GlobalState.scheduleConfiguration.subjectEnabled(value)),
             )
         }
     }
@@ -79,7 +78,7 @@ private class SubjectIconColumn(private val configuration: ScheduleConfiguration
 /**
  * A column displaying the name of each [Subject].
  */
-private class SubjectNameColumn(private val configuration: ScheduleConfiguration) : ColumnWithHeader<Subject> {
+private object SubjectNameColumn : ColumnWithHeader<Subject> {
     override val itemHorizontalAlignment = Alignment.Start
 
     @Composable
@@ -88,7 +87,7 @@ private class SubjectNameColumn(private val configuration: ScheduleConfiguration
             text = value.prettyName,
             modifier = Modifier
                 .padding(Dimens.SPACING_2)
-                .enabledIf(configuration.subjectEnabled(value)),
+                .enabledIf(GlobalState.scheduleConfiguration.subjectEnabled(value)),
         )
     }
 }
@@ -96,9 +95,7 @@ private class SubjectNameColumn(private val configuration: ScheduleConfiguration
 /**
  * A column displaying a number picker for the frequency of each [Subject] in the schedule.
  */
-private class SubjectFrequencyPickerColumn(
-    private val scheduleConfigurationState: MutableState<ScheduleConfiguration>
-) : ColumnWithHeader<Subject> {
+private object SubjectFrequencyPickerColumn : ColumnWithHeader<Subject> {
     override val headerVerticalAlignment = Alignment.Bottom
 
     @Composable
@@ -111,7 +108,7 @@ private class SubjectFrequencyPickerColumn(
 
     @Composable
     override fun itemContent(value: Subject) {
-        val config = scheduleConfigurationState.value
+        val config = GlobalState.scheduleConfiguration
         if (value == Subject.EMPTY) {
             Text(
                 modifier = Modifier.padding(Dimens.SPACING_2),
@@ -122,7 +119,7 @@ private class SubjectFrequencyPickerColumn(
                 modifier = Modifier.padding(Dimens.SPACING_2),
                 value = config.subjectFrequency[value] ?: 0,
                 onValueChange = { newValue ->
-                    scheduleConfigurationState.value = config.copy(
+                    GlobalState.scheduleConfiguration = GlobalState.scheduleConfiguration.copy(
                         subjectFrequency = ScheduleConfiguration.fillFreePeriods(
                             periodsPerWeek = config.periodsPerWeek,
                             subjectFrequency = config.subjectFrequency.plus(value to newValue),
@@ -139,22 +136,23 @@ private class SubjectFrequencyPickerColumn(
 /**
  * A column displaying the total number of teachers assigned to each [Subject].
  */
-private class TotalTeacherAssignmentsColumn(val configuration: ScheduleConfiguration) : ColumnWithHeader<Subject> {
+private object TotalTeacherAssignmentsColumn : ColumnWithHeader<Subject> {
     override val itemHorizontalAlignment = Alignment.Start
 
     @Composable
     override fun itemContent(value: Subject) {
         if (value == Subject.EMPTY) return
 
-        val numTeachers = configuration.subjectAssignments[value]?.size ?: 0
+        val config = GlobalState.scheduleConfiguration
+        val numTeachers = config.subjectAssignments[value]?.size ?: 0
 
-        val frequency = configuration.subjectFrequency[value] ?: 0
+        val frequency = config.subjectFrequency[value] ?: 0
         val error = (frequency == 0) != (numTeachers == 0)
 
         Text(
             text = "teacher".pluralizedCount(numTeachers),
             color = if (error) MaterialTheme.colors.error else Color.Unspecified,
-            modifier = Modifier.padding(Dimens.SPACING_2).enabledIf(configuration.subjectEnabled(value)),
+            modifier = Modifier.padding(Dimens.SPACING_2).enabledIf(config.subjectEnabled(value)),
         )
     }
 }
@@ -163,10 +161,7 @@ private class TotalTeacherAssignmentsColumn(val configuration: ScheduleConfigura
  * A column displaying the subject assignments for each teacher, with a header showing the teacher image and name and a
  * checkbox toggling whether the teacher is assigned for each subject row.
  */
-private class SubjectTeacherAssignmentsColumn(
-    private val teacher: Teacher,
-    private val scheduleConfigurationState: MutableState<ScheduleConfiguration>
-) : ColumnWithHeader<Subject> {
+private class SubjectTeacherAssignmentsColumn(private val teacher: Teacher) : ColumnWithHeader<Subject> {
     override val headerVerticalAlignment = Alignment.Bottom
 
     override val width = ColumnWidth.Fill(
@@ -179,7 +174,7 @@ private class SubjectTeacherAssignmentsColumn(
 
     @Composable
     override fun header() {
-        val config = scheduleConfigurationState.value
+        val config = GlobalState.scheduleConfiguration
 
         Column(
             modifier = Modifier.padding(Dimens.SPACING_2).enabledIf(config.teacherEnabled(teacher)),
@@ -222,7 +217,7 @@ private class SubjectTeacherAssignmentsColumn(
     override fun itemContent(value: Subject) {
         if (value == Subject.EMPTY) return
 
-        val config = scheduleConfigurationState.value
+        val config = GlobalState.scheduleConfiguration
         val currentAssignments = remember(config, teacher) {
             config.teacherAssignments.getOrDefault(teacher, emptySet())
         }
@@ -237,7 +232,7 @@ private class SubjectTeacherAssignmentsColumn(
                         currentAssignments.plus(value)
                     }
 
-                    scheduleConfigurationState.value = config.copy(
+                    GlobalState.scheduleConfiguration = GlobalState.scheduleConfiguration.copy(
                         teacherAssignments = config.teacherAssignments
                             .plus(teacher to newAssignments)
                             .filterValues { it.isNotEmpty() }
@@ -260,28 +255,25 @@ private class SubjectTeacherAssignmentsColumn(
 }
 
 /**
- * A grid-based view of the teacher/subject assignments and frequencies in [scheduleConfigurationState].
+ * A grid-based view of the teacher/subject assignments and frequencies in [GlobalState.scheduleConfiguration].
  */
 @Composable
-fun ScheduleConfigurationTable(
-    scheduleConfigurationState: MutableState<ScheduleConfiguration>,
-    customTeachers: Set<Teacher>,
-    showLexvilleTeachers: Boolean,
-) {
-    val scheduledTeachers = scheduleConfigurationState.value.teacherAssignments.keys
-    val teachers = remember(scheduledTeachers, customTeachers, showLexvilleTeachers) {
+fun ScheduleConfigurationTable() {
+    val configuration = GlobalState.scheduleConfiguration
+    val scheduledTeachers = configuration.teacherAssignments.keys
+    val teachers = remember(scheduledTeachers, GlobalState.customTeachers, GlobalState.showLexvilleTeachers) {
         Teacher.DEFAULT_TEACHERS
             .plus(scheduledTeachers)
-            .plus(customTeachers)
-            .plus(if (showLexvilleTeachers) Teacher.LEXVILLE_TEACHERS else emptySet())
+            .plus(GlobalState.customTeachers)
+            .plus(if (GlobalState.showLexvilleTeachers) Teacher.LEXVILLE_TEACHERS else emptySet())
             .sortedBy { it.fullName }
     }
 
     val fixedColumns = listOf(
-        SubjectIconColumn(scheduleConfigurationState.value),
-        SubjectNameColumn(scheduleConfigurationState.value),
-        SubjectFrequencyPickerColumn(scheduleConfigurationState),
-        TotalTeacherAssignmentsColumn(scheduleConfigurationState.value),
+        SubjectIconColumn,
+        SubjectNameColumn,
+        SubjectFrequencyPickerColumn,
+        TotalTeacherAssignmentsColumn,
     )
 
     val fixedRows = listOf(null)
@@ -290,7 +282,7 @@ fun ScheduleConfigurationTable(
         columns = fixedColumns
             .plus(
                 teachers.map { teacher ->
-                    SubjectTeacherAssignmentsColumn(teacher, scheduleConfigurationState)
+                    SubjectTeacherAssignmentsColumn(teacher)
                 }
             ),
         rows = fixedRows.plus(subjects),

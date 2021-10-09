@@ -10,7 +10,6 @@ import androidx.compose.material.LocalContentAlpha
 import androidx.compose.material.LocalContentColor
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -27,10 +26,7 @@ import com.tiquionophist.ui.common.topBorder
  * Row of scheduling-wide settings, placed at the bottom of the window.
  */
 @Composable
-fun SettingsPane(
-    scheduleConfigurationState: MutableState<ScheduleConfiguration>,
-    onComputedSchedule: (ComputedSchedule) -> Unit,
-) {
+fun SettingsPane() {
     Row(
         modifier = Modifier.fillMaxWidth().topBorder().padding(Dimens.SPACING_2),
         horizontalArrangement = Arrangement.SpaceBetween,
@@ -57,7 +53,7 @@ fun SettingsPane(
                     message = "Reset schedule configuration?",
                     acceptText = "Clear",
                     onAccept = {
-                        scheduleConfigurationState.value = ScheduleConfiguration.EMPTY
+                        GlobalState.scheduleConfiguration = ScheduleConfiguration.EMPTY
                         confirmDialogVisible.value = false
                     },
                     onDecline = {
@@ -79,9 +75,9 @@ fun SettingsPane(
                 Text("Classes:")
 
                 NumberPicker(
-                    value = scheduleConfigurationState.value.classes,
+                    value = GlobalState.scheduleConfiguration.classes,
                     onValueChange = { newValue ->
-                        scheduleConfigurationState.value = scheduleConfigurationState.value.copy(
+                        GlobalState.scheduleConfiguration = GlobalState.scheduleConfiguration.copy(
                             classes = newValue
                         )
                     },
@@ -90,9 +86,6 @@ fun SettingsPane(
             }
         }
 
-        RunScheduleButton(
-            configuration = scheduleConfigurationState.value,
-            onComputedSchedule = onComputedSchedule
-        )
+        RunScheduleButton()
     }
 }

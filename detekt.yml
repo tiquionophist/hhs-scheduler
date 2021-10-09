@@ -8,6 +8,10 @@ complexity:
   LongParameterList:
     active: false
 
+naming:
+  MatchingDeclarationName:
+    active: false
+
 style:
   ReturnCount:
     active: false
