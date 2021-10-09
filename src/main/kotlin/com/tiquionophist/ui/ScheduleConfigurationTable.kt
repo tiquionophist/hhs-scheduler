@@ -203,7 +203,18 @@ private class SubjectTeacherAssignmentsColumn(
             )
 
             val numAssignments = config.teacherAssignments[teacher]?.size ?: 0
-            Text(text = "$numAssignments subjects")
+            Text(text = "subject".pluralizedCount(numAssignments))
+
+            if (numAssignments != 0) {
+                val minClasses = config.minClassesTaughtPerTeacher[teacher] ?: 0
+                val maxClasses = config.maxClassesTaughtPerTeacher[teacher] ?: 0
+
+                val range = if (minClasses == maxClasses) minClasses.toString() else "$minClasses - $maxClasses"
+
+                Text(text = "($range classes/week)", textAlign = TextAlign.Center)
+            } else {
+                Text("")
+            }
         }
     }
 
