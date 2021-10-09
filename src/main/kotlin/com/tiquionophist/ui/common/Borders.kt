@@ -11,6 +11,7 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.Dp
 import com.tiquionophist.ui.Colors
 import com.tiquionophist.ui.Dimens
+import kotlin.math.sqrt
 
 /**
  * Adds a border line to the top of this element.
@@ -21,7 +22,8 @@ fun Modifier.topBorder(width: Dp = Dimens.BORDER_WIDTH, color: Color = Colors.di
     return this
         .border(
             width = width,
-            color = color,
+            // hack: path colors seem to have their alpha applied twice
+            color = color.copy(alpha = sqrt(color.alpha)),
             shape = GenericShape { size, _ ->
                 addRect(Rect(left = 0f, top = 0f, right = size.width, bottom = widthPx))
             }
@@ -38,7 +40,8 @@ fun Modifier.leftBorder(width: Dp = Dimens.BORDER_WIDTH, color: Color = Colors.d
     return this
         .border(
             width = width,
-            color = color,
+            // hack: path colors seem to have their alpha applied twice
+            color = color.copy(alpha = sqrt(color.alpha)),
             shape = GenericShape { size, _ ->
                 addRect(Rect(left = 0f, top = 0f, right = widthPx, bottom = size.height))
             }
