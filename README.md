@@ -63,6 +63,15 @@ changing parameters might help find a solution.
 
 This application is licensed under the [MIT license](https://opensource.org/licenses/MIT).
 
+This application is written in [Kotlin](https://kotlinlang.org/) and built with the
+[Compose Multiplatform](https://github.com/JetBrains/compose-jb) UI framework. Standard Gradle
+commands can be used to build it from the source, run tests, etc. For example:
+- `./gradlew run` compiles and runs the application
+- `./gradlew check` runs linting and unit tests
+- `./gradlew createRelease` creates release artifacts (in `build/release-<version>/`)
+
+---
+
 The general solution to this kind of scheduling problem is known to be
 [NP-complete](https://en.wikipedia.org/wiki/NP-completeness)!
 ([For example](https://math.stackexchange.com/q/2285015), as a reduction to k-coloring.)
