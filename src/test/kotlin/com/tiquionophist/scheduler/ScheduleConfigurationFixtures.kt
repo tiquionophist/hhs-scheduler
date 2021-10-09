@@ -97,5 +97,14 @@ object ScheduleConfigurationFixtures {
         )
     )
 
+    val trivialImpossibleConfiguration = ScheduleConfiguration(
+        classes = 3,
+        teacherAssignments = mapOf(Teacher.ANNA_MILLER to setOf(Subject.ENGLISH)),
+        subjectFrequency = mapOf(Subject.ENGLISH to 20)
+    )
+
     val possibleConfigurations = listOf(trivialConfiguration, easyConfiguration, mediumConfiguration, hardConfiguration)
+    val impossibleConfigurations = listOf(trivialImpossibleConfiguration)
+
+    val allConfigurations = possibleConfigurations.plus(impossibleConfigurations)
 }
