@@ -3,6 +3,7 @@ package com.tiquionophist.ui.common
 import java.io.File
 import javax.swing.JFileChooser
 import javax.swing.JOptionPane
+import javax.swing.filechooser.FileFilter
 import javax.swing.filechooser.FileNameExtensionFilter
 
 /**
@@ -10,6 +11,7 @@ import javax.swing.filechooser.FileNameExtensionFilter
  */
 object FilePicker {
     private val jsonFileFilter = FileNameExtensionFilter("*.json", "json")
+    val gameSaveFileFilter = FileNameExtensionFilter("*.sav", "sav")
 
     /**
      * Opens a file chooser to save a file, starting in [startingDirectory], and returns the chosen file if the user
@@ -51,11 +53,11 @@ object FilePicker {
      * Opens a file chooser to load a file, starting in [startingDirectory], and returns the chosen file if the user
      * selected one.
      */
-    fun load(startingDirectory: File? = File(".")): File? {
+    fun load(startingDirectory: File? = File("."), fileFilter: FileFilter = jsonFileFilter): File? {
         val fc = JFileChooser(startingDirectory)
 
-        fc.addChoosableFileFilter(jsonFileFilter)
-        fc.fileFilter = jsonFileFilter
+        fc.addChoosableFileFilter(fileFilter)
+        fc.fileFilter = fileFilter
 
         val result = fc.showOpenDialog(null)
         return if (result == JFileChooser.APPROVE_OPTION) {
