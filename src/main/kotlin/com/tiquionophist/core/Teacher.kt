@@ -24,6 +24,7 @@ data class Teacher(val firstName: String, val lastName: String) {
         val CARL_WALKER = Teacher("Carl", "Walker")
         val CARMEN_SMITH = Teacher("Carmen", "Smith")
         val CLAIRE_FUZUSHI = Teacher("Claire", "Fuzushi")
+        val IRINA_JELABITCH = Teacher("Irina", "Jelabitch")
         val JESSICA_UNDERWOOD = Teacher("Jessica", "Underwood")
         val NINA_PARKER = Teacher("Nina", "Parker")
         val RONDA_BELLS = Teacher("Ronda", "Bells")
@@ -38,6 +39,7 @@ data class Teacher(val firstName: String, val lastName: String) {
             CARL_WALKER,
             CARMEN_SMITH,
             CLAIRE_FUZUSHI,
+            IRINA_JELABITCH,
             JESSICA_UNDERWOOD,
             NINA_PARKER,
             RONDA_BELLS,
