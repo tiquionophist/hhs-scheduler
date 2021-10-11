@@ -8,7 +8,7 @@ import androidx.compose.ui.input.key.KeyShortcut
 import androidx.compose.ui.window.FrameWindowScope
 import androidx.compose.ui.window.MenuBar
 import com.tiquionophist.core.ScheduleConfiguration
-import com.tiquionophist.io.SaveFileReader
+import com.tiquionophist.io.SaveFileIO
 import com.tiquionophist.ui.common.ErrorDialog
 import com.tiquionophist.ui.common.FilePicker
 import com.tiquionophist.ui.common.Notification
@@ -84,7 +84,7 @@ fun FrameWindowScope.MenuBar() {
                 onClick = {
                     FilePicker.load(fileFilter = FilePicker.gameSaveFileFilter)?.let { file ->
                         // TODO add loading dialog while the file is being read and parsed
-                        val result = runCatching { SaveFileReader.read(file).toScheduleConfiguration() }
+                        val result = runCatching { SaveFileIO.read(file).toScheduleConfiguration() }
 
                         if (result.isSuccess) {
                             GlobalState.scheduleConfiguration = result.getOrThrow()

@@ -3,23 +3,49 @@ package com.tiquionophist.io
 import com.tiquionophist.core.ScheduleConfiguration
 import com.tiquionophist.core.Subject
 import com.tiquionophist.core.Teacher
+import com.tiquionophist.scheduler.ExhaustiveScheduler
+import com.tiquionophist.scheduler.RandomizedScheduler
+import com.tiquionophist.ui.ComputedSchedule
+import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 import java.io.File
 
-internal class SaveFileReaderTest {
+internal class SaveFileIOTest {
     @Test
-    fun test() {
-        val file = File(this::class.java.classLoader.getResource("test-save-file.sav")!!.file)
-        val gameVariables = SaveFileReader.read(file)
+    fun testRead() {
+        val gameVariables = SaveFileIO.read(testSaveFile)
 
         val scheduleConfiguration = gameVariables.toScheduleConfiguration()
         assertEquals(saveFileConfiguration, scheduleConfiguration)
         assertTrue(scheduleConfiguration.validationErrors().isEmpty())
     }
 
+    @Test
+    fun testWrite() {
+        val scheduler = ExhaustiveScheduler(fillOrder = RandomizedScheduler.ScheduleFillOrder.CLASS_BY_CLASS)
+        val schedule = runBlocking { scheduler.schedule(saveFileConfiguration)!! }
+
+        val outFile = resourcesDir.resolve("test-save-file-modified.sav")
+        outFile.deleteOnExit()
+
+        SaveFileIO.write(
+            schedule = ComputedSchedule(
+                configuration = saveFileConfiguration,
+                schedule = schedule,
+            ),
+            sourceFile = testSaveFile,
+            destinationFile = outFile,
+        )
+
+        assertEquals(saveFileConfiguration, SaveFileIO.read(outFile).toScheduleConfiguration())
+    }
+
     companion object {
+        private val resourcesDir = File("src/test/resources/")
+        private val testSaveFile = resourcesDir.resolve("test-save-file.sav")
+
         // expected ScheduleConfiguration in the test save file
         private val saveFileConfiguration = ScheduleConfiguration(
             classes = 2,
