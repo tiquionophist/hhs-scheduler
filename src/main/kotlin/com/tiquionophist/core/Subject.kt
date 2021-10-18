@@ -75,7 +75,7 @@ enum class Subject(
         stats = StatSet(Stat.EDUCATION to "0.1", Stat.INTELLIGENCE to "0.1", Stat.LOYALTY to "0.1")
     ),
     PHYSICS(
-        classrooms = EnumSet.of(Classroom.PHYSICS),
+        classrooms = EnumSet.of(Classroom.CHEMISTRY),
         stats = StatSet(Stat.INTELLIGENCE to "0.3")
     ),
     PRACTICAL_SEX_ED(

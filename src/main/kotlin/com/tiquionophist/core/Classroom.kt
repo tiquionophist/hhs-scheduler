@@ -12,7 +12,6 @@ enum class Classroom {
     COMPUTER,
     GYM,
     MUSIC,
-    PHYSICS,
     SPORTS_AREA,
     SWIMMING_POOL,
 }
