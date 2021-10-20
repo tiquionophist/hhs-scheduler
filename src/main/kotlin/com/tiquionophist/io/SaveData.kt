@@ -97,30 +97,39 @@ data class SaveData(
         }
 
         companion object {
+            private const val DEFAULT_PERIODS_PER_DAY = 4
+
             fun fromSchedule(schedule: Schedule): List<SchoolClass> {
                 val emptyClass = SchoolClass(
                     classIndex = 0,
-                    monday = StringList(List(4) { "" }),
-                    tuesday = StringList(List(4) { "" }),
-                    wednesday = StringList(List(4) { "" }),
-                    thursday = StringList(List(4) { "" }),
-                    friday = StringList(List(4) { "" }),
-                    mondayLocation = StringList(List(4) { "" }),
-                    tuesdayLocation = StringList(List(4) { "" }),
-                    wednesdayLocation = StringList(List(4) { "" }),
-                    thursdayLocation = StringList(List(4) { "" }),
-                    fridayLocation = StringList(List(4) { "" }),
+                    monday = StringList(List(DEFAULT_PERIODS_PER_DAY) { "" }),
+                    tuesday = StringList(List(DEFAULT_PERIODS_PER_DAY) { "" }),
+                    wednesday = StringList(List(DEFAULT_PERIODS_PER_DAY) { "" }),
+                    thursday = StringList(List(DEFAULT_PERIODS_PER_DAY) { "" }),
+                    friday = StringList(List(DEFAULT_PERIODS_PER_DAY) { "" }),
+                    mondayLocation = StringList(List(DEFAULT_PERIODS_PER_DAY) { "" }),
+                    tuesdayLocation = StringList(List(DEFAULT_PERIODS_PER_DAY) { "" }),
+                    wednesdayLocation = StringList(List(DEFAULT_PERIODS_PER_DAY) { "" }),
+                    thursdayLocation = StringList(List(DEFAULT_PERIODS_PER_DAY) { "" }),
+                    fridayLocation = StringList(List(DEFAULT_PERIODS_PER_DAY) { "" }),
                 )
 
+                val classroomNames = schedule.classroomNames()
                 val classes = schedule.lessons.mapIndexed { index, classLessons ->
-                    val chunked = classLessons.chunked(4)
-                    val mondayLessons = chunked[0]
-                    val tuesdayLessons = chunked[1]
-                    val wednesdayLessons = chunked[2]
-                    val thursdayLessons = chunked[3]
-                    val fridayLessons = chunked[4]
+                    val lessonsChunked = classLessons.chunked(DEFAULT_PERIODS_PER_DAY)
+                    val mondayLessons = lessonsChunked[0]
+                    val tuesdayLessons = lessonsChunked[1]
+                    val wednesdayLessons = lessonsChunked[2]
+                    val thursdayLessons = lessonsChunked[3]
+                    val fridayLessons = lessonsChunked[4]
 
-                    // TODO add numbered classrooms ("Classroom 1", etc)
+                    val classroomsChunked = classroomNames[index].chunked(DEFAULT_PERIODS_PER_DAY)
+                    val mondayClassrooms = classroomsChunked[0]
+                    val tuesdayClassrooms = classroomsChunked[1]
+                    val wednesdayClassrooms = classroomsChunked[2]
+                    val thursdayClassrooms = classroomsChunked[3]
+                    val fridayClassrooms = classroomsChunked[4]
+
                     SchoolClass(
                         classIndex = index + 1,
                         monday = StringList(mondayLessons.map { enumToSubjectName(it.subject) }),
@@ -128,11 +137,11 @@ data class SaveData(
                         wednesday = StringList(wednesdayLessons.map { enumToSubjectName(it.subject) }),
                         thursday = StringList(thursdayLessons.map { enumToSubjectName(it.subject) }),
                         friday = StringList(fridayLessons.map { enumToSubjectName(it.subject) }),
-                        mondayLocation = StringList(mondayLessons.map { enumToLocationName(it.classroom) }),
-                        tuesdayLocation = StringList(tuesdayLessons.map { enumToLocationName(it.classroom) }),
-                        wednesdayLocation = StringList(wednesdayLessons.map { enumToLocationName(it.classroom) }),
-                        thursdayLocation = StringList(thursdayLessons.map { enumToLocationName(it.classroom) }),
-                        fridayLocation = StringList(fridayLessons.map { enumToLocationName(it.classroom) }),
+                        mondayLocation = StringList(mondayClassrooms),
+                        tuesdayLocation = StringList(tuesdayClassrooms),
+                        wednesdayLocation = StringList(wednesdayClassrooms),
+                        thursdayLocation = StringList(thursdayClassrooms),
+                        fridayLocation = StringList(fridayClassrooms),
                     )
                 }
 
@@ -198,6 +207,42 @@ data class SaveData(
 
     companion object {
         /**
+         * Maps the lessons in this [Schedule] to the canonical names of the locations where they take place, i.e. the
+         * location names used in the save data.
+         *
+         * For explicit [Classroom]s this is similar to their [Classroom.prettyName] (but not always identical, since
+         * some have a prefix "Classroom XXX"), but in cases where the classroom is null this function also fills it in
+         * which a generic numbered classroom, i.e. "Classroom 1", "Classroom 2", etc.
+         */
+        private fun Schedule.classroomNames(): List<List<String>> {
+            // [periodIndex -> highest classroom number that's in use for that period]
+            val numberedClassrooms = mutableMapOf<Int, Int>()
+
+            return lessons.map { classLessons ->
+                classLessons.mapIndexed { periodIndex, lesson ->
+                    when (lesson.classroom) {
+                        Classroom.ART -> "Classroom Art"
+                        Classroom.BASEMENT -> "Basement"
+                        Classroom.BIOLOGY -> "Classroom Biology"
+                        Classroom.CHEMISTRY -> "Classroom Chemistry"
+                        Classroom.COMPUTER -> "Computer Room"
+                        Classroom.GYM -> "Gym"
+                        Classroom.MUSIC -> "Classroom Music"
+                        Classroom.SPORTS_AREA -> "Sports Area"
+                        Classroom.SWIMMING_POOL -> "Swimming Pool"
+                        null -> {
+                            val classroomNumber = (numberedClassrooms[periodIndex] ?: 0) + 1
+                            numberedClassrooms[periodIndex] = classroomNumber
+
+                            check(classroomNumber <= 10) { "exceeded numbered classrooms" }
+                            "Classroom $classroomNumber"
+                        }
+                    }
+                }
+            }
+        }
+
+        /**
          * Convert [subjectName] from game save XML to a [Subject], which requires a bit of transformation from its
          * [Subject.prettyName].
          */
@@ -217,14 +262,6 @@ data class SaveData(
             if (subject == Subject.EMPTY) return ""
 
             return subject.prettyName.replace("Sex Ed", "Sex Education")
-        }
-
-        /**
-         * Convert [classroom] to its name in the game save XML, which requires a bit of transformation from its
-         * [Classroom.prettyName].
-         */
-        private fun enumToLocationName(classroom: Classroom?): String {
-            return classroom?.prettyName.orEmpty() // TODO classroom names are a bit different
         }
     }
 }
