@@ -63,6 +63,7 @@ fun XMLStreamReader.readUntilElementEnd() {
     while (hasNext()) {
         next()
 
+        @Suppress("ComplexCondition")
         if (isStartElement &&
             prefix == startPrefix &&
             localName == startLocalName &&

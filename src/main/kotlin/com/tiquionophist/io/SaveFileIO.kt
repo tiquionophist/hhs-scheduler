@@ -12,6 +12,12 @@ import javax.xml.stream.XMLStreamReader
 import javax.xml.stream.XMLStreamWriter
 
 object SaveFileIO {
+    /**
+     * The required number of periods per week in save game files, since they are hardcoded to 5 days/week and 4
+     * periods/day.
+     */
+    private const val PERIODS_PER_WEEK = 20
+
     val xmlMapper: XmlMapper = XmlMapper.builder()
         .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
         .addModule(kotlinModule()) // allow non-empty constructors and other Kotlin compatibility
@@ -33,7 +39,9 @@ object SaveFileIO {
      * assignments from [ComputedSchedule].
      */
     fun write(schedule: ComputedSchedule, sourceFile: File, destinationFile: File) {
-        require(schedule.configuration.periodsPerWeek == 20) { "must have 20 periods/week" }
+        require(schedule.configuration.periodsPerWeek == PERIODS_PER_WEEK) {
+            "must have $PERIODS_PER_WEEK periods/week"
+        }
 
         sourceFile.inputStream().use { inputStream ->
             val reader: XMLStreamReader = XMLInputFactory.newFactory().createXMLStreamReader(inputStream)

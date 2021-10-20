@@ -99,6 +99,7 @@ data class SaveData(
         companion object {
             private const val DEFAULT_PERIODS_PER_DAY = 4
 
+            @Suppress("MagicNumber")
             fun fromSchedule(schedule: Schedule): List<SchoolClass> {
                 val emptyClass = SchoolClass(
                     classIndex = 0,
@@ -207,6 +208,11 @@ data class SaveData(
 
     companion object {
         /**
+         * The number of numbered classrooms that exist in the game.
+         */
+        private const val MAX_NUMBERED_CLASSROOMS = 10
+
+        /**
          * Maps the lessons in this [Schedule] to the canonical names of the locations where they take place, i.e. the
          * location names used in the save data.
          *
@@ -234,7 +240,9 @@ data class SaveData(
                             val classroomNumber = (numberedClassrooms[periodIndex] ?: 0) + 1
                             numberedClassrooms[periodIndex] = classroomNumber
 
-                            check(classroomNumber <= 10) { "exceeded numbered classrooms" }
+                            check(classroomNumber <= MAX_NUMBERED_CLASSROOMS) {
+                                "exceeded numbered classrooms limit of $MAX_NUMBERED_CLASSROOMS"
+                            }
                             "Classroom $classroomNumber"
                         }
                     }
