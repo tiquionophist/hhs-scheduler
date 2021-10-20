@@ -8,8 +8,10 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.RectangleShape
@@ -87,6 +89,21 @@ fun ScheduleWindow(
                     schedule = computedSchedule.schedule,
                     classIndex = selectedClassIndexState.value,
                 )
+
+                var exporting by remember { mutableStateOf(false) }
+                Button(
+                    shape = RectangleShape,
+                    onClick = { exporting = true },
+                ) {
+                    Text("Export to game save")
+                }
+
+                if (exporting) {
+                    ScheduleExportDialog(
+                        computedSchedule = computedSchedule,
+                        onClose = { exporting = false },
+                    )
+                }
             }
         }
     }
