@@ -14,9 +14,15 @@ data class Teacher(val firstName: String, val lastName: String) {
     @Transient
     val imageFilename = "teachers/${firstName.uppercase(Locale.US)}_${lastName.uppercase(Locale.US)}.png"
 
-    // TODO avoid retrying load every time if loadImageBitmapOrNull() returns null
     val imageBitmap: ImageBitmap?
-        get() = imageCache.getOrPut(this) { loadImageBitmapOrNull(imageFilename) }
+        get() {
+            // explicitly use containsKey to avoid calling loadImageBitmapOrNull() again if it returns null
+            return if (imageCache.containsKey(this)) {
+                imageCache[this]
+            } else {
+                loadImageBitmapOrNull(imageFilename).also { imageCache[this] = it }
+            }
+        }
 
     companion object {
         val APRIL_RAYMUND = Teacher("April", "Raymund")
