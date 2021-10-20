@@ -10,7 +10,7 @@ plugins {
     kotlin("plugin.serialization") version "1.5.30"
     jacoco
     id("io.gitlab.arturbosch.detekt") version "1.18.1"
-    id("org.jetbrains.compose") version "1.0.0-alpha4-build366"
+    id("org.jetbrains.compose") version "1.0.0-alpha4-build411"
 }
 
 repositories {

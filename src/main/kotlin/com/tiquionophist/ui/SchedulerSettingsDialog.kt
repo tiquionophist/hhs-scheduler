@@ -29,9 +29,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
-import androidx.compose.ui.window.WindowSize
 import androidx.compose.ui.window.rememberDialogState
 import com.tiquionophist.core.Scheduler
 import com.tiquionophist.scheduler.ExhaustiveScheduler
@@ -128,7 +128,7 @@ fun SchedulerSettingsDialog(
 ) {
     Dialog(
         state = rememberDialogState(
-            size = WindowSize(width = DIALOG_WIDTH, height = DIALOG_HEIGHT)
+            size = DpSize(width = DIALOG_WIDTH, height = DIALOG_HEIGHT)
         ),
         title = "Scheduler settings",
         onCloseRequest = { onClose(null) },

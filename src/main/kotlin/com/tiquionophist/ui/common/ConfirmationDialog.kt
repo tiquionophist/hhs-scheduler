@@ -12,8 +12,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.window.Dialog
-import androidx.compose.ui.window.WindowSize
 import androidx.compose.ui.window.rememberDialogState
 import com.tiquionophist.ui.Dimens
 
@@ -28,7 +28,7 @@ fun ConfirmationDialog(
     onDecline: () -> Unit = {},
 ) {
     Dialog(
-        state = rememberDialogState(size = WindowSize(width = Dp.Unspecified, height = Dp.Unspecified)),
+        state = rememberDialogState(size = DpSize(width = Dp.Unspecified, height = Dp.Unspecified)),
         resizable = false,
         title = windowTitle ?: "Confirmation",
         onCloseRequest = onDecline,

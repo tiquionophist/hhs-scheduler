@@ -19,9 +19,9 @@ import androidx.compose.ui.input.key.KeyEventType
 import androidx.compose.ui.input.key.key
 import androidx.compose.ui.input.key.type
 import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.WindowPosition
-import androidx.compose.ui.window.WindowSize
 import androidx.compose.ui.window.rememberDialogState
 import com.tiquionophist.core.Teacher
 import com.tiquionophist.ui.common.withInitialFocus
@@ -67,7 +67,7 @@ fun CustomTeacherDialog(onClose: () -> Unit) {
         onCloseRequest = { onClose() },
         state = rememberDialogState(
             position = WindowPosition(Alignment.Center),
-            size = WindowSize(width = Dp.Unspecified, height = Dp.Unspecified),
+            size = DpSize(width = Dp.Unspecified, height = Dp.Unspecified),
         ),
         onKeyEvent = {
             if (it.key == Key.Enter && it.type == KeyEventType.KeyDown) {
