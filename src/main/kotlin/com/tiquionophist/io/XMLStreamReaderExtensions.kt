@@ -13,7 +13,25 @@ fun XMLStreamReader.mirrorTo(writer: XMLStreamWriter, intercept: () -> Boolean =
             when (eventType) {
                 XMLStreamReader.START_DOCUMENT -> writer.writeStartDocument()
                 XMLStreamReader.END_DOCUMENT -> writer.writeEndDocument()
-                XMLStreamReader.START_ELEMENT -> writer.writeStartElement(prefix, localName, namespaceURI)
+                XMLStreamReader.START_ELEMENT -> {
+                    writer.writeStartElement(prefix, localName, namespaceURI)
+
+                    for (attributeIndex in 0 until attributeCount) {
+                        val prefix = getAttributePrefix(attributeIndex)
+                        val namespaceURI = getAttributeNamespace(attributeIndex)
+                        val localName = getAttributeLocalName(attributeIndex)
+                        val value = getAttributeValue(attributeIndex)
+
+                        writer.writeAttribute(prefix, namespaceURI, localName, value)
+                    }
+
+                    for (namespaceIndex in 0 until namespaceCount) {
+                        val prefix = getNamespacePrefix(namespaceIndex)
+                        val namespaceURI = getNamespaceURI(namespaceIndex)
+
+                        writer.writeNamespace(prefix, namespaceURI)
+                    }
+                }
                 XMLStreamReader.END_ELEMENT -> writer.writeEndElement()
                 XMLStreamReader.CHARACTERS -> writer.writeCharacters(text)
                 // TODO add remaining event types to be safe

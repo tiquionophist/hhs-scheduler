@@ -122,7 +122,9 @@ fun ScheduleExportDialog(
                         )
                     }
                     is ExportStatus.Error -> {
-                        Text("Error: ${(status as ExportStatus.Error).throwable.message}")
+                        val throwable = (status as ExportStatus.Error).throwable
+                        throwable.printStackTrace()
+                        Text("Error: ${throwable.message}")
                     }
                 }
             }
