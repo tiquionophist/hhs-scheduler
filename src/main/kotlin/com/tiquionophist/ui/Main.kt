@@ -5,9 +5,12 @@ import androidx.compose.foundation.VerticalScrollbar
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.rememberScrollbarAdapter
+import androidx.compose.material.ExperimentalMaterialApi
+import androidx.compose.material.LocalMinimumTouchTargetEnforcement
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
@@ -22,6 +25,7 @@ import com.tiquionophist.ui.common.fillMaxHeightVerticalScroll
 import com.tiquionophist.ui.common.fillMaxWidthHorizontalScroll
 
 // TODO investigate text field focus (cursor remains after unfocused)
+@ExperimentalMaterialApi
 fun main() {
     application {
         Window(
@@ -32,12 +36,16 @@ fun main() {
         ) {
             MaterialTheme(colors = Colors.materialColors(light = ApplicationPreferences.lightMode)) {
                 Dimens.apply {
-                    MenuBar()
-                    CustomTeacherDialogHandler.content()
-                    ScheduleWindowHandler.content()
+                    CompositionLocalProvider(
+                        LocalMinimumTouchTargetEnforcement provides false
+                    ) {
+                        MenuBar()
+                        CustomTeacherDialogHandler.content()
+                        ScheduleWindowHandler.content()
 
-                    Surface {
-                        MainContent()
+                        Surface {
+                            MainContent()
+                        }
                     }
                 }
             }
