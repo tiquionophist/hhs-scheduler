@@ -218,10 +218,8 @@ private class SubjectTeacherAssignmentsColumn(private val teacher: Teacher) : Co
         if (value == Subject.EMPTY) return
 
         val config = GlobalState.scheduleConfiguration
-        val currentAssignments = remember(config, teacher) {
-            config.teacherAssignments.getOrDefault(teacher, emptySet())
-        }
-        val contains = remember(currentAssignments) { currentAssignments.contains(value) }
+        val currentAssignments = config.teacherAssignments.getOrDefault(teacher, emptySet())
+        val contains = currentAssignments.contains(value)
 
         Surface(
             modifier = Modifier
