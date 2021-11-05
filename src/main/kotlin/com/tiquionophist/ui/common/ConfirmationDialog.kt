@@ -1,15 +1,15 @@
 package com.tiquionophist.ui.common
 
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.material.Button
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.DpSize
@@ -34,22 +34,26 @@ fun ConfirmationDialog(
         onCloseRequest = onDecline,
     ) {
         Surface {
-            Column(
+            MatchingWidthColumn(
                 modifier = Modifier
                     .padding(Dimens.SPACING_2)
                     .widthIn(min = Dimens.Dialog.MIN_WIDTH, max = Dimens.Dialog.MAX_WIDTH),
-                verticalArrangement = Arrangement.spacedBy(Dimens.SPACING_2),
             ) {
-                title?.let { Text(title, fontSize = Dimens.Dialog.TITLE_FONT_SIZE) }
+                title?.let {
+                    Text(title, fontSize = Dimens.Dialog.TITLE_FONT_SIZE)
 
-                message?.let { Text(message) }
+                    Spacer(Modifier.height(Dimens.SPACING_2))
+                }
 
-                Row(
-                    modifier = Modifier.align(Alignment.End),
-                    horizontalArrangement = Arrangement.spacedBy(Dimens.SPACING_2)
-                ) {
+                message?.let {
+                    Text(message)
+
+                    Spacer(Modifier.height(Dimens.SPACING_2))
+                }
+
+                Row(horizontalArrangement = Arrangement.spacedBy(Dimens.SPACING_2)) {
                     Button(
-                        onClick = onDecline
+                        onClick = onDecline,
                     ) {
                         Text(cancelText)
                     }
