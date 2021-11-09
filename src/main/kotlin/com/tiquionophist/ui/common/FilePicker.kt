@@ -1,5 +1,6 @@
 package com.tiquionophist.ui.common
 
+import com.tiquionophist.ui.ApplicationPreferences
 import java.io.File
 import javax.swing.JFileChooser
 import javax.swing.JOptionPane
@@ -17,7 +18,10 @@ object FilePicker {
      * Opens a file chooser to save a file, starting in [startingDirectory], and returns the chosen file if the user
      * selected one.
      */
-    fun save(startingDirectory: File? = File("."), confirmOverwrite: Boolean = true): File? {
+    fun save(
+        startingDirectory: File? = ApplicationPreferences.fileChooserDirectory ?: File("."),
+        confirmOverwrite: Boolean = true
+    ): File? {
         val fc = object : JFileChooser(startingDirectory) {
             override fun approveSelection() {
                 val file = selectedFile.withJsonExtensionIfEmpty()
@@ -44,6 +48,9 @@ object FilePicker {
         val result = fc.showSaveDialog(null)
         return if (result == JFileChooser.APPROVE_OPTION) {
             fc.selectedFile.withJsonExtensionIfEmpty()
+                .also {
+                    ApplicationPreferences.fileChooserDirectory = it.parentFile
+                }
         } else {
             null
         }
@@ -53,7 +60,10 @@ object FilePicker {
      * Opens a file chooser to load a file, starting in [startingDirectory], and returns the chosen file if the user
      * selected one.
      */
-    fun load(startingDirectory: File? = File("."), fileFilter: FileFilter = jsonFileFilter): File? {
+    fun load(
+        startingDirectory: File? = ApplicationPreferences.fileChooserDirectory ?: File("."),
+        fileFilter: FileFilter = jsonFileFilter
+    ): File? {
         val fc = JFileChooser(startingDirectory)
 
         fc.addChoosableFileFilter(fileFilter)
@@ -61,7 +71,11 @@ object FilePicker {
 
         val result = fc.showOpenDialog(null)
         return if (result == JFileChooser.APPROVE_OPTION) {
-            fc.selectedFile.takeIf { it.exists() }
+            fc.selectedFile
+                .takeIf { it.exists() }
+                ?.also {
+                    ApplicationPreferences.fileChooserDirectory = it.parentFile
+                }
         } else {
             null
         }
