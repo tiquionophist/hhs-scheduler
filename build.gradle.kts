@@ -1,3 +1,5 @@
+import org.gradle.api.tasks.testing.logging.TestExceptionFormat
+import org.gradle.api.tasks.testing.logging.TestLogEvent
 import org.jetbrains.compose.desktop.application.dsl.TargetFormat
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import java.nio.file.Files
@@ -47,6 +49,11 @@ tasks.withType<KotlinCompile>().configureEach {
 }
 
 tasks.test {
+    testLogging {
+        exceptionFormat = TestExceptionFormat.FULL
+        events(TestLogEvent.STANDARD_OUT, TestLogEvent.STANDARD_ERROR, TestLogEvent.FAILED)
+    }
+
     useJUnitPlatform()
     finalizedBy(tasks.jacocoTestReport)
 }
