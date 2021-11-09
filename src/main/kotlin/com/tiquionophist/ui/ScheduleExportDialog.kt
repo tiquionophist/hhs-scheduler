@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.material.Button
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.Icon
+import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
@@ -123,8 +124,7 @@ fun ScheduleExportDialog(
                     }
                     is ExportStatus.Error -> {
                         val throwable = (status as ExportStatus.Error).throwable
-                        throwable.printStackTrace()
-                        Text("Error: ${throwable.message}")
+                        Text("Error: ${throwable.message}", color = MaterialTheme.colors.error)
                     }
                 }
             }
