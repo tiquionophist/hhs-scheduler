@@ -1,6 +1,5 @@
 package com.tiquionophist.core
 
-import com.tiquionophist.util.prettyName
 import java.util.EnumMap
 import java.util.EnumSet
 
@@ -58,7 +57,7 @@ data class Schedule(val lessons: List<List<Lesson>>) {
 
                 lesson.classroom?.let { classroom ->
                     require(classroom !in classrooms) {
-                        "${classroom.prettyName} is overbooked for $classIndex | $periodIndex"
+                        "${classroom.canonicalName} is overbooked for $classIndex | $periodIndex"
                     }
                     classrooms.add(classroom)
                 }

@@ -80,7 +80,7 @@ internal class LessonTest {
                         classroom = Classroom.COMPUTER
                     ),
                     config = nonEmptyConfig,
-                    message = "English has no classroom, but Computer was provided"
+                    message = "English has no classroom, but Computer Room was provided"
                 ),
                 VerifyTestCase(
                     lesson = Lesson(
@@ -98,7 +98,7 @@ internal class LessonTest {
                         classroom = Classroom.ART
                     ),
                     config = nonEmptyConfig,
-                    message = "Computer Science cannot be scheduled in Art"
+                    message = "Computer Science cannot be scheduled in Classroom Art"
                 ),
             )
         }

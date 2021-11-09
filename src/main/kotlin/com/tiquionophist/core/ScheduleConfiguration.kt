@@ -116,7 +116,7 @@ data class ScheduleConfiguration(
                 .values
                 .sum()
             if (classesPerWeek > periodsPerWeek) {
-                errors += "${classroom.prettyName} must be occupied at least $classesPerWeek times per week, " +
+                errors += "${classroom.canonicalName} must be occupied at least $classesPerWeek times per week, " +
                         "which is impossible"
             }
         }

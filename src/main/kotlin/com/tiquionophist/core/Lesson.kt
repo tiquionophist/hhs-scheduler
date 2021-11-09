@@ -27,11 +27,11 @@ data class Lesson(val subject: Subject, val teacher: Teacher?, val classroom: Cl
             val classrooms = subject.classrooms
             if (classrooms == null) {
                 require(classroom == null) {
-                    "${subject.prettyName} has no classroom, but ${classroom!!.prettyName} was provided"
+                    "${subject.prettyName} has no classroom, but ${classroom!!.canonicalName} was provided"
                 }
             } else {
                 require(classrooms.contains(classroom)) {
-                    "${subject.prettyName} cannot be scheduled in ${classroom?.prettyName}"
+                    "${subject.prettyName} cannot be scheduled in ${classroom?.canonicalName}"
                 }
             }
         }

@@ -216,9 +216,8 @@ data class SaveData(
          * Maps the lessons in this [Schedule] to the canonical names of the locations where they take place, i.e. the
          * location names used in the save data.
          *
-         * For explicit [Classroom]s this is similar to their [Classroom.prettyName] (but not always identical, since
-         * some have a prefix "Classroom XXX"), but in cases where the classroom is null this function also fills it in
-         * which a generic numbered classroom, i.e. "Classroom 1", "Classroom 2", etc.
+         * For explicit [Classroom]s this is their [Classroom.canonicalName], but in cases where the classroom is null
+         * this function also fills it in which a generic numbered classroom, i.e. "Classroom 1", "Classroom 2", etc.
          */
         private fun Schedule.classroomNames(): List<List<String>> {
             // [periodIndex -> highest classroom number that's in use for that period]
@@ -226,25 +225,14 @@ data class SaveData(
 
             return lessons.map { classLessons ->
                 classLessons.mapIndexed { periodIndex, lesson ->
-                    when (lesson.classroom) {
-                        Classroom.ART -> "Classroom Art"
-                        Classroom.BASEMENT -> "Basement"
-                        Classroom.BIOLOGY -> "Classroom Biology"
-                        Classroom.CHEMISTRY -> "Classroom Chemistry"
-                        Classroom.COMPUTER -> "Computer Room"
-                        Classroom.GYM -> "Gym"
-                        Classroom.MUSIC -> "Classroom Music"
-                        Classroom.SPORTS_AREA -> "Sports Area"
-                        Classroom.SWIMMING_POOL -> "Swimming Pool"
-                        null -> {
-                            val classroomNumber = (numberedClassrooms[periodIndex] ?: 0) + 1
-                            numberedClassrooms[periodIndex] = classroomNumber
+                    lesson.classroom?.canonicalName ?: run {
+                        val classroomNumber = (numberedClassrooms[periodIndex] ?: 0) + 1
+                        numberedClassrooms[periodIndex] = classroomNumber
 
-                            check(classroomNumber <= MAX_NUMBERED_CLASSROOMS) {
-                                "exceeded numbered classrooms limit of $MAX_NUMBERED_CLASSROOMS"
-                            }
-                            "Classroom $classroomNumber"
+                        check(classroomNumber <= MAX_NUMBERED_CLASSROOMS) {
+                            "exceeded numbered classrooms limit of $MAX_NUMBERED_CLASSROOMS"
                         }
+                        "Classroom $classroomNumber"
                     }
                 }
             }

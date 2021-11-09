@@ -102,7 +102,7 @@ private class ScheduleDayColumn(
                     }
 
                     lesson.classroom?.let { classroom ->
-                        Text(text = "in ${classroom.prettyName}", fontSize = Dimens.FONT_SMALL)
+                        Text(text = "in ${classroom.canonicalName}", fontSize = Dimens.FONT_SMALL)
                     }
                 }
             }

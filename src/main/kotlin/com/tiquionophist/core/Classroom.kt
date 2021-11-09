@@ -13,5 +13,24 @@ enum class Classroom {
     GYM,
     MUSIC,
     SPORTS_AREA,
-    SWIMMING_POOL,
+    SWIMMING_POOL;
+
+    /**
+     * The canonical name of the classroom used in the game. This is similar to its [Classroom.prettyName], but not
+     * always identical, since some have a prefix "Classroom XXX".
+     */
+    val canonicalName: String
+        get() {
+            return when (this) {
+                ART -> "Classroom Art"
+                BASEMENT -> "Basement"
+                BIOLOGY -> "Classroom Biology"
+                CHEMISTRY -> "Classroom Chemistry"
+                COMPUTER -> "Computer Room"
+                GYM -> "Gym"
+                MUSIC -> "Classroom Music"
+                SPORTS_AREA -> "Sports Area"
+                SWIMMING_POOL -> "Swimming Pool"
+            }
+        }
 }
