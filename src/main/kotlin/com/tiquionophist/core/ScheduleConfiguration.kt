@@ -111,13 +111,13 @@ data class ScheduleConfiguration(
         }
 
         Classroom.values().forEach { classroom ->
-            val classesPerWeek = classes * subjectFrequency
+            val subjectsInClassroom = subjectFrequency
                 .filterKeys { it.classrooms?.size == 1 && it.classrooms.contains(classroom) }
-                .values
-                .sum()
+
+            val classesPerWeek = classes * subjectsInClassroom.values.sum()
             if (classesPerWeek > periodsPerWeek) {
-                errors += "${classroom.canonicalName} must be occupied at least $classesPerWeek times per week, " +
-                        "which is impossible"
+                errors += "${classroom.canonicalName} must be occupied at least $classesPerWeek times per week (by " +
+                        "${subjectsInClassroom.keys.sorted().joinToString { it.prettyName }}), which is impossible"
             }
         }
 
