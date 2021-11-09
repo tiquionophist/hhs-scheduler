@@ -51,8 +51,13 @@ fun XMLStreamReader.mirrorTo(writer: XMLStreamWriter, intercept: () -> Boolean =
 /**
  * Reads this [XMLStreamReader] past the current start element. That is, continues reading events until an end tag is
  * found matching the current start element tag (accounting for nested elements with the same type).
+ *
+ * [onChildElement] is invoked for each child START_ELEMENT event within the current tag with the child's prefix, local
+ * name, and namespace URI (respectively).
  */
-fun XMLStreamReader.readUntilElementEnd() {
+fun XMLStreamReader.readUntilElementEnd(
+    onChildElement: (prefix: String, localName: String, namespaceURI: String) -> Unit = { _, _, _ -> }
+) {
     require(eventType == XMLStreamReader.START_ELEMENT)
     val startLocalName = localName
     val startPrefix = prefix
@@ -70,6 +75,8 @@ fun XMLStreamReader.readUntilElementEnd() {
             namespaceURI == startNamespaceURI
         ) {
             depth += 1
+        } else if (isStartElement) {
+            onChildElement(prefix, localName, namespaceURI)
         } else if (isEndElement &&
             prefix == startPrefix &&
             localName == startLocalName &&

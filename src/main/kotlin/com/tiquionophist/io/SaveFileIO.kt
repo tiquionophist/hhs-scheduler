@@ -108,7 +108,20 @@ object SaveFileIO {
 
                         writer.writeEndElement()
 
-                        reader.readUntilElementEnd()
+                        var classes = 0
+                        reader.readUntilElementEnd(onChildElement = { _, localName, _ ->
+                            if (localName == "SchoolClass") {
+                                classes++
+                            }
+                        })
+
+                        // subtract 1 since there's always a class of unassigned students (even if it's empty)
+                        if (schedule.configuration.classes < classes - 1) {
+                            error(
+                                "Save file has ${classes - 1} classes; cannot write " +
+                                        "${schedule.configuration.classes} since this would lose students."
+                            )
+                        }
                     }
                     "TeacherSubjects" -> {
                         require(inPersonList)

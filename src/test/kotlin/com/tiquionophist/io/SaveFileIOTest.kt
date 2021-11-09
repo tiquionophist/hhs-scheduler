@@ -10,9 +10,18 @@ import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.assertThrows
 import java.io.File
 
 internal class SaveFileIOTest {
+    private val scheduler = ExhaustiveScheduler(fillOrder = RandomizedScheduler.ScheduleFillOrder.CLASS_BY_CLASS)
+
+    private val outFile: File by lazy {
+        resourcesDir.resolve("test-save-file-modified.sav").also {
+            it.deleteOnExit()
+        }
+    }
+
     @Test
     fun testRead() {
         val gameVariables = SaveFileIO.read(testSaveFile)
@@ -24,22 +33,45 @@ internal class SaveFileIOTest {
 
     @Test
     fun testWrite() {
-        val scheduler = ExhaustiveScheduler(fillOrder = RandomizedScheduler.ScheduleFillOrder.CLASS_BY_CLASS)
         val schedule = runBlocking { scheduler.schedule(saveFileConfiguration)!! }
 
-        val outFile = resourcesDir.resolve("test-save-file-modified.sav")
-        outFile.deleteOnExit()
-
         SaveFileIO.write(
-            schedule = ComputedSchedule(
-                configuration = saveFileConfiguration,
-                schedule = schedule,
-            ),
+            schedule = ComputedSchedule(configuration = saveFileConfiguration, schedule = schedule),
             sourceFile = testSaveFile,
             destinationFile = outFile,
         )
 
         assertEquals(saveFileConfiguration, SaveFileIO.read(outFile).toScheduleConfiguration())
+    }
+
+    @Test
+    fun testWriteMoreClasses() {
+        val configuration = saveFileConfiguration.copy(classes = saveFileConfiguration.classes + 1)
+        val schedule = runBlocking { scheduler.schedule(configuration)!! }
+
+        SaveFileIO.write(
+            schedule = ComputedSchedule(configuration = configuration, schedule = schedule),
+            sourceFile = testSaveFile,
+            destinationFile = outFile,
+        )
+
+        assertEquals(configuration, SaveFileIO.read(outFile).toScheduleConfiguration())
+    }
+
+    @Test
+    fun testWriteFewerClasses() {
+        val configuration = saveFileConfiguration.copy(classes = saveFileConfiguration.classes - 1)
+        val schedule = runBlocking { scheduler.schedule(configuration)!! }
+
+        val exception = assertThrows<IllegalStateException> {
+            SaveFileIO.write(
+                schedule = ComputedSchedule(configuration = configuration, schedule = schedule),
+                sourceFile = testSaveFile,
+                destinationFile = outFile,
+            )
+        }
+
+        assertEquals("Save file has 2 classes; cannot write 1 since this would lose students.", exception.message)
     }
 
     companion object {
