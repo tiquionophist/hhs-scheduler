@@ -27,6 +27,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.DpSize
@@ -358,7 +359,8 @@ private fun FillOrderSelector(
 
                 Image(
                     painter = painterResource("icons/arrow_drop_down.svg"),
-                    contentDescription = null
+                    contentDescription = null,
+                    colorFilter = ColorFilter.tint(LocalContentColor.current)
                 )
             }
 
