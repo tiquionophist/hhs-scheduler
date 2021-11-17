@@ -43,8 +43,8 @@ import com.tiquionophist.ui.common.PaneDirection
 import com.tiquionophist.ui.common.topBorder
 import com.tiquionophist.util.prettyName
 
-private val DIALOG_WIDTH = 500.dp
-private val DIALOG_HEIGHT = 900.dp
+private val DIALOG_WIDTH = 800.dp
+private val DIALOG_HEIGHT = 600.dp
 
 sealed class SchedulerSettings(val type: SchedulerType) {
     abstract fun create(): Scheduler
