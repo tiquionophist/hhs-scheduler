@@ -245,7 +245,9 @@ data class SaveData(
         private fun subjectNameToEnum(subjectName: String): Subject {
             if (subjectName.isEmpty()) return Subject.EMPTY
 
-            val transformedName = subjectName.replace("Sex Education", "Sex Ed")
+            val transformedName = subjectName
+                .replace("Sex Education", "Sex Ed")
+                .replace("Anatomy Class", "Anatomy")
             return Subject.values().firstOrNull { it.prettyName == transformedName }
                 ?: error("no Subject matching $subjectName")
         }
@@ -257,7 +259,9 @@ data class SaveData(
         fun enumToSubjectName(subject: Subject): String {
             if (subject == Subject.EMPTY) return ""
 
-            return subject.prettyName.replace("Sex Ed", "Sex Education")
+            return subject.prettyName
+                .replace("Sex Ed", "Sex Education")
+                .replace("Anatomy", "Anatomy Class")
         }
     }
 }
