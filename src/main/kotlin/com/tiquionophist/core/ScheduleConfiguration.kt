@@ -126,7 +126,7 @@ data class ScheduleConfiguration(
     }
 
     fun save(file: File) {
-        json.encodeToStream(this, file.outputStream())
+        file.outputStream().use { json.encodeToStream(this, it) }
     }
 
     companion object {
@@ -142,7 +142,7 @@ data class ScheduleConfiguration(
         }
 
         fun loadOrError(file: File): ScheduleConfiguration {
-            return json.decodeFromStream(file.inputStream())
+            return file.inputStream().use { json.decodeFromStream(it) }
         }
 
         fun loadOrNull(file: File): ScheduleConfiguration? {
