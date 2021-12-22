@@ -86,7 +86,7 @@ data class ScheduleConfiguration(
         val errors = mutableListOf<String>()
 
         if (classes <= 0) {
-            errors += "Must have >0 classes"
+            errors += "Must have >0 classes."
         }
 
         if (subjectFrequency.values.sum() != periodsPerWeek) {
@@ -117,7 +117,7 @@ data class ScheduleConfiguration(
             val classesPerWeek = classes * subjectsInClassroom.values.sum()
             if (classesPerWeek > periodsPerWeek) {
                 errors += "${classroom.canonicalName} must be occupied at least $classesPerWeek times per week (by " +
-                        "${subjectsInClassroom.keys.sorted().joinToString { it.prettyName }}), which is impossible"
+                        "${subjectsInClassroom.keys.sorted().joinToString { it.prettyName }}), which is impossible."
             }
         }
 

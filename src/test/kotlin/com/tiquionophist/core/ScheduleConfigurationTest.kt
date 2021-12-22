@@ -7,7 +7,7 @@ import org.junit.jupiter.params.provider.MethodSource
 import java.io.File
 
 internal class ScheduleConfigurationTest {
-    data class VerifyTestCase(val config: ScheduleConfiguration, val errors: List<String> = emptyList())
+    data class ValidationTestCase(val config: ScheduleConfiguration, val errors: List<String> = emptyList())
 
     @ParameterizedTest
     @MethodSource("configurations")
@@ -23,7 +23,7 @@ internal class ScheduleConfigurationTest {
 
     @ParameterizedTest
     @MethodSource
-    fun testVerify(testCase: VerifyTestCase) {
+    fun testValidationErrors(testCase: ValidationTestCase) {
         assertEquals(testCase.errors, testCase.config.validationErrors())
     }
 
@@ -32,15 +32,57 @@ internal class ScheduleConfigurationTest {
         fun configurations() = ScheduleConfigurationFixtures.allConfigurations
 
         @JvmStatic
-        fun testVerify(): List<VerifyTestCase> {
-            // TODO cover other error cases (and more success cases)
+        fun testValidationErrors(): List<ValidationTestCase> {
             return listOf(
-                VerifyTestCase(config = ScheduleConfiguration(classes = 2)),
-                VerifyTestCase(
+                ValidationTestCase(config = ScheduleConfiguration(classes = 2)),
+                ValidationTestCase(
                     config = ScheduleConfiguration(classes = -1),
-                    errors = listOf("Must have >0 classes"),
+                    errors = listOf("Must have >0 classes."),
                 ),
-                VerifyTestCase(
+                ValidationTestCase(
+                    config = ScheduleConfiguration(
+                        daysPerWeek = 4,
+                        periodsPerDay = 3,
+                        classes = 2,
+                        teacherAssignments = mapOf(
+                            Teacher("Teacher", "1") to setOf(Subject.CHEMISTRY, Subject.PHYSICS),
+                        ),
+                        subjectFrequency = mapOf(
+                            Subject.CHEMISTRY to 1,
+                            Subject.EMPTY to 2,
+                            Subject.PHYSICS to 1,
+                        )
+                    ),
+                    errors = listOf("4 subjects assigned per week; must be 12.")
+                ),
+                ValidationTestCase(
+                    config = ScheduleConfiguration(
+                        classes = 2,
+                        teacherAssignments = mapOf(
+                            Teacher("Teacher", "1") to setOf(Subject.CHEMISTRY),
+                        ),
+                        subjectFrequency = mapOf(
+                            Subject.CHEMISTRY to 1,
+                            Subject.EMPTY to 18,
+                            Subject.PHYSICS to 1,
+                        )
+                    ),
+                    errors = listOf("Physics is not taught by any teachers.")
+                ),
+                ValidationTestCase(
+                    config = ScheduleConfiguration(
+                        classes = 2,
+                        teacherAssignments = mapOf(
+                            Teacher("Teacher", "1") to setOf(Subject.PHILOSOPHY),
+                        ),
+                        subjectFrequency = mapOf(
+                            Subject.PHILOSOPHY to 16,
+                            Subject.EMPTY to 4,
+                        )
+                    ),
+                    errors = listOf("Teacher 1 must teach at least 32 classes per week, which is impossible.")
+                ),
+                ValidationTestCase(
                     config = ScheduleConfiguration(
                         classes = 10,
                         teacherAssignments = mapOf(
@@ -56,10 +98,11 @@ internal class ScheduleConfigurationTest {
                     ),
                     errors = listOf(
                         "Classroom Chemistry must be occupied at least 30 times per week (by Chemistry, Physics), " +
-                                "which is impossible"
+                                "which is impossible."
                     ),
                 ),
             )
+                .plus(ScheduleConfigurationFixtures.possibleConfigurations.map { ValidationTestCase(config = it) })
         }
     }
 }
