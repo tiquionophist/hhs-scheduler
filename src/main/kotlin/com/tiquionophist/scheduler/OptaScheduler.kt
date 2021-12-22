@@ -12,6 +12,7 @@ import org.optaplanner.core.api.domain.solution.PlanningEntityCollectionProperty
 import org.optaplanner.core.api.domain.solution.PlanningScore
 import org.optaplanner.core.api.domain.solution.PlanningSolution
 import org.optaplanner.core.api.domain.solution.ProblemFactProperty
+import org.optaplanner.core.api.domain.valuerange.CountableValueRange
 import org.optaplanner.core.api.domain.valuerange.ValueRangeFactory
 import org.optaplanner.core.api.domain.valuerange.ValueRangeProvider
 import org.optaplanner.core.api.domain.variable.PlanningVariable
@@ -170,7 +171,8 @@ class OptaScheduler(private val timeoutSeconds: Int? = null) : Scheduler {
 
         @ValueRangeProvider(id = "periods")
         @ProblemFactProperty
-        val periodRange = ValueRangeFactory.createIntValueRange(0, configuration.periodsPerWeek)
+        val periodRange: CountableValueRange<Int> =
+            ValueRangeFactory.createIntValueRange(0, configuration.periodsPerWeek)
 
         // [classIndex -> [periodIndex -> class]]
         val schedule: Schedule

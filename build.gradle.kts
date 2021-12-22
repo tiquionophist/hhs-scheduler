@@ -68,7 +68,7 @@ detekt {
     buildUponDefaultConfig = true
 }
 
-val resourcesDir = sourceSets["main"].resources.sourceDirectories.first()
+val resourcesDir: File = sourceSets["main"].resources.sourceDirectories.first()
 val appProperties = resourcesDir.resolve("app.properties")
     .bufferedReader()
     .use { Properties().apply { load(it) } }

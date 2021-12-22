@@ -1,5 +1,6 @@
 package com.tiquionophist.core
 
+import com.tiquionophist.util.flattenToSet
 import com.tiquionophist.util.prettyName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
@@ -99,7 +100,7 @@ data class ScheduleConfiguration(
             }
         }
 
-        val missingSubjects = subjectFrequency.keys.minus(teacherAssignments.values.flatten()).minus(Subject.EMPTY)
+        val missingSubjects = subjectFrequency.keys.minus(teacherAssignments.values.flattenToSet()).minus(Subject.EMPTY)
         missingSubjects.forEach { subject ->
             errors += "${subject.prettyName} is not taught by any teachers."
         }

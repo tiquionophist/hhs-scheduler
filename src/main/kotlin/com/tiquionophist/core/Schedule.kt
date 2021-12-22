@@ -11,24 +11,6 @@ import java.util.EnumSet
  */
 data class Schedule(val lessons: List<List<Lesson>>) {
     /**
-     * A map from each [Teacher] in the schedule to the [StatSet] of stats gained by the teacher each week as a result
-     * of the lessons they are teaching.
-     */
-    val teacherStats: Map<Teacher, StatSet> by lazy {
-        lessons
-            .flatten()
-            .fold(mutableMapOf()) { acc, lesson ->
-                lesson.teacher?.let { teacher ->
-                    acc.compute(teacher) { _, stats ->
-                        stats?.plus(lesson.subject.stats) ?: lesson.subject.stats
-                    }
-                }
-
-                acc
-            }
-    }
-
-    /**
      * Verifies that this schedule is valid, throwing an [IllegalArgumentException] if it is not.
      */
     fun verify(config: ScheduleConfiguration) {
