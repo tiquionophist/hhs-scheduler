@@ -1,15 +1,16 @@
 package com.tiquionophist.ui.common
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.material.Button
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
+import androidx.compose.material.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.DpSize
@@ -19,9 +20,8 @@ import com.tiquionophist.ui.Dimens
 
 @Composable
 fun ConfirmationDialog(
-    title: String? = null,
-    windowTitle: String? = title,
-    message: String? = null,
+    windowTitle: String,
+    prompt: String,
     cancelText: String = "Cancel",
     acceptText: String = "OK",
     onAccept: () -> Unit = {},
@@ -29,38 +29,26 @@ fun ConfirmationDialog(
 ) {
     Dialog(
         state = rememberDialogState(size = DpSize(width = Dp.Unspecified, height = Dp.Unspecified)),
+        title = windowTitle,
         resizable = false,
-        title = windowTitle ?: "Confirmation",
         onCloseRequest = onDecline,
     ) {
-        Surface {
-            MatchingWidthColumn(
-                modifier = Modifier
-                    .padding(Dimens.SPACING_2)
-                    .widthIn(min = Dimens.Dialog.MIN_WIDTH, max = Dimens.Dialog.MAX_WIDTH),
+        Surface(elevation = Dimens.TOOLTIP_ELEVATION) {
+            Column(
+                modifier = Modifier.padding(Dimens.SPACING_2),
+                verticalArrangement = Arrangement.spacedBy(Dimens.SPACING_3),
             ) {
-                title?.let {
-                    Text(title, fontSize = Dimens.Dialog.TITLE_FONT_SIZE)
+                Text(modifier = Modifier.widthIn(max = Dimens.Dialog.MAX_TEXT_WIDTH), text = prompt)
 
-                    Spacer(Modifier.height(Dimens.SPACING_2))
-                }
-
-                message?.let {
-                    Text(message)
-
-                    Spacer(Modifier.height(Dimens.SPACING_2))
-                }
-
-                Row(horizontalArrangement = Arrangement.spacedBy(Dimens.SPACING_2)) {
-                    Button(
-                        onClick = onDecline,
-                    ) {
+                Row(
+                    modifier = Modifier.align(Alignment.End),
+                    horizontalArrangement = Arrangement.spacedBy(Dimens.SPACING_2),
+                ) {
+                    TextButton(onClick = onDecline) {
                         Text(cancelText)
                     }
 
-                    Button(
-                        onClick = onAccept,
-                    ) {
+                    Button(onClick = onAccept) {
                         Text(acceptText)
                     }
                 }

@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material.IconButton
 import androidx.compose.material.LocalContentAlpha
 import androidx.compose.material.LocalContentColor
+import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
@@ -20,72 +21,73 @@ import com.tiquionophist.core.ScheduleConfiguration
 import com.tiquionophist.ui.common.ConfirmationDialog
 import com.tiquionophist.ui.common.IconAndTextButton
 import com.tiquionophist.ui.common.NumberPicker
-import com.tiquionophist.ui.common.topBorder
 
 /**
  * Row of scheduling-wide settings, placed at the bottom of the window.
  */
 @Composable
 fun SettingsPane() {
-    Row(
-        modifier = Modifier.fillMaxWidth().topBorder().padding(Dimens.SPACING_2),
-        horizontalArrangement = Arrangement.SpaceBetween,
-        verticalAlignment = Alignment.CenterVertically
-    ) {
+    Surface(color = ThemeColors.current.surface3) {
         Row(
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(Dimens.SPACING_3)
+            modifier = Modifier.fillMaxWidth().padding(Dimens.SPACING_2),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
         ) {
-            IconButton(onClick = { ApplicationPreferences.lightMode = !ApplicationPreferences.lightMode }) {
-                val filename = if (ApplicationPreferences.lightMode) "light_mode" else "dark_mode"
-                Image(
-                    painter = painterResource("icons/$filename.svg"),
-                    contentDescription = "Light/dark mode",
-                    colorFilter = ColorFilter.tint(LocalContentColor.current),
-                    alpha = LocalContentAlpha.current,
-                )
-            }
-
-            val confirmDialogVisible = remember { mutableStateOf(false) }
-            if (confirmDialogVisible.value) {
-                ConfirmationDialog(
-                    windowTitle = "Clear schedule",
-                    message = "Reset schedule configuration?",
-                    acceptText = "Clear",
-                    onAccept = {
-                        GlobalState.scheduleConfiguration = ScheduleConfiguration.EMPTY
-                        confirmDialogVisible.value = false
-                    },
-                    onDecline = {
-                        confirmDialogVisible.value = false
-                    }
-                )
-            }
-
-            IconAndTextButton(
-                text = "Clear schedule",
-                iconFilename = "delete",
-                onClick = { confirmDialogVisible.value = true }
-            )
-
             Row(
-                horizontalArrangement = Arrangement.spacedBy(Dimens.SPACING_1),
-                verticalAlignment = Alignment.CenterVertically
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(Dimens.SPACING_3)
             ) {
-                Text("Classes:")
+                IconButton(onClick = { ApplicationPreferences.lightMode = !ApplicationPreferences.lightMode }) {
+                    val filename = if (ApplicationPreferences.lightMode) "light_mode" else "dark_mode"
+                    Image(
+                        painter = painterResource("icons/$filename.svg"),
+                        contentDescription = "Light/dark mode",
+                        colorFilter = ColorFilter.tint(LocalContentColor.current),
+                        alpha = LocalContentAlpha.current,
+                    )
+                }
 
-                NumberPicker(
-                    value = GlobalState.scheduleConfiguration.classes,
-                    onValueChange = { newValue ->
-                        GlobalState.scheduleConfiguration = GlobalState.scheduleConfiguration.copy(
-                            classes = newValue
-                        )
-                    },
-                    min = 1,
+                val confirmDialogVisible = remember { mutableStateOf(false) }
+                if (confirmDialogVisible.value) {
+                    ConfirmationDialog(
+                        windowTitle = "Clear schedule",
+                        prompt = "Reset schedule configuration?",
+                        acceptText = "Clear",
+                        onAccept = {
+                            GlobalState.scheduleConfiguration = ScheduleConfiguration.EMPTY
+                            confirmDialogVisible.value = false
+                        },
+                        onDecline = {
+                            confirmDialogVisible.value = false
+                        }
+                    )
+                }
+
+                IconAndTextButton(
+                    text = "Clear schedule",
+                    iconFilename = "delete",
+                    onClick = { confirmDialogVisible.value = true }
                 )
-            }
-        }
 
-        RunScheduleButton()
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(Dimens.SPACING_1),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text("Classes:")
+
+                    NumberPicker(
+                        value = GlobalState.scheduleConfiguration.classes,
+                        onValueChange = { newValue ->
+                            GlobalState.scheduleConfiguration = GlobalState.scheduleConfiguration.copy(
+                                classes = newValue
+                            )
+                        },
+                        min = 1,
+                    )
+                }
+            }
+
+            RunScheduleButton()
+        }
     }
 }

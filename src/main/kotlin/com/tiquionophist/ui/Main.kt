@@ -7,7 +7,6 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.rememberScrollbarAdapter
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.LocalMinimumTouchTargetEnforcement
-import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
@@ -34,7 +33,7 @@ fun main() {
             icon = painterResource("app_icon.png"),
             state = rememberWindowState(placement = WindowPlacement.Maximized),
         ) {
-            MaterialTheme(colors = Colors.materialColors(light = ApplicationPreferences.lightMode)) {
+            ThemeColors.apply(light = ApplicationPreferences.lightMode) {
                 Dimens.apply {
                     CompositionLocalProvider(
                         LocalMinimumTouchTargetEnforcement provides false

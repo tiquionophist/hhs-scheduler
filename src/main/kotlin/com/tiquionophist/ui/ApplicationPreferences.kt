@@ -13,6 +13,8 @@ object ApplicationPreferences {
 
     /**
      * Whether the application should be in light mode.
+     *
+     * TODO use isSystemInDarkTheme() as the default (non-trivial since it's @Composable)
      */
     var lightMode: Boolean by BooleanPropertyDelegate(prefs = prefs, propertyName = "light_mode", defaultValue = true)
 

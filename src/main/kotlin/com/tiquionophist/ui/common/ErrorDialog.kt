@@ -9,6 +9,7 @@ import androidx.compose.material.Button
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
+import androidx.compose.material.TextButton
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Warning
 import androidx.compose.runtime.Composable
@@ -38,16 +39,18 @@ fun ErrorDialog(
         title = "Error",
         onCloseRequest = onClose,
     ) {
-        Surface {
+        Surface(elevation = Dimens.TOOLTIP_ELEVATION) {
             Column(
-                modifier = Modifier
-                    .padding(Dimens.SPACING_2)
-                    .widthIn(min = Dimens.Dialog.MIN_WIDTH, max = Dimens.Dialog.MAX_WIDTH),
-                verticalArrangement = Arrangement.spacedBy(Dimens.SPACING_2),
+                modifier = Modifier.padding(Dimens.SPACING_2),
+                verticalArrangement = Arrangement.spacedBy(Dimens.SPACING_3),
             ) {
-                Text(title, fontSize = Dimens.Dialog.TITLE_FONT_SIZE)
+                Text(
+                    text = title,
+                    fontSize = Dimens.Dialog.TITLE_FONT_SIZE,
+                    modifier = Modifier.widthIn(max = Dimens.Dialog.MAX_TEXT_WIDTH),
+                )
 
-                Text(message)
+                Text(text = message, modifier = Modifier.widthIn(max = Dimens.Dialog.MAX_TEXT_WIDTH))
 
                 if (throwable != null) {
                     throwable.message?.let { message ->
@@ -65,7 +68,7 @@ fun ErrorDialog(
                     horizontalArrangement = Arrangement.spacedBy(Dimens.SPACING_2)
                 ) {
                     if (throwable != null) {
-                        Button(
+                        TextButton(
                             onClick = {
                                 val stringSelection = StringSelection(throwable.stackTraceToString())
                                 Toolkit.getDefaultToolkit()
@@ -77,9 +80,7 @@ fun ErrorDialog(
                         }
                     }
 
-                    Button(
-                        onClick = onClose,
-                    ) {
+                    Button(onClick = onClose) {
                         Text("Close")
                     }
                 }

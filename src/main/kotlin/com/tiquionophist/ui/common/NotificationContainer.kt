@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Icon
 import androidx.compose.material.LocalContentAlpha
@@ -16,7 +17,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.res.painterResource
 import com.tiquionophist.ui.Dimens
 import com.tiquionophist.ui.GlobalState
@@ -40,10 +40,7 @@ fun NotificationContainer(content: @Composable () -> Unit) {
             }
 
             Box(modifier = Modifier.padding(Dimens.NOTIFICATION_MARGIN).align(Alignment.TopStart)) {
-                Surface(
-                    shape = RoundedCornerShape(Dimens.CORNER_ROUNDING),
-                    modifier = Modifier.shadow(Dimens.SHADOW_ELEVATION),
-                ) {
+                Surface(shape = RoundedCornerShape(Dimens.CORNER_ROUNDING), elevation = Dimens.TOOLTIP_ELEVATION) {
                     Column(
                         modifier = Modifier
                             .clickable { GlobalState.currentNotification = null }
@@ -56,6 +53,7 @@ fun NotificationContainer(content: @Composable () -> Unit) {
                         ) {
                             notification.iconFilename?.let { iconFilename ->
                                 Icon(
+                                    modifier = Modifier.size(Dimens.NOTIFICATION_ICON_SIZE),
                                     painter = painterResource("icons/$iconFilename.svg"),
                                     contentDescription = null,
                                     tint = (notification.iconTint ?: LocalContentColor.current)

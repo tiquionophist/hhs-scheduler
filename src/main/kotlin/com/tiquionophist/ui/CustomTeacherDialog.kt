@@ -64,7 +64,7 @@ fun CustomTeacherDialog(onClose: () -> Unit) {
 
     Dialog(
         title = "Add custom teacher",
-        onCloseRequest = { onClose() },
+        onCloseRequest = onClose,
         state = rememberDialogState(
             position = WindowPosition(Alignment.Center),
             size = DpSize(width = Dp.Unspecified, height = Dp.Unspecified),
@@ -79,8 +79,11 @@ fun CustomTeacherDialog(onClose: () -> Unit) {
         },
         resizable = false,
     ) {
-        Surface {
-            Column(Modifier.padding(Dimens.SPACING_2), verticalArrangement = Arrangement.spacedBy(Dimens.SPACING_2)) {
+        Surface(elevation = Dimens.TOOLTIP_ELEVATION) {
+            Column(
+                modifier = Modifier.padding(Dimens.SPACING_2),
+                verticalArrangement = Arrangement.spacedBy(Dimens.SPACING_3),
+            ) {
                 OutlinedTextField(
                     modifier = Modifier.withInitialFocus(),
                     value = firstNameState.value,

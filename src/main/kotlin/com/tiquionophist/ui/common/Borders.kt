@@ -9,42 +9,22 @@ import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.Dp
-import com.tiquionophist.ui.Colors
 import com.tiquionophist.ui.Dimens
-import kotlin.math.sqrt
+import com.tiquionophist.ui.ThemeColors
 
 /**
  * Adds a border line to the top of this element.
  */
 @Composable
-fun Modifier.topBorder(width: Dp = Dimens.BORDER_WIDTH, color: Color = Colors.divider): Modifier {
+fun Modifier.topBorder(width: Dp = Dimens.BORDER_WIDTH, color: Color = ThemeColors.current.divider): Modifier {
     val widthPx = with(LocalDensity.current) { width.toPx() }
     return this
         .border(
             width = width,
-            // hack: path colors seem to have their alpha applied twice
-            color = color.copy(alpha = sqrt(color.alpha)),
+            color = color,
             shape = GenericShape { size, _ ->
                 addRect(Rect(left = 0f, top = 0f, right = size.width, bottom = widthPx))
             }
         )
         .padding(top = width)
-}
-
-/**
- * Adds a border line to the left of this element.
- */
-@Composable
-fun Modifier.leftBorder(width: Dp = Dimens.BORDER_WIDTH, color: Color = Colors.divider): Modifier {
-    val widthPx = with(LocalDensity.current) { width.toPx() }
-    return this
-        .border(
-            width = width,
-            // hack: path colors seem to have their alpha applied twice
-            color = color.copy(alpha = sqrt(color.alpha)),
-            shape = GenericShape { size, _ ->
-                addRect(Rect(left = 0f, top = 0f, right = widthPx, bottom = size.height))
-            }
-        )
-        .padding(start = width) // assumes LTR direction
 }

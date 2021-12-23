@@ -144,11 +144,15 @@ fun ScheduleTable(configuration: ScheduleConfiguration, schedule: Schedule, clas
         rows = rows,
         // strong divider after the header row, weak dividers between each period row
         horizontalDividers = List(rows.size - 1) { rowIndex ->
-            rowIndex + 1 to TableDivider(color = if (rowIndex == 0) Colors.divider else Colors.weakDivider)
+            rowIndex + 1 to TableDivider(
+                color = if (rowIndex == 0) ThemeColors.current.divider else ThemeColors.current.weakDivider
+            )
         }.toMap(),
         // strong divider after the period name column, weak dividers between each day column
         verticalDividers = List(columns.size - 1) { colIndex ->
-            colIndex + 1 to TableDivider(color = if (colIndex == 0) Colors.divider else Colors.weakDivider)
+            colIndex + 1 to TableDivider(
+                color = if (colIndex == 0) ThemeColors.current.divider else ThemeColors.current.weakDivider
+            )
         }.toMap(),
     )
 }

@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Button
 import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.CircularProgressIndicator
@@ -26,7 +27,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.DpOffset
@@ -103,7 +103,7 @@ fun RunScheduleButton() {
         if (validationErrors.isNotEmpty()) {
             TooltipArea(
                 tooltip = {
-                    Surface(modifier = Modifier.shadow(Dimens.SHADOW_ELEVATION)) {
+                    Surface(shape = RoundedCornerShape(Dimens.CORNER_ROUNDING), elevation = Dimens.TOOLTIP_ELEVATION) {
                         Column(
                             modifier = Modifier.padding(Dimens.SPACING_2),
                             verticalArrangement = Arrangement.spacedBy(Dimens.SPACING_2),

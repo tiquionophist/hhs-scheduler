@@ -24,8 +24,8 @@ import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import com.tiquionophist.ui.Colors
 import com.tiquionophist.ui.Dimens
+import com.tiquionophist.ui.ThemeColors
 import kotlin.math.max
 import kotlin.math.roundToInt
 
@@ -178,7 +178,7 @@ fun <T> Table(
                         .padding(top = divider.paddingBefore, bottom = divider.paddingAfter)
                         .fillMaxWidth()
                         .height(divider.dividerSize)
-                        .background(divider.color ?: Colors.divider)
+                        .background(divider.color ?: ThemeColors.current.divider)
                 )
             }
 
@@ -188,7 +188,7 @@ fun <T> Table(
                         .padding(start = divider.paddingBefore, end = divider.paddingAfter)
                         .fillMaxHeight()
                         .width(divider.dividerSize)
-                        .background(divider.color ?: Colors.divider)
+                        .background(divider.color ?: ThemeColors.current.divider)
                 )
             }
 

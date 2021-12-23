@@ -11,8 +11,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.Dp
-import com.tiquionophist.ui.Colors
 import com.tiquionophist.ui.Dimens
+import com.tiquionophist.ui.ThemeColors
 
 @Composable
 fun CheckboxWithLabel(
@@ -20,7 +20,7 @@ fun CheckboxWithLabel(
     onCheckedChange: (Boolean) -> Unit,
     modifier: Modifier = Modifier,
     checkboxPadding: Dp = Dimens.SPACING_2,
-    colors: CheckboxColors = CheckboxDefaults.colors(checkedColor = Colors.SELECTED),
+    colors: CheckboxColors = CheckboxDefaults.colors(checkedColor = ThemeColors.current.selected),
     content: @Composable () -> Unit,
 ) {
     Row(

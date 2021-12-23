@@ -40,6 +40,7 @@ fun FrameWindowScope.MenuBar() {
 
     MenuBar {
         Menu("File") {
+            val tint = ThemeColors.current.selected
             Item(
                 text = "Save configuration",
                 shortcut = KeyShortcut(Key.S, ctrl = true),
@@ -52,7 +53,7 @@ fun FrameWindowScope.MenuBar() {
                                 title = "Configuration saved",
                                 message = "Successfully saved configuration to ${file.canonicalPath}.",
                                 iconFilename = "done",
-                                iconTint = Colors.SELECTED,
+                                iconTint = tint,
                             )
                         } else {
                             throwableState.value = result.exceptionOrNull()

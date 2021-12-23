@@ -24,7 +24,6 @@ import androidx.compose.ui.text.style.TextAlign
 import com.tiquionophist.core.ScheduleConfiguration
 import com.tiquionophist.core.Subject
 import com.tiquionophist.core.Teacher
-import com.tiquionophist.ui.Colors.enabledIf
 import com.tiquionophist.ui.common.ColumnWidth
 import com.tiquionophist.ui.common.ColumnWithHeader
 import com.tiquionophist.ui.common.NumberPicker
@@ -238,7 +237,7 @@ private class SubjectTeacherAssignmentsColumn(private val teacher: Teacher) : Co
                 }
                 .fillMaxSize(),
             color = if (contains) {
-                Colors.SELECTED.copy(alpha = Colors.DISABLED_ALPHA)
+                ThemeColors.current.selected.copy(alpha = ThemeColors.current.disabledAlpha)
             } else {
                 Color.Unspecified
             },
@@ -246,7 +245,7 @@ private class SubjectTeacherAssignmentsColumn(private val teacher: Teacher) : Co
             Checkbox(
                 checked = contains,
                 onCheckedChange = null,
-                colors = CheckboxDefaults.colors(checkedColor = Colors.SELECTED)
+                colors = CheckboxDefaults.colors(checkedColor = ThemeColors.current.selected)
             )
         }
     }
@@ -314,25 +313,25 @@ fun ScheduleConfigurationTable() {
                 fixedColumns.size,
                 TableDivider(
                     paddingBefore = Dimens.SPACING_2,
-                    color = Colors.divider
+                    color = ThemeColors.current.divider,
                 )
             ),
         ).plus(
             // weak dividers between each teacher column
             List(teachers.size - 1) { teacherIndex ->
-                Pair(teacherIndex + fixedColumns.size + 1, TableDivider(color = Colors.weakDivider))
+                Pair(teacherIndex + fixedColumns.size + 1, TableDivider(color = ThemeColors.current.weakDivider))
             }
         ),
         horizontalDividers = mapOf(
             // strong divider after header row
             fixedRows.size to TableDivider(
                 paddingBefore = Dimens.SPACING_2,
-                color = Colors.divider
+                color = ThemeColors.current.divider,
             ),
         ).plus(
             // weak dividers between each subject row
             List(subjectRows.size - 1) { subjectIndex ->
-                Pair(subjectIndex + fixedRows.size + 1, TableDivider(color = Colors.weakDivider))
+                Pair(subjectIndex + fixedRows.size + 1, TableDivider(color = ThemeColors.current.weakDivider))
             }
         ),
     )

@@ -3,9 +3,9 @@ package com.tiquionophist.ui
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.material.Button
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.Icon
@@ -23,8 +23,8 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.DpSize
-import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.rememberDialogState
 import com.tiquionophist.io.SaveFileIO
@@ -45,34 +45,35 @@ fun ScheduleExportDialog(
     onClose: () -> Unit,
 ) {
     Dialog(
-        state = rememberDialogState(size = DpSize(width = 500.dp, height = 250.dp)),
+        state = rememberDialogState(size = DpSize(width = Dp.Unspecified, height = Dp.Unspecified)),
         title = "Export schedule",
         onCloseRequest = onClose,
     ) {
-        Surface(modifier = Modifier.fillMaxSize()) {
+        Surface(elevation = Dimens.TOOLTIP_ELEVATION) {
             var status by remember { mutableStateOf<ExportStatus>(ExportStatus.NotStarted) }
 
             Column(
                 modifier = Modifier.padding(Dimens.SPACING_2),
-                verticalArrangement = Arrangement.SpaceBetween,
+                verticalArrangement = Arrangement.spacedBy(Dimens.SPACING_3),
             ) {
                 Row(horizontalArrangement = Arrangement.spacedBy(Dimens.SPACING_2)) {
                     Icon(
-                        modifier = Modifier.size(50.dp),
+                        modifier = Modifier.size(Dimens.NOTIFICATION_ICON_SIZE),
                         imageVector = Icons.Default.Info,
                         contentDescription = null,
                     )
 
                     Text(
+                        modifier = Modifier.widthIn(max = Dimens.Dialog.MAX_TEXT_WIDTH),
                         text = """
                         Copying this schedule to an existing save file is complicated and has a chance of corrupting the
-                        data. As a precaution, this will write to a copy of your game file without touching the
-                        original. Choose a save file and a copy will be saved named
-                        "${exportFilename(sourceFilename = "mySave", sourceExtension = "sav")}" (overwriting it if it
-                        exists) with this schedule as its timetable. Please report any issues you see with exporting.
+                        data. As a precaution, the export will write to a copy of your game file without touching the
+                        original. Choose an existing save file and a copy will be saved named
+                        "${exportFilename(sourceFilename = "mySave", sourceExtension = "sav")}" with this schedule as
+                        its timetable. Please report any issues you see with exporting.
                         """
                             .trim()
-                            .replace("""\s+""".toRegex(), " ")
+                            .replace("""\s+""".toRegex(), " "),
                     )
                 }
 

@@ -134,7 +134,7 @@ fun SchedulerSettingsDialog(
         title = "Scheduler settings",
         onCloseRequest = { onClose(null) },
     ) {
-        Surface {
+        Surface(elevation = Dimens.TOOLTIP_ELEVATION) {
             val settingsState = remember { mutableStateOf(initialSchedulerSettings) }
             val currentSettings = settingsState.value
 

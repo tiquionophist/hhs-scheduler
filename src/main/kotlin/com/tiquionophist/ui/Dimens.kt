@@ -25,9 +25,9 @@ object Dimens {
     val SPACING_4 = 32.dp
 
     /**
-     * Standard elevation for drop shadows.
+     * Standard elevation for tooltips and notifications.
      */
-    val SHADOW_ELEVATION = 4.dp
+    val TOOLTIP_ELEVATION = 4.dp
 
     /**
      * Standard rounding for corners.
@@ -38,6 +38,8 @@ object Dimens {
      * Stroke width of loading spinners.
      */
     val PROGRESS_INDICATOR_STROKE_WIDTH = 2.dp
+
+    val NOTIFICATION_ICON_SIZE = 48.dp
 
     val NOTIFICATION_MARGIN = 35.dp
 
@@ -64,8 +66,7 @@ object Dimens {
     }
 
     object Dialog {
-        val MIN_WIDTH = 200.dp
-        val MAX_WIDTH = 500.dp
+        val MAX_TEXT_WIDTH = 500.dp
         val TITLE_FONT_SIZE = 20.sp
     }
 }
