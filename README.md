@@ -14,8 +14,8 @@ let this program figure out how to satisfy those requirements.
 
 ## Installation
 
-The latest release can be found in the
-[Releases](https://github.com/tiquionophist/hhs-scheduler/releases) tab.
+The latest release can be found in
+[Releases](https://github.com/tiquionophist/hhs-scheduler/releases).
 
 hhs-scheduler is distributed in three formats:
 1. `.zip` standalone distributable for Windows. This is the **recommended** format. Simply download
@@ -29,7 +29,7 @@ to bundle a Java runtime. For advanced users who have a JRE installed (15+ is re
 
 ## Usage
 
-hhs-scheduler is designed to be intuitive it to use (if it's not - please leave feedback!). The main
+hhs-scheduler is designed to be intuitive to use (if it's not - please leave feedback!). The main
 idea is to make two selections:
 
 1. which teachers are allowed to teach which subjects
@@ -37,7 +37,7 @@ idea is to make two selections:
 
 From this configuration (and the number of classes in the school) the application can generate a
 full schedule which meets the requirements (and, of course, ensures that teachers only teach one
-class per period, classrooms aren't overbooked, etc), which you can set in-game.
+class per period, classrooms aren't overbooked, etc.), which you can set in-game.
 
 The basic configuration should be straightforward - check the subjects under each teacher that they
 are allowed to teach, and set for each subject the number of times per week it is taught. Then click
