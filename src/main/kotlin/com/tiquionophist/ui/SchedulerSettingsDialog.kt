@@ -36,7 +36,6 @@ import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.rememberDialogState
 import com.tiquionophist.core.Scheduler
 import com.tiquionophist.scheduler.ExhaustiveScheduler
-import com.tiquionophist.scheduler.OptaScheduler
 import com.tiquionophist.scheduler.RandomizedScheduler
 import com.tiquionophist.ui.common.ContentWithPane
 import com.tiquionophist.ui.common.NumberPicker
@@ -80,15 +79,6 @@ sealed class SchedulerSettings(val type: SchedulerType) {
         }
     }
 
-    data class Opta(
-        val timeoutSeconds: Int = 10,
-        val timeoutSecondsEnabled: Boolean = false
-    ) : SchedulerSettings(type = SchedulerType.OPTA) {
-        override fun create(): Scheduler {
-            return OptaScheduler(timeoutSeconds = timeoutSeconds.takeIf { timeoutSecondsEnabled })
-        }
-    }
-
     companion object {
         val default: SchedulerSettings = defaultSettingsFor(SchedulerType.RANDOMIZED)
 
@@ -96,7 +86,6 @@ sealed class SchedulerSettings(val type: SchedulerType) {
             return when (type) {
                 SchedulerType.EXHAUSTIVE -> Exhaustive()
                 SchedulerType.RANDOMIZED -> Randomized()
-                SchedulerType.OPTA -> Opta()
             }
         }
     }
@@ -113,12 +102,6 @@ enum class SchedulerType(val buttonName: String, val description: String) {
         description = "A randomized search through all possible schedules, filling out each schedule with a random " +
                 "valid lesson in the given fill order until no more lessons can be added. Tends to have best overall " +
                 "performance when attempts per round are limited."
-    ),
-    OPTA(
-        buttonName = "OptaPlanner",
-        description = "Uses commercial constraint satisfaction solver OptaPlanner. May scale the best to extremely " +
-                "large problems or the most flexibly to add soft constraints in the future but struggles to find a " +
-                "perfect solution for even medium-size problems."
     ),
 }
 
@@ -174,7 +157,6 @@ fun SchedulerSettingsDialog(
                             when (currentSettings) {
                                 is SchedulerSettings.Exhaustive -> ExhaustiveSettings(currentSettings, settingsState)
                                 is SchedulerSettings.Randomized -> RandomizedSettings(currentSettings, settingsState)
-                                is SchedulerSettings.Opta -> OptaSettings(currentSettings, settingsState)
                             }
                         }
                     }
@@ -304,35 +286,6 @@ private fun RandomizedSettings(
                     "algorithm starts again from scratch with the next random seed. This is very effective in " +
                     "avoiding local maxima (i.e. when we have all but the last period scheduled), but enabling it " +
                     "does mean it is possible that the algorithm is not guaranteed to find a solution if one exists."
-        )
-    }
-}
-
-@Composable
-private fun OptaSettings(
-    settings: SchedulerSettings.Opta,
-    settingsState: MutableState<SchedulerSettings>
-) {
-    SettingWithDescription(
-        description = "A maximum time limit on the Opta runtime."
-    ) {
-        Checkbox(
-            checked = settings.timeoutSecondsEnabled,
-            onCheckedChange = {
-                settingsState.value = settings.copy(timeoutSecondsEnabled = it)
-            }
-        )
-
-        Text("Timeout (seconds):")
-
-        NumberPicker(
-            value = settings.timeoutSeconds,
-            enabled = settings.timeoutSecondsEnabled,
-            textFieldWidth = Dimens.NumberPicker.LARGE_TEXT_FIELD_WIDTH,
-            min = 1,
-            onValueChange = {
-                settingsState.value = settings.copy(timeoutSeconds = it)
-            }
         )
     }
 }
