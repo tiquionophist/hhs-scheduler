@@ -6,6 +6,7 @@ import androidx.compose.foundation.TooltipPlacement
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -49,7 +50,7 @@ import com.tiquionophist.util.prettyName
 fun SettingsPane(classIndexState: MutableState<Int?>) {
     Surface(color = ThemeColors.current.surface3) {
         Row(
-            modifier = Modifier.fillMaxWidth().padding(Dimens.SPACING_2),
+            modifier = Modifier.fillMaxWidth().padding(horizontal = Dimens.SPACING_3, vertical = Dimens.SPACING_2),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
@@ -121,62 +122,63 @@ fun SettingsPane(classIndexState: MutableState<Int?>) {
                     )
                 }
 
-                TooltipArea(
-                    tooltip = {
-                        TooltipSurface {
-                            Box(Modifier.padding(Dimens.SPACING_2).widthIn(max = Dimens.Dialog.MAX_TEXT_WIDTH)) {
-                                Text(
-                                    "Whether to allow the same subject (excluding free periods) to be scheduled for " +
-                                            "the same class more than once on the same day."
-                                )
+                Column {
+                    TooltipArea(
+                        tooltip = {
+                            TooltipSurface {
+                                Box(Modifier.padding(Dimens.SPACING_2).widthIn(max = Dimens.Dialog.MAX_TEXT_WIDTH)) {
+                                    Text(
+                                        "Whether to allow the same subject (excluding free periods) to be scheduled " +
+                                                "for the same class more than once on the same day."
+                                    )
+                                }
                             }
                         }
+                    ) {
+                        CheckboxWithLabel(
+                            checked = config.allowSameDaySubjectRepeats,
+                            padding = PaddingValues(all = Dimens.SPACING_1),
+                            onCheckedChange = {
+                                GlobalState.scheduleConfiguration = config.copy(
+                                    allowSameDaySubjectRepeats = !config.allowSameDaySubjectRepeats,
+                                )
+                            }
+                        ) {
+                            Text(text = "Allow same-day subject repeats", maxLines = 2)
+                        }
                     }
-                ) {
-                    CheckboxWithLabel(
-                        checked = config.allowSameDaySubjectRepeats,
-                        onCheckedChange = {
-                            GlobalState.scheduleConfiguration = config.copy(
-                                allowSameDaySubjectRepeats = !config.allowSameDaySubjectRepeats,
-                            )
+
+                    TooltipArea(
+                        tooltip = {
+                            TooltipSurface {
+                                Box(Modifier.padding(Dimens.SPACING_2).widthIn(max = Dimens.Dialog.MAX_TEXT_WIDTH)) {
+                                    Text(
+                                        "Whether to allow the same subject (excluding free periods) to be scheduled " +
+                                                "for the same class back-to-back on the same day. Does not affect " +
+                                                "scheduling between the end of the previous day and the first period " +
+                                                "of the following day."
+                                    )
+                                }
+                            }
                         }
                     ) {
-                        Text(text = "Allow same-day subject repeats", maxLines = 2)
+                        CheckboxWithLabel(
+                            checked = config.allowSubsequentSubjectsRepeats && config.allowSameDaySubjectRepeats,
+                            enabled = config.allowSameDaySubjectRepeats,
+                            padding = PaddingValues(all = Dimens.SPACING_1),
+                            onCheckedChange = {
+                                GlobalState.scheduleConfiguration = config.copy(
+                                    allowSubsequentSubjectsRepeats = !config.allowSubsequentSubjectsRepeats,
+                                )
+                            }
+                        ) {
+                            Text(text = "Allow subsequent subject repeats", maxLines = 2)
+                        }
                     }
                 }
 
-                TooltipArea(
-                    tooltip = {
-                        TooltipSurface {
-                            Box(Modifier.padding(Dimens.SPACING_2).widthIn(max = Dimens.Dialog.MAX_TEXT_WIDTH)) {
-                                Text(
-                                    "Whether to allow the same subject (excluding free periods) to be scheduled for " +
-                                            "the same class back-to-back on the same day. Does not affect scheduling " +
-                                            "between the end of the previous day and the first period of the " +
-                                            "following day."
-                                )
-                            }
-                        }
-                    }
-                ) {
-                    CheckboxWithLabel(
-                        checked = config.allowSubsequentSubjectsRepeats && config.allowSameDaySubjectRepeats,
-                        enabled = config.allowSameDaySubjectRepeats,
-                        onCheckedChange = {
-                            GlobalState.scheduleConfiguration = config.copy(
-                                allowSubsequentSubjectsRepeats = !config.allowSubsequentSubjectsRepeats,
-                            )
-                        }
-                    ) {
-                        Text(text = "Allow subsequent subject repeats", maxLines = 2)
-                    }
-                }
-
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(Dimens.SPACING_1),
-                ) {
-                    Text("Classroom selection:")
+                Column(verticalArrangement = Arrangement.spacedBy(Dimens.SPACING_1)) {
+                    Text(text = "Classroom selection:", maxLines = 2)
 
                     val dropdownExpanded = remember { mutableStateOf(false) }
                     TextButton(
