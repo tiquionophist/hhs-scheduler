@@ -11,10 +11,12 @@ object ScheduleConfigurationFixtures {
             Teacher("English", "Teacher") to setOf(Subject.ENGLISH),
             Teacher("Math", "Teacher") to setOf(Subject.MATH),
         ),
-        subjectFrequency = mapOf(
-            Subject.ENGLISH to 10,
-            Subject.MATH to 10,
-        )
+        subjectFrequency = List(2) {
+            mapOf(
+                Subject.ENGLISH to 10,
+                Subject.MATH to 10,
+            )
+        }
     )
 
     private val easyConfiguration = ScheduleConfiguration(
@@ -24,12 +26,46 @@ object ScheduleConfigurationFixtures {
             Teacher.BETH_MANILI to setOf(Subject.MATH),
             Teacher.CARMEN_SMITH to setOf(Subject.ART),
         ),
-        subjectFrequency = mapOf(
-            Subject.ART to 4,
-            Subject.MATH to 4,
-            Subject.PHILOSOPHY to 3,
-            Subject.RELIGION to 3,
-            Subject.EMPTY to 6,
+        subjectFrequency = List(3) {
+            mapOf(
+                Subject.ART to 4,
+                Subject.MATH to 4,
+                Subject.PHILOSOPHY to 3,
+                Subject.RELIGION to 3,
+                Subject.EMPTY to 6,
+            )
+        }
+    )
+
+    private val easyConfigurationDifferentClassFrequencies = ScheduleConfiguration(
+        classes = 3,
+        teacherAssignments = mapOf(
+            Teacher.APRIL_RAYMUND to setOf(Subject.PHILOSOPHY, Subject.RELIGION),
+            Teacher.BETH_MANILI to setOf(Subject.MATH),
+            Teacher.CARMEN_SMITH to setOf(Subject.ART),
+        ),
+        subjectFrequency = listOf(
+            mapOf(
+                Subject.ART to 4,
+                Subject.MATH to 4,
+                Subject.PHILOSOPHY to 3,
+                Subject.RELIGION to 3,
+                Subject.EMPTY to 6,
+            ),
+            mapOf(
+                Subject.ART to 4,
+                Subject.MATH to 3,
+                Subject.PHILOSOPHY to 4,
+                Subject.RELIGION to 3,
+                Subject.EMPTY to 6,
+            ),
+            mapOf(
+                Subject.ART to 4,
+                Subject.MATH to 4,
+                Subject.PHILOSOPHY to 3,
+                Subject.RELIGION to 4,
+                Subject.EMPTY to 5,
+            ),
         )
     )
 
@@ -40,13 +76,15 @@ object ScheduleConfigurationFixtures {
             Teacher.BETH_MANILI to setOf(Subject.ART, Subject.MATH, Subject.PHILOSOPHY, Subject.RELIGION),
             Teacher.CARMEN_SMITH to setOf(Subject.ART, Subject.MATH, Subject.PHILOSOPHY, Subject.RELIGION),
         ),
-        subjectFrequency = mapOf(
-            Subject.ART to 4,
-            Subject.MATH to 4,
-            Subject.PHILOSOPHY to 3,
-            Subject.RELIGION to 3,
-            Subject.EMPTY to 6,
-        ),
+        subjectFrequency = List(2) {
+            mapOf(
+                Subject.ART to 4,
+                Subject.MATH to 4,
+                Subject.PHILOSOPHY to 3,
+                Subject.RELIGION to 3,
+                Subject.EMPTY to 6,
+            )
+        },
         allowSameDaySubjectRepeats = false,
     )
 
@@ -63,20 +101,22 @@ object ScheduleConfigurationFixtures {
             Teacher.RONDA_BELLS to setOf(Subject.SCHOOL_SPORT, Subject.SWIMMING),
             Teacher.SAMANTHA_KELLER to setOf(Subject.BONDAGE, Subject.PRACTICAL_SEX_ED, Subject.THEORETICAL_SEX_ED),
         ),
-        subjectFrequency = mapOf(
-            Subject.ANATOMY to 1,
-            Subject.ART to 2,
-            Subject.BONDAGE to 2,
-            Subject.CHEMISTRY to 2,
-            Subject.COMPUTER_SCIENCE to 2,
-            Subject.MATH to 3,
-            Subject.PHILOSOPHY to 2,
-            Subject.PRACTICAL_SEX_ED to 1,
-            Subject.RELIGION to 1,
-            Subject.SCHOOL_SPORT to 1,
-            Subject.SWIMMING to 2,
-            Subject.THEORETICAL_SEX_ED to 1,
-        ),
+        subjectFrequency = List(6) {
+            mapOf(
+                Subject.ANATOMY to 1,
+                Subject.ART to 2,
+                Subject.BONDAGE to 2,
+                Subject.CHEMISTRY to 2,
+                Subject.COMPUTER_SCIENCE to 2,
+                Subject.MATH to 3,
+                Subject.PHILOSOPHY to 2,
+                Subject.PRACTICAL_SEX_ED to 1,
+                Subject.RELIGION to 1,
+                Subject.SCHOOL_SPORT to 1,
+                Subject.SWIMMING to 2,
+                Subject.THEORETICAL_SEX_ED to 1,
+            )
+        },
     )
 
     private val hardConfiguration = ScheduleConfiguration(
@@ -94,43 +134,45 @@ object ScheduleConfigurationFixtures {
             Teacher.RONDA_BELLS to setOf(Subject.SCHOOL_SPORT, Subject.SWIMMING),
             Teacher.SAMANTHA_KELLER to setOf(Subject.BONDAGE, Subject.PRACTICAL_SEX_ED, Subject.THEORETICAL_SEX_ED),
         ),
-        subjectFrequency = mapOf(
-            Subject.ANATOMY to 1,
-            Subject.ART to 2,
-            Subject.BONDAGE to 1,
-            Subject.CHEMISTRY to 2,
-            Subject.COMPUTER_SCIENCE to 1,
-            Subject.ENGLISH to 1,
-            Subject.GEOGRAPHY to 1,
-            Subject.HISTORY to 1,
-            Subject.MATH to 2,
-            Subject.PHILOSOPHY to 1,
-            Subject.PRACTICAL_SEX_ED to 1,
-            Subject.RELIGION to 1,
-            Subject.SCHOOL_SPORT to 1,
-            Subject.SWIMMING to 2,
-            Subject.THEORETICAL_SEX_ED to 1,
-            Subject.EMPTY to 1,
-        ),
+        subjectFrequency = List(8) {
+            mapOf(
+                Subject.ANATOMY to 1,
+                Subject.ART to 2,
+                Subject.BONDAGE to 1,
+                Subject.CHEMISTRY to 2,
+                Subject.COMPUTER_SCIENCE to 1,
+                Subject.ENGLISH to 1,
+                Subject.GEOGRAPHY to 1,
+                Subject.HISTORY to 1,
+                Subject.MATH to 2,
+                Subject.PHILOSOPHY to 1,
+                Subject.PRACTICAL_SEX_ED to 1,
+                Subject.RELIGION to 1,
+                Subject.SCHOOL_SPORT to 1,
+                Subject.SWIMMING to 2,
+                Subject.THEORETICAL_SEX_ED to 1,
+                Subject.EMPTY to 1,
+            )
+        },
     )
 
     private val trivialImpossibleConfiguration = ScheduleConfiguration(
         classes = 3,
         teacherAssignments = mapOf(Teacher.ANNA_MILLER to setOf(Subject.ENGLISH)),
-        subjectFrequency = mapOf(Subject.ENGLISH to 20)
+        subjectFrequency = List(3) { mapOf(Subject.ENGLISH to 20) }
     )
 
     private val impossibleConfigurationFromSameDayConstraint = ScheduleConfiguration(
         classes = 2,
         teacherAssignments = mapOf(Teacher.ANNA_MILLER to setOf(Subject.ENGLISH)),
-        subjectFrequency = mapOf(Subject.ENGLISH to 20),
+        subjectFrequency = List(2) { mapOf(Subject.ENGLISH to 20) },
         allowSameDaySubjectRepeats = false,
     )
 
     private val impossibleConfigurationFromSubsequentConstraint = ScheduleConfiguration(
         classes = 2,
         teacherAssignments = mapOf(Teacher.ANNA_MILLER to setOf(Subject.ENGLISH)),
-        subjectFrequency = mapOf(Subject.ENGLISH to 20),
+        subjectFrequency = List(2) { mapOf(Subject.ENGLISH to 20) },
         allowSubsequentSubjectsRepeats = false,
     )
 
@@ -138,6 +180,7 @@ object ScheduleConfigurationFixtures {
         trivialConfiguration,
         trivialConfiguration.copy(allowSubsequentSubjectsRepeats = false),
         easyConfiguration,
+        easyConfigurationDifferentClassFrequencies,
     )
 
     val possibleConfigurations = listOf(
@@ -145,6 +188,7 @@ object ScheduleConfigurationFixtures {
         trivialConfiguration.copy(allowSubsequentSubjectsRepeats = false),
         easyConfiguration,
         easyConfigurationNoSameDayRepeats,
+        easyConfigurationDifferentClassFrequencies,
         mediumConfiguration,
         mediumConfiguration.copy(allowSubsequentSubjectsRepeats = false),
         mediumConfiguration.copy(allowSameDaySubjectRepeats = false),

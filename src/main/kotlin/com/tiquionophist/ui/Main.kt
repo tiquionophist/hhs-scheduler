@@ -70,7 +70,7 @@ private fun MainContent() {
                                     .fillMaxHeightVerticalScroll(verticalScrollState)
                                     .fillMaxWidthHorizontalScroll(horizontalScrollState)
                             ) {
-                                ScheduleConfigurationTable()
+                                ScheduleConfigurationTable(classIndex = 0) // TODO class switcher
                             }
 
                             VerticalScrollbar(

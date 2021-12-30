@@ -46,10 +46,7 @@ class RandomizedScheduler(
                     lessons = List(configuration.classes) {
                         List(configuration.periodsPerWeek) { null }
                     },
-                    remainingSubjects = List(configuration.classes) {
-                        configuration.subjectFrequency.takeIf { it.isNotEmpty() }?.let { EnumMap(it) }
-                            ?: EnumMap(Subject::class.java)
-                    }
+                    remainingSubjects = configuration.subjectFrequency,
                 ),
                 random = randomSeed?.let { it.invoke(round)?.let { seed -> Random(seed) } ?: defaultRandom },
                 attempts = attemptsPerRound?.let { AttemptWrapper(it) }
@@ -106,7 +103,7 @@ class RandomizedScheduler(
         private val lessons: List<List<Lesson?>>,
 
         // [classIndex -> { subject -> number of classes in that subject still to be assigned }]
-        private val remainingSubjects: List<EnumMap<Subject, Int>>,
+        private val remainingSubjects: List<Map<Subject, Int>>,
 
         private val nextClassIndex: Int = 0,
         private val nextPeriodIndex: Int = 0,

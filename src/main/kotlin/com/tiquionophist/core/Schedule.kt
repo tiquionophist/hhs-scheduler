@@ -16,6 +16,8 @@ data class Schedule(val lessons: List<List<Lesson>>) {
      */
     fun verify(config: ScheduleConfiguration) {
         require(lessons.size == config.classes) { "wrong number of classes" }
+        require(config.classes == config.subjectFrequency.size) { "wrong subject frequency size" }
+
         lessons.forEach { classSchedule ->
             require(classSchedule.size == config.periodsPerWeek) { "wrong number of periods" }
 
@@ -47,8 +49,8 @@ data class Schedule(val lessons: List<List<Lesson>>) {
             }
         }
 
-        for (classSchedule in lessons) {
-            val remainingSubjects = EnumMap(config.subjectFrequency)
+        for ((classSchedule, classFrequency) in lessons.zip(config.subjectFrequency)) {
+            val remainingSubjects = EnumMap(classFrequency)
             for (cls in classSchedule) {
                 remainingSubjects.compute(cls.subject) { _, count -> (count ?: 0) - 1 }
             }

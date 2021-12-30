@@ -46,9 +46,12 @@ data class ScheduleConfiguration(
     val teacherAssignments: Map<Teacher, Set<Subject>> = emptyMap(),
 
     /**
-     * A map from each [Subject] to the number of times per week it ought to be taught (including free periods).
+     * For each class, a map from each [Subject] to the number of times per week it ought to be taught for that class
+     * (including free periods).
      */
-    val subjectFrequency: Map<Subject, Int> = mapOf(Subject.EMPTY to daysPerWeek * periodsPerDay),
+    val subjectFrequency: List<Map<Subject, Int>> = List(classes.coerceAtLeast(0)) {
+        EnumMap(mapOf(Subject.EMPTY to daysPerWeek * periodsPerDay))
+    },
 ) {
     @Transient
     val periodsPerWeek: Int = daysPerWeek * periodsPerDay
@@ -75,9 +78,9 @@ data class ScheduleConfiguration(
     @Transient
     val minClassesTaughtPerTeacher: Map<Teacher, Int> = teacherAssignments
         .mapValues { (_, subjects) ->
-            classes * subjects
+            subjects
                 .filter { subject -> subjectAssignments[subject]?.size == 1 }
-                .sumOf { subjectFrequency[it] ?: 0 }
+                .sumOf { subject -> subjectFrequency.sumOf { classFrequency -> classFrequency[subject] ?: 0 } }
         }
 
     /**
@@ -87,13 +90,17 @@ data class ScheduleConfiguration(
      */
     @Transient
     val maxClassesTaughtPerTeacher: Map<Teacher, Int> = teacherAssignments
-        .mapValues { (_, subjects) -> classes * subjects.sumOf { subjectFrequency[it] ?: 0 } }
+        .mapValues { (_, subjects) ->
+            subjects.sumOf { subject -> subjectFrequency.sumOf { classFrequency -> classFrequency[subject] ?: 0 } }
+        }
 
     /**
-     * The [StatSet] gained by students in each class per week as a result of the subjects being taught.
+     * The [StatSet] for each class gained by students in each class per week as a result of the subjects being taught.
      */
     @Transient
-    val classStats: StatSet = subjectFrequency.flatMap { (subject, times) -> List(times) { subject.stats } }.sum()
+    val classStats: List<StatSet> = subjectFrequency.map { classFrequency ->
+        classFrequency.flatMap { (subject, times) -> List(times) { subject.stats } }.sum()
+    }
 
     /**
      * Verifies that this configuration is valid, returning a list of user-readable error messages for any issues.
@@ -105,8 +112,11 @@ data class ScheduleConfiguration(
             errors += "Must have >0 classes."
         }
 
-        if (subjectFrequency.values.sum() != periodsPerWeek) {
-            errors += "${subjectFrequency.values.sum()} subjects assigned per week; must be $periodsPerWeek."
+        subjectFrequency.forEachIndexed { classIndex, classFrequency ->
+            if (classFrequency.values.sum() != periodsPerWeek) {
+                errors += "${classFrequency.values.sum()} subjects assigned per week for class ${classIndex + 1}; " +
+                        "must be $periodsPerWeek."
+            }
         }
 
         teacherAssignments.forEach { (teacher, subjects) ->
@@ -115,7 +125,9 @@ data class ScheduleConfiguration(
             }
         }
 
-        val missingSubjects = subjectFrequency.keys.minus(teacherAssignments.values.flattenToSet()).minus(Subject.EMPTY)
+        val missingSubjects: Set<Subject> = subjectFrequency.flatMapTo(mutableSetOf()) { it.keys }
+            .minus(teacherAssignments.values.flattenToSet())
+            .minus(Subject.EMPTY)
         missingSubjects.forEach { subject ->
             errors += "${subject.prettyName} is not taught by any teachers."
         }
@@ -127,13 +139,21 @@ data class ScheduleConfiguration(
         }
 
         Classroom.values().forEach { classroom ->
-            val subjectsInClassroom = subjectFrequency
-                .filterKeys { it.classrooms?.size == 1 && it.classrooms.contains(classroom) }
+            val classesPerWeek = subjectFrequency.sumOf { classFrequency ->
+                classFrequency
+                    .filterKeys { it.classrooms?.size == 1 && it.classrooms.contains(classroom) }
+                    .values
+                    .sum()
+            }
 
-            val classesPerWeek = classes * subjectsInClassroom.values.sum()
             if (classesPerWeek > periodsPerWeek) {
+                val subjectsInClassroom = subjectFrequency.flatMapTo(mutableSetOf()) { classFrequency ->
+                    classFrequency.keys
+                        .filter { it.classrooms?.size == 1 && it.classrooms.contains(classroom) }
+                }
+
                 errors += "${classroom.canonicalName} must be occupied at least $classesPerWeek times per week (by " +
-                        "${subjectsInClassroom.keys.sorted().joinToString { it.prettyName }}), which is impossible."
+                        "${subjectsInClassroom.sorted().joinToString { it.prettyName }}), which is impossible."
             }
         }
 
@@ -166,14 +186,16 @@ data class ScheduleConfiguration(
 
         /**
          * Returns a subject frequency map from the given [subjectFrequency] with [Subject.EMPTY] set to the number of
-         * missing slots per week. Also removes any subjects with zero frequency.
+         * missing slots per week for each class. Also removes any subjects with zero frequency.
          */
-        fun fillFreePeriods(periodsPerWeek: Int, subjectFrequency: Map<Subject, Int>): Map<Subject, Int> {
-            val totalFrequency = subjectFrequency.filterKeys { it != Subject.EMPTY }.values.sum()
-            val freePeriods = (periodsPerWeek - totalFrequency).coerceAtLeast(0)
-            return subjectFrequency
-                .plus(Subject.EMPTY to freePeriods)
-                .filterValues { it > 0 }
+        fun fillFreePeriods(periodsPerWeek: Int, subjectFrequency: List<Map<Subject, Int>>): List<Map<Subject, Int>> {
+            return subjectFrequency.map { classFrequency ->
+                val totalFrequency = classFrequency.filterKeys { it != Subject.EMPTY }.values.sum()
+                val freePeriods = (periodsPerWeek - totalFrequency).coerceAtLeast(0)
+                classFrequency
+                    .plus(Subject.EMPTY to freePeriods)
+                    .filterValues { it > 0 }
+            }
         }
     }
 }

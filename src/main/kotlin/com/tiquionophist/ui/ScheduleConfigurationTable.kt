@@ -50,16 +50,16 @@ private fun ScheduleConfiguration.teacherEnabled(teacher: Teacher): Boolean {
 
 /**
  * Whether [subject] should be shown as enabled for this [ScheduleConfiguration], i.e. if it has non-zero frequency in
- * the schedule or has any teachers assigned to it.
+ * the schedule for [classIndex].
  */
-private fun ScheduleConfiguration.subjectEnabled(subject: Subject): Boolean {
-    return subjectFrequency[subject]?.let { it > 0 } == true || subjectAssignments[subject]?.isNotEmpty() == true
+private fun ScheduleConfiguration.subjectEnabled(subject: Subject, classIndex: Int): Boolean {
+    return subjectFrequency[classIndex][subject]?.let { it > 0 } == true
 }
 
 /**
  * A column displaying the icon for each [Subject].
  */
-private object SubjectIconColumn : ColumnWithHeader<Subject> {
+private class SubjectIconColumn(private val classIndex: Int) : ColumnWithHeader<Subject> {
     @Composable
     override fun itemContent(value: Subject) {
         value.imageBitmap?.let { imageBitmap ->
@@ -69,7 +69,9 @@ private object SubjectIconColumn : ColumnWithHeader<Subject> {
                 modifier = Modifier
                     .padding(horizontal = Dimens.SPACING_2)
                     .size(Dimens.ScheduleConfigurationTable.SUBJECT_ICON_SIZE)
-                    .enabledIf(GlobalState.scheduleConfiguration.subjectEnabled(value)),
+                    .enabledIf(
+                        GlobalState.scheduleConfiguration.subjectEnabled(subject = value, classIndex = classIndex)
+                    ),
             )
         }
     }
@@ -78,7 +80,7 @@ private object SubjectIconColumn : ColumnWithHeader<Subject> {
 /**
  * A column displaying the name of each [Subject].
  */
-private object SubjectNameColumn : ColumnWithHeader<Subject> {
+private class SubjectNameColumn(private val classIndex: Int) : ColumnWithHeader<Subject> {
     override val itemHorizontalAlignment = Alignment.Start
 
     @Composable
@@ -87,7 +89,7 @@ private object SubjectNameColumn : ColumnWithHeader<Subject> {
             text = value.prettyName,
             modifier = Modifier
                 .padding(Dimens.SPACING_2)
-                .enabledIf(GlobalState.scheduleConfiguration.subjectEnabled(value)),
+                .enabledIf(GlobalState.scheduleConfiguration.subjectEnabled(subject = value, classIndex = classIndex)),
         )
     }
 }
@@ -95,7 +97,7 @@ private object SubjectNameColumn : ColumnWithHeader<Subject> {
 /**
  * A column displaying a number picker for the frequency of each [Subject] in the schedule.
  */
-private object SubjectFrequencyPickerColumn : ColumnWithHeader<Subject> {
+private class SubjectFrequencyPickerColumn(private val classIndex: Int) : ColumnWithHeader<Subject> {
     override val headerVerticalAlignment = Alignment.Bottom
 
     @Composable
@@ -112,17 +114,23 @@ private object SubjectFrequencyPickerColumn : ColumnWithHeader<Subject> {
         if (value == Subject.EMPTY) {
             Text(
                 modifier = Modifier.padding(Dimens.SPACING_2),
-                text = (config.subjectFrequency[value] ?: 0).toString(),
+                text = (config.subjectFrequency[classIndex][value] ?: 0).toString(),
             )
         } else {
             NumberPicker(
                 modifier = Modifier.padding(Dimens.SPACING_2),
-                value = config.subjectFrequency[value] ?: 0,
+                value = config.subjectFrequency[classIndex][value] ?: 0,
                 onValueChange = { newValue ->
                     GlobalState.scheduleConfiguration = GlobalState.scheduleConfiguration.copy(
                         subjectFrequency = ScheduleConfiguration.fillFreePeriods(
                             periodsPerWeek = config.periodsPerWeek,
-                            subjectFrequency = config.subjectFrequency.plus(value to newValue),
+                            subjectFrequency = config.subjectFrequency.mapIndexed { index, classFrequency ->
+                                if (index == classIndex) {
+                                    classFrequency.plus(value to newValue)
+                                } else {
+                                    classFrequency
+                                }
+                            },
                         )
                     )
                 },
@@ -136,7 +144,7 @@ private object SubjectFrequencyPickerColumn : ColumnWithHeader<Subject> {
 /**
  * A column displaying the total number of teachers assigned to each [Subject].
  */
-private object TotalTeacherAssignmentsColumn : ColumnWithHeader<Subject> {
+private class TotalTeacherAssignmentsColumn(private val classIndex: Int) : ColumnWithHeader<Subject> {
     override val itemHorizontalAlignment = Alignment.Start
 
     @Composable
@@ -146,13 +154,15 @@ private object TotalTeacherAssignmentsColumn : ColumnWithHeader<Subject> {
         val config = GlobalState.scheduleConfiguration
         val numTeachers = config.subjectAssignments[value]?.size ?: 0
 
-        val frequency = config.subjectFrequency[value] ?: 0
+        val frequency = config.subjectFrequency[classIndex][value] ?: 0
         val error = (frequency == 0) != (numTeachers == 0)
 
         Text(
             text = "teacher".pluralizedCount(numTeachers),
             color = if (error) MaterialTheme.colors.error else Color.Unspecified,
-            modifier = Modifier.padding(Dimens.SPACING_2).enabledIf(config.subjectEnabled(value)),
+            modifier = Modifier
+                .padding(Dimens.SPACING_2)
+                .enabledIf(config.subjectEnabled(subject = value, classIndex = classIndex)),
         )
     }
 }
@@ -259,7 +269,7 @@ private class SubjectTeacherAssignmentsColumn(private val teacher: Teacher) : Co
  * A grid-based view of the teacher/subject assignments and frequencies in [GlobalState.scheduleConfiguration].
  */
 @Composable
-fun ScheduleConfigurationTable() {
+fun ScheduleConfigurationTable(classIndex: Int) {
     val configuration = GlobalState.scheduleConfiguration
     val scheduledTeachers = configuration.teacherAssignments.keys
 
@@ -285,10 +295,10 @@ fun ScheduleConfigurationTable() {
     }
 
     val fixedColumns = listOf(
-        SubjectIconColumn,
-        SubjectNameColumn,
-        SubjectFrequencyPickerColumn,
-        TotalTeacherAssignmentsColumn,
+        SubjectIconColumn(classIndex = classIndex),
+        SubjectNameColumn(classIndex = classIndex),
+        SubjectFrequencyPickerColumn(classIndex = classIndex),
+        TotalTeacherAssignmentsColumn(classIndex = classIndex),
     )
 
     val fixedRows = listOf(null)
@@ -297,7 +307,7 @@ fun ScheduleConfigurationTable() {
         if (GlobalState.showUnusedSubjects) {
             subjects
         } else {
-            subjects.filter { configuration.subjectEnabled(it) }
+            subjects.filter { configuration.subjectEnabled(subject = it, classIndex = classIndex) }
                 .takeUnless { it.minus(Subject.EMPTY).isEmpty() } ?: subjects // don't allow empty subjects
         }
     }

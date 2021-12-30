@@ -46,7 +46,12 @@ internal class SaveFileIOTest {
 
     @Test
     fun testWriteMoreClasses() {
-        val configuration = saveFileConfiguration.copy(classes = saveFileConfiguration.classes + 1)
+        val configuration = saveFileConfiguration.copy(
+            classes = saveFileConfiguration.classes + 1,
+            // copy the first class subject frequency to the end so we have the right number
+            subjectFrequency = saveFileConfiguration.subjectFrequency
+                .plus(saveFileConfiguration.subjectFrequency.first().toMap()),
+        )
         val schedule = runBlocking { scheduler.schedule(configuration)!! }
 
         SaveFileIO.write(
@@ -86,15 +91,17 @@ internal class SaveFileIOTest {
                 Teacher.IRINA_JELABITCH to setOf(Subject.ENGLISH, Subject.GEOGRAPHY),
                 Teacher.JESSICA_UNDERWOOD to setOf(Subject.HISTORY, Subject.SCHOOL_SPORT),
             ),
-            subjectFrequency = mapOf(
-                Subject.PHILOSOPHY to 3,
-                Subject.RELIGION to 3,
-                Subject.ENGLISH to 3,
-                Subject.GEOGRAPHY to 3,
-                Subject.HISTORY to 3,
-                Subject.SCHOOL_SPORT to 3,
-                Subject.EMPTY to 2,
-            )
+            subjectFrequency = List(2) {
+                mapOf(
+                    Subject.PHILOSOPHY to 3,
+                    Subject.RELIGION to 3,
+                    Subject.ENGLISH to 3,
+                    Subject.GEOGRAPHY to 3,
+                    Subject.HISTORY to 3,
+                    Subject.SCHOOL_SPORT to 3,
+                    Subject.EMPTY to 2,
+                )
+            }
         )
     }
 }

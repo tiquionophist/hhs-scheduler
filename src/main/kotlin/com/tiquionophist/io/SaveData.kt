@@ -187,12 +187,16 @@ data class SaveData(
 
     /**
      * Converts this [SaveData] to a [ScheduleConfiguration] with teacher assignments based on [people] and subject
-     * frequency based on the class with index [frequencyFromClassIndex].
+     * frequency based on [schoolClasses].
      */
-    fun toScheduleConfiguration(frequencyFromClassIndex: Int = 1): ScheduleConfiguration {
+    fun toScheduleConfiguration(): ScheduleConfiguration {
         val teachers = people.people.filter { !it.teacherSubjects?.subjects.isNullOrEmpty() }
+
+        // drop the last class since it just contains unassigned students
+        val nonEmptyClasses = schoolClasses.classes.dropLast(1)
+
         return ScheduleConfiguration(
-            classes = schoolClasses.classes.size - 1,
+            classes = nonEmptyClasses.size,
             teacherAssignments = teachers.associate { person ->
                 val teacher = Teacher(firstName = person.firstName, lastName = person.lastName)
                 val subjects = person.teacherSubjects!!.subjects
@@ -201,8 +205,7 @@ data class SaveData(
 
                 teacher to subjects
             },
-            subjectFrequency = schoolClasses.classes
-                .find { it.classIndex == frequencyFromClassIndex }!!.toSubjectFrequency()
+            subjectFrequency = nonEmptyClasses.map { it.toSubjectFrequency() },
         )
     }
 

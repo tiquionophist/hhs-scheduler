@@ -6,7 +6,6 @@ import androidx.compose.runtime.setValue
 import com.tiquionophist.core.ScheduleConfiguration
 import com.tiquionophist.core.Teacher
 import com.tiquionophist.ui.common.Notification
-import java.io.File
 
 /**
  * Stores the global state, which does not need to be attached to a particular point in the composition and can be
@@ -15,8 +14,7 @@ import java.io.File
  * TODO handle error dialogs here as well
  */
 object GlobalState {
-    private val initialConfiguration = ScheduleConfiguration.loadOrNull(File("config.json"))
-        ?: ScheduleConfiguration.EMPTY
+    private val initialConfiguration = ScheduleConfiguration.EMPTY
 
     var scheduleConfiguration by mutableStateOf(initialConfiguration)
     var customTeachers by mutableStateOf(emptySet<Teacher>())

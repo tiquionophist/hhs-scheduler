@@ -47,13 +47,18 @@ internal class ScheduleConfigurationTest {
                         teacherAssignments = mapOf(
                             Teacher("Teacher", "1") to setOf(Subject.CHEMISTRY, Subject.PHYSICS),
                         ),
-                        subjectFrequency = mapOf(
-                            Subject.CHEMISTRY to 1,
-                            Subject.EMPTY to 2,
-                            Subject.PHYSICS to 1,
-                        )
+                        subjectFrequency = List(2) {
+                            mapOf(
+                                Subject.CHEMISTRY to 1,
+                                Subject.EMPTY to 2,
+                                Subject.PHYSICS to 1,
+                            )
+                        },
                     ),
-                    errors = listOf("4 subjects assigned per week; must be 12.")
+                    errors = listOf(
+                        "4 subjects assigned per week for class 1; must be 12.",
+                        "4 subjects assigned per week for class 2; must be 12.",
+                    )
                 ),
                 ValidationTestCase(
                     config = ScheduleConfiguration(
@@ -61,11 +66,13 @@ internal class ScheduleConfigurationTest {
                         teacherAssignments = mapOf(
                             Teacher("Teacher", "1") to setOf(Subject.CHEMISTRY),
                         ),
-                        subjectFrequency = mapOf(
-                            Subject.CHEMISTRY to 1,
-                            Subject.EMPTY to 18,
-                            Subject.PHYSICS to 1,
-                        )
+                        subjectFrequency = List(2) {
+                            mapOf(
+                                Subject.CHEMISTRY to 1,
+                                Subject.EMPTY to 18,
+                                Subject.PHYSICS to 1,
+                            )
+                        },
                     ),
                     errors = listOf("Physics is not taught by any teachers.")
                 ),
@@ -75,10 +82,12 @@ internal class ScheduleConfigurationTest {
                         teacherAssignments = mapOf(
                             Teacher("Teacher", "1") to setOf(Subject.PHILOSOPHY),
                         ),
-                        subjectFrequency = mapOf(
-                            Subject.PHILOSOPHY to 16,
-                            Subject.EMPTY to 4,
-                        )
+                        subjectFrequency = List(2) {
+                            mapOf(
+                                Subject.PHILOSOPHY to 16,
+                                Subject.EMPTY to 4,
+                            )
+                        },
                     ),
                     errors = listOf("Teacher 1 must teach at least 32 classes per week, which is impossible.")
                 ),
@@ -90,11 +99,13 @@ internal class ScheduleConfigurationTest {
                             Teacher("Teacher", "2") to setOf(Subject.CHEMISTRY, Subject.PHYSICS),
                             Teacher("Teacher", "3") to setOf(Subject.CHEMISTRY, Subject.PHYSICS),
                         ),
-                        subjectFrequency = mapOf(
-                            Subject.CHEMISTRY to 2,
-                            Subject.PHYSICS to 1,
-                            Subject.EMPTY to 17,
-                        ),
+                        subjectFrequency = List(10) {
+                            mapOf(
+                                Subject.CHEMISTRY to 2,
+                                Subject.PHYSICS to 1,
+                                Subject.EMPTY to 17,
+                            )
+                        },
                     ),
                     errors = listOf(
                         "Classroom Chemistry must be occupied at least 30 times per week (by Chemistry, Physics), " +

@@ -25,7 +25,7 @@ internal class LessonTest {
             val emptyConfig = ScheduleConfiguration(
                 classes = 1,
                 teacherAssignments = mapOf(),
-                subjectFrequency = mapOf()
+                subjectFrequency = listOf(mapOf()),
             )
 
             val nonEmptyConfig = ScheduleConfiguration(
@@ -34,7 +34,7 @@ internal class LessonTest {
                     Teacher.CARMEN_SMITH to setOf(Subject.ENGLISH),
                     Teacher.SAMANTHA_KELLER to setOf(Subject.COMPUTER_SCIENCE),
                 ),
-                subjectFrequency = mapOf()
+                subjectFrequency = listOf(mapOf()),
             )
 
             return listOf(

@@ -68,7 +68,8 @@ fun StatsPane() {
                 )
 
                 val stats = remember(GlobalState.scheduleConfiguration) {
-                    GlobalState.scheduleConfiguration.classStats.stats
+                    // TODO per-class stats
+                    GlobalState.scheduleConfiguration.classStats[0].stats
                         .toList()
                         .sortedBy { it.first.prettyName }
                 }
