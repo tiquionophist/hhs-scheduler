@@ -95,11 +95,13 @@ data class ScheduleConfiguration(
         }
 
     /**
-     * The [StatSet] for each class gained by students in each class per week as a result of the subjects being taught.
+     * The [StatSet] for the class at [classIndex] gained by students in that class per week as a result of the subjects
+     * being taught.
      */
-    @Transient
-    val classStats: List<StatSet> = subjectFrequency.map { classFrequency ->
-        classFrequency.flatMap { (subject, times) -> List(times) { subject.stats } }.sum()
+    fun classStats(classIndex: Int): StatSet {
+        return subjectFrequency[classIndex]
+            .flatMap { (subject, times) -> List(times) { subject.stats } }
+            .sum()
     }
 
     /**

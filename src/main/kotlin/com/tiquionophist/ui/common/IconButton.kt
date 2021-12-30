@@ -36,6 +36,6 @@ fun IconAndTextButton(
 
         Spacer(Modifier.width(Dimens.SPACING_2))
 
-        Text(text)
+        Text(text = text, maxLines = 2)
     }
 }

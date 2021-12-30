@@ -55,7 +55,7 @@ private object StatValueColumn : Column<Pair<Stat, BigDecimal>> {
  * Shows the weekly stat effects of [GlobalState.scheduleConfiguration], placed at the right of the window.
  */
 @Composable
-fun StatsPane() {
+fun StatsPane(classIndex: Int?) {
     Surface(color = ThemeColors.current.surface2) {
         Box(modifier = Modifier.fillMaxHeight()) {
             val scrollState = rememberScrollState()
@@ -67,9 +67,9 @@ fun StatsPane() {
                     modifier = Modifier.padding(Dimens.SPACING_2),
                 )
 
-                val stats = remember(GlobalState.scheduleConfiguration) {
-                    // TODO per-class stats
-                    GlobalState.scheduleConfiguration.classStats[0].stats
+                val stats = remember(GlobalState.scheduleConfiguration, classIndex) {
+                    GlobalState.scheduleConfiguration.classStats(classIndex = classIndex ?: 0)
+                        .stats
                         .toList()
                         .sortedBy { it.first.prettyName }
                 }

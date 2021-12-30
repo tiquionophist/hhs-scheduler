@@ -84,7 +84,7 @@ fun SettingsPane() {
                     horizontalArrangement = Arrangement.spacedBy(Dimens.SPACING_1),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Text("Classes:")
+                    Text(text = "Classes:", maxLines = 2)
 
                     NumberPicker(
                         value = GlobalState.scheduleConfiguration.classes,
@@ -118,7 +118,7 @@ fun SettingsPane() {
                             )
                         }
                     ) {
-                        Text("Allow same-day subject repeats")
+                        Text(text = "Allow same-day subject repeats", maxLines = 2)
                     }
                 }
 
@@ -147,7 +147,7 @@ fun SettingsPane() {
                             )
                         }
                     ) {
-                        Text("Allow subsequent subject repeats")
+                        Text(text = "Allow subsequent subject repeats", maxLines = 2)
                     }
                 }
             }

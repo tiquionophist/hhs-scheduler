@@ -148,7 +148,7 @@ fun RunScheduleButton(
 
                     Spacer(Modifier.width(Dimens.SPACING_2))
 
-                    Text(runText)
+                    Text(text = runText, maxLines = 2)
                 }
             }
         )
