@@ -18,6 +18,7 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -37,7 +38,7 @@ import com.tiquionophist.ui.common.TooltipSurface
  * Row of scheduling-wide settings, placed at the bottom of the window.
  */
 @Composable
-fun SettingsPane() {
+fun SettingsPane(classIndexState: MutableState<Int?>) {
     Surface(color = ThemeColors.current.surface3) {
         Row(
             modifier = Modifier.fillMaxWidth().padding(Dimens.SPACING_2),
@@ -89,8 +90,23 @@ fun SettingsPane() {
                     NumberPicker(
                         value = GlobalState.scheduleConfiguration.classes,
                         onValueChange = { newValue ->
-                            GlobalState.scheduleConfiguration = GlobalState.scheduleConfiguration.copy(
-                                classes = newValue
+                            val config = GlobalState.scheduleConfiguration
+
+                            // if we're adding new classes, we need to add new subject frequencies. Copy them from the
+                            // currently selected class frequencies
+                            val currentFrequency = config.subjectFrequency[classIndexState.value ?: 0]
+                            val missingFrequencies = List((newValue - config.classes).coerceAtLeast(0)) {
+                                currentFrequency
+                            }
+
+                            val droppedFrequencies = (config.classes - newValue).coerceAtLeast(0)
+
+                            classIndexState.value = classIndexState.value?.coerceAtMost(newValue - 1)
+                            GlobalState.scheduleConfiguration = config.copy(
+                                classes = newValue,
+                                subjectFrequency = config.subjectFrequency
+                                    .dropLast(droppedFrequencies)
+                                    .plus(missingFrequencies),
                             )
                         },
                         min = 1,

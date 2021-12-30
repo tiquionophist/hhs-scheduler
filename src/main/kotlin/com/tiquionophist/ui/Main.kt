@@ -93,6 +93,6 @@ private fun MainContent() {
                 pane = { StatsPane(classIndex = classIndexState.value) }
             )
         },
-        pane = { SettingsPane() }
+        pane = { SettingsPane(classIndexState = classIndexState) }
     )
 }
