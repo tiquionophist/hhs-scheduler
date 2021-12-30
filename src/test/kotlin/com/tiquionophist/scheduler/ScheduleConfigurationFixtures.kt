@@ -5,7 +5,7 @@ import com.tiquionophist.core.Subject
 import com.tiquionophist.core.Teacher
 
 object ScheduleConfigurationFixtures {
-    val trivialConfiguration = ScheduleConfiguration(
+    private val trivialConfiguration = ScheduleConfiguration(
         classes = 2,
         teacherAssignments = mapOf(
             Teacher("English", "Teacher") to setOf(Subject.ENGLISH),
@@ -17,7 +17,7 @@ object ScheduleConfigurationFixtures {
         )
     )
 
-    val easyConfiguration = ScheduleConfiguration(
+    private val easyConfiguration = ScheduleConfiguration(
         classes = 3,
         teacherAssignments = mapOf(
             Teacher.APRIL_RAYMUND to setOf(Subject.PHILOSOPHY, Subject.RELIGION),
@@ -33,7 +33,24 @@ object ScheduleConfigurationFixtures {
         )
     )
 
-    val mediumConfiguration = ScheduleConfiguration(
+    private val easyConfigurationNoSameDayRepeats = ScheduleConfiguration(
+        classes = 2,
+        teacherAssignments = mapOf(
+            Teacher.APRIL_RAYMUND to setOf(Subject.ART, Subject.MATH, Subject.PHILOSOPHY, Subject.RELIGION),
+            Teacher.BETH_MANILI to setOf(Subject.ART, Subject.MATH, Subject.PHILOSOPHY, Subject.RELIGION),
+            Teacher.CARMEN_SMITH to setOf(Subject.ART, Subject.MATH, Subject.PHILOSOPHY, Subject.RELIGION),
+        ),
+        subjectFrequency = mapOf(
+            Subject.ART to 4,
+            Subject.MATH to 4,
+            Subject.PHILOSOPHY to 3,
+            Subject.RELIGION to 3,
+            Subject.EMPTY to 6,
+        ),
+        allowSameDaySubjectRepeats = false,
+    )
+
+    private val mediumConfiguration = ScheduleConfiguration(
         classes = 6,
         teacherAssignments = mapOf(
             Teacher.APRIL_RAYMUND to setOf(Subject.PHILOSOPHY, Subject.RELIGION),
@@ -59,10 +76,10 @@ object ScheduleConfigurationFixtures {
             Subject.SCHOOL_SPORT to 1,
             Subject.SWIMMING to 2,
             Subject.THEORETICAL_SEX_ED to 1,
-        )
+        ),
     )
 
-    val hardConfiguration = ScheduleConfiguration(
+    private val hardConfiguration = ScheduleConfiguration(
         classes = 8,
         teacherAssignments = mapOf(
             Teacher.ANNA_MILLER to setOf(Subject.ENGLISH, Subject.GEOGRAPHY, Subject.HISTORY),
@@ -94,17 +111,51 @@ object ScheduleConfigurationFixtures {
             Subject.SWIMMING to 2,
             Subject.THEORETICAL_SEX_ED to 1,
             Subject.EMPTY to 1,
-        )
+        ),
     )
 
-    val trivialImpossibleConfiguration = ScheduleConfiguration(
+    private val trivialImpossibleConfiguration = ScheduleConfiguration(
         classes = 3,
         teacherAssignments = mapOf(Teacher.ANNA_MILLER to setOf(Subject.ENGLISH)),
         subjectFrequency = mapOf(Subject.ENGLISH to 20)
     )
 
-    val possibleConfigurations = listOf(trivialConfiguration, easyConfiguration, mediumConfiguration, hardConfiguration)
-    val impossibleConfigurations = listOf(trivialImpossibleConfiguration)
+    private val impossibleConfigurationFromSameDayConstraint = ScheduleConfiguration(
+        classes = 2,
+        teacherAssignments = mapOf(Teacher.ANNA_MILLER to setOf(Subject.ENGLISH)),
+        subjectFrequency = mapOf(Subject.ENGLISH to 20),
+        allowSameDaySubjectRepeats = false,
+    )
+
+    private val impossibleConfigurationFromSubsequentConstraint = ScheduleConfiguration(
+        classes = 2,
+        teacherAssignments = mapOf(Teacher.ANNA_MILLER to setOf(Subject.ENGLISH)),
+        subjectFrequency = mapOf(Subject.ENGLISH to 20),
+        allowSubsequentSubjectsRepeats = false,
+    )
+
+    val trivialOrEasyConfigurations = listOf(
+        trivialConfiguration,
+        trivialConfiguration.copy(allowSubsequentSubjectsRepeats = false),
+        easyConfiguration,
+    )
+
+    val possibleConfigurations = listOf(
+        trivialConfiguration,
+        trivialConfiguration.copy(allowSubsequentSubjectsRepeats = false),
+        easyConfiguration,
+        easyConfigurationNoSameDayRepeats,
+        mediumConfiguration,
+        mediumConfiguration.copy(allowSubsequentSubjectsRepeats = false),
+        mediumConfiguration.copy(allowSameDaySubjectRepeats = false),
+        hardConfiguration,
+    )
+
+    val impossibleConfigurations = listOf(
+        trivialImpossibleConfiguration,
+        impossibleConfigurationFromSameDayConstraint,
+        impossibleConfigurationFromSubsequentConstraint,
+    )
 
     val allConfigurations = possibleConfigurations.plus(impossibleConfigurations)
 }

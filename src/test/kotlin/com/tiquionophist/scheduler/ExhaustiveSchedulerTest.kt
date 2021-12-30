@@ -32,12 +32,7 @@ internal class ExhaustiveSchedulerTest {
 
     companion object {
         @JvmStatic
-        fun possibleConfiguration(): List<ScheduleConfiguration> {
-            return listOf(
-                ScheduleConfigurationFixtures.trivialConfiguration,
-                ScheduleConfigurationFixtures.easyConfiguration,
-            )
-        }
+        fun possibleConfiguration() = ScheduleConfigurationFixtures.trivialOrEasyConfigurations
 
         @JvmStatic
         fun impossibleConfiguration() = ScheduleConfigurationFixtures.impossibleConfigurations

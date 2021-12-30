@@ -124,8 +124,8 @@ class RandomizedScheduler(
          * [4, 5, 6, 7] is the result for input indexes 4, 5, 6, 7; etc.
          */
         private fun periodIndexesForDay(periodIndex: Int): IntRange {
-            val dayIndex = periodIndex / configuration.periodsPerDay
-            return IntRange(start = dayIndex, endInclusive = dayIndex + configuration.periodsPerDay)
+            val dayIndex = (periodIndex / configuration.periodsPerDay) * configuration.periodsPerDay
+            return IntRange(start = dayIndex, endInclusive = dayIndex + configuration.periodsPerDay - 1)
         }
 
         /**

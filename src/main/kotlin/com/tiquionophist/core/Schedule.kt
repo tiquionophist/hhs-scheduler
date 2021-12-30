@@ -1,5 +1,6 @@
 package com.tiquionophist.core
 
+import com.tiquionophist.util.prettyName
 import java.util.EnumMap
 import java.util.EnumSet
 
@@ -54,6 +55,32 @@ data class Schedule(val lessons: List<List<Lesson>>) {
 
             val unfulfilled = remainingSubjects.filterValues { it > 0 }
             require(unfulfilled.isEmpty()) { "missing subjects: $unfulfilled" }
+        }
+
+        if (!config.allowSubsequentSubjectsRepeats) {
+            for (classLessons in lessons) {
+                for (day in classLessons.chunked(size = config.periodsPerDay)) {
+                    var prevSubject: Subject? = null
+                    for (lesson in day) {
+                        require(lesson.subject != prevSubject) { "${lesson.subject.prettyName} repeated subsequently" }
+
+                        prevSubject = lesson.subject.takeIf { it != Subject.EMPTY }
+                    }
+                }
+            }
+        }
+
+        if (!config.allowSameDaySubjectRepeats) {
+            for (classLessons in lessons) {
+                for (day in classLessons.chunked(size = config.periodsPerDay)) {
+                    val subjects = day.map { it.subject }.filter { it != Subject.EMPTY }
+
+                    val duplicates = subjects.minus(subjects.toSet())
+                    require(duplicates.isEmpty()) {
+                        "${duplicates.joinToString { it.prettyName }} repeated in the same day"
+                    }
+                }
+            }
         }
     }
 
