@@ -3,7 +3,6 @@ package com.tiquionophist.io
 import com.fasterxml.jackson.annotation.JsonProperty
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlElementWrapper
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty
-import com.tiquionophist.core.Classroom
 import com.tiquionophist.core.Schedule
 import com.tiquionophist.core.ScheduleConfiguration
 import com.tiquionophist.core.Subject
@@ -211,32 +210,13 @@ data class SaveData(
 
     companion object {
         /**
-         * The number of numbered classrooms that exist in the game.
-         */
-        private const val MAX_NUMBERED_CLASSROOMS = 10
-
-        /**
          * Maps the lessons in this [Schedule] to the canonical names of the locations where they take place, i.e. the
          * location names used in the save data.
-         *
-         * For explicit [Classroom]s this is their [Classroom.canonicalName], but in cases where the classroom is null
-         * this function also fills it in which a generic numbered classroom, i.e. "Classroom 1", "Classroom 2", etc.
          */
         private fun Schedule.classroomNames(): List<List<String>> {
-            // [periodIndex -> highest classroom number that's in use for that period]
-            val numberedClassrooms = mutableMapOf<Int, Int>()
-
             return lessons.map { classLessons ->
-                classLessons.mapIndexed { periodIndex, lesson ->
-                    lesson.classroom?.canonicalName ?: run {
-                        val classroomNumber = (numberedClassrooms[periodIndex] ?: 0) + 1
-                        numberedClassrooms[periodIndex] = classroomNumber
-
-                        check(classroomNumber <= MAX_NUMBERED_CLASSROOMS) {
-                            "exceeded numbered classrooms limit of $MAX_NUMBERED_CLASSROOMS"
-                        }
-                        "Classroom $classroomNumber"
-                    }
+                classLessons.map { lesson ->
+                    lesson.assignedClassroom?.toString().orEmpty()
                 }
             }
         }

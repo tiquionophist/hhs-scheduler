@@ -101,8 +101,8 @@ private class ScheduleDayColumn(
                         Text(text = "by ${teacher.fullName}", fontSize = Dimens.FONT_SMALL)
                     }
 
-                    lesson.classroom?.let { classroom ->
-                        Text(text = "in ${classroom.canonicalName}", fontSize = Dimens.FONT_SMALL)
+                    lesson.assignedClassroom?.let { classroom ->
+                        Text(text = "in $classroom", fontSize = Dimens.FONT_SMALL)
                     }
                 }
             }

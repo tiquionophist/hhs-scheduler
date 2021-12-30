@@ -39,37 +39,57 @@ internal class LessonTest {
 
             return listOf(
                 VerifyTestCase(
-                    lesson = Lesson(subject = Subject.EMPTY, teacher = null, classroom = null),
+                    lesson = Lesson(subject = Subject.EMPTY, teacher = null, assignedClassroom = null),
                     config = emptyConfig,
                     message = null
                 ),
                 VerifyTestCase(
-                    lesson = Lesson(subject = Subject.EMPTY, teacher = Teacher.BETH_MANILI, classroom = null),
+                    lesson = Lesson(subject = Subject.EMPTY, teacher = Teacher.BETH_MANILI, assignedClassroom = null),
                     config = emptyConfig,
                     message = "empty subject must not have a teacher"
                 ),
                 VerifyTestCase(
-                    lesson = Lesson(subject = Subject.EMPTY, teacher = null, classroom = Classroom.ART),
+                    lesson = Lesson(
+                        subject = Subject.EMPTY,
+                        teacher = null,
+                        assignedClassroom = AssignedClassroom.NamedClassroom(Classroom.ART)
+                    ),
                     config = emptyConfig,
                     message = "empty subject must not have a classroom"
                 ),
                 VerifyTestCase(
-                    lesson = Lesson(subject = Subject.ENGLISH, teacher = null, classroom = null),
+                    lesson = Lesson(
+                        subject = Subject.ENGLISH,
+                        teacher = null,
+                        assignedClassroom = AssignedClassroom.NumberedClassroom(1)
+                    ),
                     config = emptyConfig,
                     message = "no teachers assigned for English"
                 ),
                 VerifyTestCase(
-                    lesson = Lesson(subject = Subject.ENGLISH, teacher = Teacher.CARMEN_SMITH, classroom = null),
+                    lesson = Lesson(
+                        subject = Subject.ENGLISH,
+                        teacher = Teacher.CARMEN_SMITH,
+                        assignedClassroom = AssignedClassroom.NumberedClassroom(1)
+                    ),
                     config = nonEmptyConfig,
                     message = null
                 ),
                 VerifyTestCase(
-                    lesson = Lesson(subject = Subject.ENGLISH, teacher = null, classroom = null),
+                    lesson = Lesson(
+                        subject = Subject.ENGLISH,
+                        teacher = null,
+                        assignedClassroom = AssignedClassroom.NumberedClassroom(1)
+                    ),
                     config = nonEmptyConfig,
                     message = "no teacher provided for English"
                 ),
                 VerifyTestCase(
-                    lesson = Lesson(subject = Subject.ENGLISH, teacher = Teacher.SAMANTHA_KELLER, classroom = null),
+                    lesson = Lesson(
+                        subject = Subject.ENGLISH,
+                        teacher = Teacher.SAMANTHA_KELLER,
+                        assignedClassroom = AssignedClassroom.NumberedClassroom(1)
+                    ),
                     config = nonEmptyConfig,
                     message = "Samantha Keller not allowed to teach English"
                 ),
@@ -77,16 +97,16 @@ internal class LessonTest {
                     lesson = Lesson(
                         subject = Subject.ENGLISH,
                         teacher = Teacher.CARMEN_SMITH,
-                        classroom = Classroom.COMPUTER
+                        assignedClassroom = AssignedClassroom.NamedClassroom(Classroom.COMPUTER)
                     ),
                     config = nonEmptyConfig,
-                    message = "English has no classroom, but Computer Room was provided"
+                    message = "English has no special classroom, but Computer Room was provided"
                 ),
                 VerifyTestCase(
                     lesson = Lesson(
                         subject = Subject.COMPUTER_SCIENCE,
                         teacher = Teacher.SAMANTHA_KELLER,
-                        classroom = Classroom.COMPUTER
+                        assignedClassroom = AssignedClassroom.NamedClassroom(Classroom.COMPUTER)
                     ),
                     config = nonEmptyConfig,
                     message = null
@@ -95,7 +115,7 @@ internal class LessonTest {
                     lesson = Lesson(
                         subject = Subject.COMPUTER_SCIENCE,
                         teacher = Teacher.SAMANTHA_KELLER,
-                        classroom = Classroom.ART
+                        assignedClassroom = AssignedClassroom.NamedClassroom(Classroom.ART)
                     ),
                     config = nonEmptyConfig,
                     message = "Computer Science cannot be scheduled in Classroom Art"

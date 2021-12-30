@@ -1,5 +1,6 @@
 package com.tiquionophist.core
 
+import com.tiquionophist.scheduler.ClassroomFillOrder
 import com.tiquionophist.util.flattenToSet
 import com.tiquionophist.util.prettyName
 import kotlinx.serialization.Serializable
@@ -32,6 +33,11 @@ data class ScheduleConfiguration(
      * Has no effect if [allowSameDaySubjectRepeats] is false, since that always excludes subsequent repeats.
      */
     val allowSubsequentSubjectsRepeats: Boolean = true,
+
+    /**
+     * The strategy by which classrooms are assigned to each lesson.
+     */
+    val classroomFillOrder: ClassroomFillOrder = ClassroomFillOrder.BY_TEACHER,
 
     /**
      * The number of classes in the school.

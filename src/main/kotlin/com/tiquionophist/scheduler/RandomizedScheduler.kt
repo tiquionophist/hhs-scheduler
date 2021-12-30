@@ -1,6 +1,6 @@
 package com.tiquionophist.scheduler
 
-import com.tiquionophist.core.Classroom
+import com.tiquionophist.core.AssignedClassroom
 import com.tiquionophist.core.Lesson
 import com.tiquionophist.core.Schedule
 import com.tiquionophist.core.ScheduleConfiguration
@@ -46,6 +46,7 @@ class RandomizedScheduler(
                     lessons = List(configuration.classes) {
                         List(configuration.periodsPerWeek) { null }
                     },
+                    classroomFillOrderInstance = configuration.classroomFillOrder.make(),
                     remainingSubjects = configuration.subjectFrequency,
                 ),
                 random = randomSeed?.let { it.invoke(round)?.let { seed -> Random(seed) } ?: defaultRandom },
@@ -101,6 +102,10 @@ class RandomizedScheduler(
 
         // [classIndex -> [periodIndex -> (subject, teacher, classroom)]]
         private val lessons: List<List<Lesson?>>,
+
+        // note that while e.g. the by-teacher fill order strategy is stateful, it will still work in this case since
+        // the teacher-classroom map it develops can continue being used even after backtracking
+        private val classroomFillOrderInstance: ClassroomFillOrderInstance,
 
         // [classIndex -> { subject -> number of classes in that subject still to be assigned }]
         private val remainingSubjects: List<Map<Subject, Int>>,
@@ -160,13 +165,14 @@ class RandomizedScheduler(
             val classOptions = mutableListOf<Lesson>()
 
             val busyTeachers = mutableSetOf<Teacher>()
-            val busyClassrooms = EnumSet.noneOf(Classroom::class.java)
+            val occupiedClassrooms = mutableSetOf<AssignedClassroom>()
             val blockedSubjects = EnumSet.noneOf(Subject::class.java)
 
             for (classSchedule in lessons) {
-                val lesson = classSchedule[periodIndex]
-                lesson?.teacher?.let { busyTeachers.add(it) }
-                lesson?.classroom?.let { busyClassrooms?.add(it) }
+                classSchedule[periodIndex]?.let { lesson ->
+                    lesson.teacher?.let { busyTeachers.add(it) }
+                    lesson.assignedClassroom?.let { occupiedClassrooms.add(it) }
+                }
             }
 
             if (!configuration.allowSameDaySubjectRepeats) {
@@ -190,21 +196,19 @@ class RandomizedScheduler(
                     classOptions.add(Lesson(subject, null, null))
                 } else {
                     val teachers = configuration.subjectAssignments[subject]!!
-                    val classrooms = subject.classrooms
 
-                    if (classrooms == null) {
-                        for (teacher in teachers) {
-                            if (teacher !in busyTeachers) {
-                                classOptions.add(Lesson(subject = subject, teacher = teacher, classroom = null))
-                            }
-                        }
-                    } else {
-                        for (teacher in teachers) {
-                            if (teacher !in busyTeachers) {
-                                for (classroom in classrooms) {
-                                    if (classroom !in busyClassrooms) {
-                                        classOptions.add(Lesson(subject, teacher, classroom))
-                                    }
+                    for (teacher in teachers) {
+                        if (teacher !in busyTeachers) {
+                            val classrooms = classroomFillOrderInstance.assignNext(
+                                classIndex = classIndex,
+                                subject = subject,
+                                teacher = teacher,
+                                occupiedClassrooms = occupiedClassrooms
+                            )
+
+                            for (classroom in classrooms) {
+                                if (classroom !in occupiedClassrooms) {
+                                    classOptions.add(Lesson(subject, teacher, classroom))
                                 }
                             }
                         }
@@ -224,13 +228,14 @@ class RandomizedScheduler(
 
             return PartialSchedule(
                 configuration = configuration,
+                classroomFillOrderInstance = classroomFillOrderInstance,
                 lessons = lessons.mapIndexed { classIndex, classSchedule ->
                     classSchedule.mapIndexed { periodIndex, lesson ->
                         if (classIndex == nextClassIndex && periodIndex == nextPeriodIndex) {
                             Lesson(
                                 subject = next.subject,
                                 teacher = next.teacher,
-                                classroom = next.classroom,
+                                assignedClassroom = next.assignedClassroom,
                             )
                         } else {
                             lesson

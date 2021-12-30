@@ -2,7 +2,6 @@ package com.tiquionophist.core
 
 import com.tiquionophist.util.prettyName
 import java.util.EnumMap
-import java.util.EnumSet
 
 /**
  * A complete school schedule, represented as a two-dimensional list of [Lesson]s.
@@ -28,7 +27,7 @@ data class Schedule(val lessons: List<List<Lesson>>) {
 
         for (periodIndex in 0 until config.periodsPerWeek) {
             val teachers = mutableSetOf<Teacher>()
-            val classrooms = EnumSet.noneOf(Classroom::class.java)
+            val classrooms = mutableSetOf<AssignedClassroom>()
 
             for (classIndex in 0 until config.classes) {
                 val lesson = lessons[classIndex][periodIndex]
@@ -40,9 +39,9 @@ data class Schedule(val lessons: List<List<Lesson>>) {
                     teachers.add(teacher)
                 }
 
-                lesson.classroom?.let { classroom ->
+                lesson.assignedClassroom?.let { classroom ->
                     require(classroom !in classrooms) {
-                        "${classroom.canonicalName} is overbooked for $classIndex | $periodIndex"
+                        "$classroom is overbooked for $classIndex | $periodIndex"
                     }
                     classrooms.add(classroom)
                 }
@@ -84,6 +83,8 @@ data class Schedule(val lessons: List<List<Lesson>>) {
                 }
             }
         }
+
+        config.classroomFillOrder.verify(this)
     }
 
     companion object {
