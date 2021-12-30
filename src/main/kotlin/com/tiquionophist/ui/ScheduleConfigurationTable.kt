@@ -1,8 +1,10 @@
 package com.tiquionophist.ui
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
@@ -12,7 +14,6 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.material.Checkbox
 import androidx.compose.material.CheckboxDefaults
 import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
@@ -220,7 +221,7 @@ private class SubjectTeacherAssignmentsColumn(private val teacher: Teacher) : Co
         val currentAssignments = config.teacherAssignments.getOrDefault(teacher, emptySet())
         val contains = currentAssignments.contains(value)
 
-        Surface(
+        Box(
             modifier = Modifier
                 .clickable {
                     val newAssignments = if (contains) {
@@ -235,14 +236,17 @@ private class SubjectTeacherAssignmentsColumn(private val teacher: Teacher) : Co
                             .filterValues { it.isNotEmpty() }
                     )
                 }
-                .fillMaxSize(),
-            color = if (contains) {
-                ThemeColors.current.selected.copy(alpha = ThemeColors.current.disabledAlpha)
-            } else {
-                Color.Unspecified
-            },
+                .fillMaxSize()
+                .background(
+                    color = if (contains) {
+                        ThemeColors.current.selected.copy(alpha = ThemeColors.current.disabledAlpha)
+                    } else {
+                        Color.Unspecified
+                    }
+                ),
         ) {
             Checkbox(
+                modifier = Modifier.align(Alignment.Center),
                 checked = contains,
                 onCheckedChange = null,
                 colors = CheckboxDefaults.colors(checkedColor = ThemeColors.current.selected)
