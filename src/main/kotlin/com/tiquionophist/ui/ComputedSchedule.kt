@@ -9,6 +9,7 @@ import com.tiquionophist.core.ScheduleConfiguration
  */
 data class ComputedSchedule(
     val configuration: ScheduleConfiguration,
+    val schedulerSettings: SchedulerSettings = SchedulerSettings(),
     val schedule: Schedule,
     val index: Int = indexCounter++
 ) {

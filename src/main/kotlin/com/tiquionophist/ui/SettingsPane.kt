@@ -2,15 +2,19 @@ package com.tiquionophist.ui
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.TooltipArea
+import androidx.compose.foundation.TooltipPlacement
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.widthIn
+import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.LocalContentAlpha
 import androidx.compose.material.LocalContentColor
+import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
@@ -20,6 +24,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.unit.DpOffset
+import androidx.compose.ui.unit.dp
 import com.tiquionophist.core.ScheduleConfiguration
 import com.tiquionophist.ui.common.CheckboxWithLabel
 import com.tiquionophist.ui.common.ConfirmationDialog
@@ -146,7 +152,64 @@ fun SettingsPane() {
                 }
             }
 
-            RunScheduleButton()
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(Dimens.SPACING_3)
+            ) {
+                val schedulerSettingsState = remember { mutableStateOf(SchedulerSettings()) }
+
+                val schedulerSettingsDialogVisibleState = remember { mutableStateOf(false) }
+                IconButton(onClick = { schedulerSettingsDialogVisibleState.value = true }) {
+                    Image(
+                        painter = painterResource("icons/settings.svg"),
+                        contentDescription = "Scheduler settings",
+                        colorFilter = ColorFilter.tint(LocalContentColor.current),
+                        alpha = LocalContentAlpha.current,
+                    )
+                }
+
+                if (schedulerSettingsDialogVisibleState.value) {
+                    SchedulerSettingsDialog(initialSchedulerSettings = schedulerSettingsState.value) { newScheduler ->
+                        newScheduler?.let { schedulerSettingsState.value = it }
+                        schedulerSettingsDialogVisibleState.value = false
+                    }
+                }
+
+                val validationErrors = remember(GlobalState.scheduleConfiguration) {
+                    GlobalState.scheduleConfiguration.validationErrors()
+                }
+
+                if (validationErrors.isNotEmpty()) {
+                    TooltipArea(
+                        tooltip = {
+                            TooltipSurface {
+                                Column(
+                                    modifier = Modifier.padding(Dimens.SPACING_2),
+                                    verticalArrangement = Arrangement.spacedBy(Dimens.SPACING_2),
+                                ) {
+                                    validationErrors.forEach { error ->
+                                        Text(error)
+                                    }
+                                }
+                            }
+                        },
+                        tooltipPlacement = TooltipPlacement.CursorPoint(
+                            offset = DpOffset(0.dp, Dimens.SPACING_3)
+                        )
+                    ) {
+                        Icon(
+                            painter = painterResource("icons/error.svg"),
+                            contentDescription = "Error",
+                            tint = MaterialTheme.colors.error,
+                        )
+                    }
+                }
+
+                RunScheduleButton(
+                    enabled = validationErrors.isEmpty(),
+                    schedulerSettings = schedulerSettingsState.value,
+                )
+            }
         }
     }
 }

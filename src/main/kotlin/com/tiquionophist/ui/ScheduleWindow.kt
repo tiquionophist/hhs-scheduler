@@ -1,12 +1,20 @@
 package com.tiquionophist.ui
 
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.material.Button
 import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Refresh
+import androidx.compose.material.icons.filled.Share
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -21,6 +29,7 @@ import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.WindowPosition
 import androidx.compose.ui.window.rememberWindowState
 import com.tiquionophist.ui.common.MatchingWidthColumn
+import com.tiquionophist.ui.common.topBorder
 
 /**
  * Wraps global handling of the computed schedule dialog windows.
@@ -32,7 +41,8 @@ object ScheduleWindowHandler {
             ScheduleWindow(
                 computedSchedule = computedSchedule,
                 onClose = {
-                    GlobalState.computedSchedules = GlobalState.computedSchedules.minus(computedSchedule)
+                    GlobalState.computedSchedules = GlobalState.computedSchedules
+                        .filter { it.index != computedSchedule.index }
                 }
             )
         }
@@ -90,19 +100,32 @@ fun ScheduleWindow(
                     classIndex = selectedClassIndexState.value,
                 )
 
-                var exporting by remember { mutableStateOf(false) }
-                Button(
-                    shape = RectangleShape,
-                    onClick = { exporting = true },
+                Row(
+                    modifier = Modifier.topBorder().padding(Dimens.SPACING_2),
+                    horizontalArrangement = Arrangement.spacedBy(Dimens.SPACING_2, Alignment.End),
                 ) {
-                    Text("Export to game save")
-                }
-
-                if (exporting) {
-                    ScheduleExportDialog(
-                        computedSchedule = computedSchedule,
-                        onClose = { exporting = false },
+                    RunScheduleButton(
+                        schedulerSettings = computedSchedule.schedulerSettings,
+                        configuration = computedSchedule.configuration,
+                        runText = "Regenerate",
+                        runImageVector = Icons.Default.Refresh,
                     )
+
+                    var exporting by remember { mutableStateOf(false) }
+                    Button(onClick = { exporting = true }) {
+                        Image(imageVector = Icons.Default.Share, contentDescription = null)
+
+                        Spacer(Modifier.width(Dimens.SPACING_2))
+
+                        Text("Export to game save")
+                    }
+
+                    if (exporting) {
+                        ScheduleExportDialog(
+                            computedSchedule = computedSchedule,
+                            onClose = { exporting = false },
+                        )
+                    }
                 }
             }
         }
