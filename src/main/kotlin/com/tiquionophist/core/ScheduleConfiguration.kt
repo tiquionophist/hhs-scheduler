@@ -19,6 +19,19 @@ data class ScheduleConfiguration(
     val periodsPerDay: Int = 4,
 
     /**
+     * Whether to allow the same subject to be taught back-to-back, on the same day.
+     *
+     * Does not affect scheduling between the end of the previous day and the first period of the following day or
+     * scheduling of free periods.
+     */
+    val allowSubsequentSubjects: Boolean = true,
+
+    /**
+     * Whether to allow the same subject (excluding free periods) to be taught more than once in the same day.
+     */
+    val allowSameDaySubjectRepeats: Boolean = true,
+
+    /**
      * The number of classes in the school.
      */
     val classes: Int,

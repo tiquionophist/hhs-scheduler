@@ -117,6 +117,43 @@ class RandomizedScheduler(
         val scheduleOptions: List<Lesson>
             get() = scheduleOptions(classIndex = nextClassIndex, periodIndex = nextPeriodIndex)
 
+        /**
+         * Generates the period indexes on the same day as [periodIndex].
+         *
+         * For example, if we have 4 periods per day, then [0, 1, 2, 3] is the result for input indexes 0, 1, 2, or 3;
+         * [4, 5, 6, 7] is the result for input indexes 4, 5, 6, 7; etc.
+         */
+        private fun periodIndexesForDay(periodIndex: Int): IntRange {
+            val dayIndex = periodIndex / configuration.periodsPerDay
+            return IntRange(start = dayIndex, endInclusive = dayIndex + configuration.periodsPerDay)
+        }
+
+        /**
+         * Generates the neighboring period indexes for [periodIndex], excluding periods on different days.
+         *
+         * For example, if we have 4 periods per day, then:
+         * - 0 -> [1] since [-1] is not a valid period
+         * - 1 -> [0, 2]
+         * - 2 -> [1, 3]
+         * - 3 -> [2] since 4 is on the next day
+         * - 4 -> [5] since 3 is on the previous day
+         * - 5 -> [4, 6]
+         * etc
+         */
+        private fun subsequentPeriodIndexes(periodIndex: Int): List<Int> {
+            val dayIndexes = periodIndexesForDay(periodIndex)
+            val previous = periodIndex - 1
+            val next = periodIndex + 1
+            val list = mutableListOf<Int>()
+            if (previous in dayIndexes) {
+                list.add(previous)
+            }
+            if (next in dayIndexes) {
+                list.add(next)
+            }
+            return list
+        }
+
         // schedule options for a particular period and class
         // note: doesn't check that the class is currently unscheduled, wouldn't work if it wasn't
         private fun scheduleOptions(classIndex: Int, periodIndex: Int): List<Lesson> {
@@ -124,6 +161,7 @@ class RandomizedScheduler(
 
             val busyTeachers = mutableSetOf<Teacher>()
             val busyClassrooms = EnumSet.noneOf(Classroom::class.java)
+            val blockedSubjects = EnumSet.noneOf(Subject::class.java)
 
             for (classSchedule in lessons) {
                 val lesson = classSchedule[periodIndex]
@@ -131,7 +169,25 @@ class RandomizedScheduler(
                 lesson?.classroom?.let { busyClassrooms?.add(it) }
             }
 
-            for ((subject, _) in remainingSubjects[classIndex]) {
+            if (!configuration.allowSameDaySubjectRepeats) {
+                for (periodIndexInDay in periodIndexesForDay(periodIndex = periodIndex)) {
+                    val lesson = lessons[classIndex][periodIndexInDay]
+                    lesson?.subject
+                        ?.takeIf { it != Subject.EMPTY }
+                        ?.let { blockedSubjects.add(it) }
+                }
+            }
+
+            if (!configuration.allowSubsequentSubjects) {
+                for (subsequentPeriodIndex in subsequentPeriodIndexes(periodIndex = periodIndex)) {
+                    val lesson = lessons[classIndex][subsequentPeriodIndex]
+                    lesson?.subject
+                        ?.takeIf { it != Subject.EMPTY }
+                        ?.let { blockedSubjects.add(it) }
+                }
+            }
+
+            for ((subject, _) in remainingSubjects[classIndex].minus(blockedSubjects)) {
                 if (subject == Subject.EMPTY) {
                     classOptions.add(Lesson(subject, null, null))
                 } else {
