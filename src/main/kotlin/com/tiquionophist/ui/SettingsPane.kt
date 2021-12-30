@@ -10,6 +10,10 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.widthIn
+import androidx.compose.material.ButtonDefaults
+import androidx.compose.material.ContentAlpha
+import androidx.compose.material.DropdownMenu
+import androidx.compose.material.DropdownMenuItem
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.LocalContentAlpha
@@ -17,7 +21,9 @@ import androidx.compose.material.LocalContentColor
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
+import androidx.compose.material.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -28,11 +34,13 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
 import com.tiquionophist.core.ScheduleConfiguration
+import com.tiquionophist.scheduler.ClassroomFillOrder
 import com.tiquionophist.ui.common.CheckboxWithLabel
 import com.tiquionophist.ui.common.ConfirmationDialog
 import com.tiquionophist.ui.common.IconAndTextButton
 import com.tiquionophist.ui.common.NumberPicker
 import com.tiquionophist.ui.common.TooltipSurface
+import com.tiquionophist.util.prettyName
 
 /**
  * Row of scheduling-wide settings, placed at the bottom of the window.
@@ -49,6 +57,8 @@ fun SettingsPane(classIndexState: MutableState<Int?>) {
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.spacedBy(Dimens.SPACING_3)
             ) {
+                val config = GlobalState.scheduleConfiguration
+
                 IconButton(onClick = { ApplicationPreferences.lightMode = !ApplicationPreferences.lightMode }) {
                     val filename = if (ApplicationPreferences.lightMode) "light_mode" else "dark_mode"
                     Image(
@@ -88,10 +98,8 @@ fun SettingsPane(classIndexState: MutableState<Int?>) {
                     Text(text = "Classes:", maxLines = 2)
 
                     NumberPicker(
-                        value = GlobalState.scheduleConfiguration.classes,
+                        value = config.classes,
                         onValueChange = { newValue ->
-                            val config = GlobalState.scheduleConfiguration
-
                             // if we're adding new classes, we need to add new subject frequencies. Copy them from the
                             // currently selected class frequencies
                             val currentFrequency = config.subjectFrequency[classIndexState.value ?: 0]
@@ -126,11 +134,10 @@ fun SettingsPane(classIndexState: MutableState<Int?>) {
                     }
                 ) {
                     CheckboxWithLabel(
-                        checked = GlobalState.scheduleConfiguration.allowSameDaySubjectRepeats,
+                        checked = config.allowSameDaySubjectRepeats,
                         onCheckedChange = {
-                            GlobalState.scheduleConfiguration = GlobalState.scheduleConfiguration.copy(
-                                allowSameDaySubjectRepeats =
-                                !GlobalState.scheduleConfiguration.allowSameDaySubjectRepeats,
+                            GlobalState.scheduleConfiguration = config.copy(
+                                allowSameDaySubjectRepeats = !config.allowSameDaySubjectRepeats,
                             )
                         }
                     ) {
@@ -153,17 +160,68 @@ fun SettingsPane(classIndexState: MutableState<Int?>) {
                     }
                 ) {
                     CheckboxWithLabel(
-                        checked = GlobalState.scheduleConfiguration.allowSubsequentSubjectsRepeats &&
-                                GlobalState.scheduleConfiguration.allowSameDaySubjectRepeats,
-                        enabled = GlobalState.scheduleConfiguration.allowSameDaySubjectRepeats,
+                        checked = config.allowSubsequentSubjectsRepeats && config.allowSameDaySubjectRepeats,
+                        enabled = config.allowSameDaySubjectRepeats,
                         onCheckedChange = {
-                            GlobalState.scheduleConfiguration = GlobalState.scheduleConfiguration.copy(
-                                allowSubsequentSubjectsRepeats =
-                                !GlobalState.scheduleConfiguration.allowSubsequentSubjectsRepeats,
+                            GlobalState.scheduleConfiguration = config.copy(
+                                allowSubsequentSubjectsRepeats = !config.allowSubsequentSubjectsRepeats,
                             )
                         }
                     ) {
                         Text(text = "Allow subsequent subject repeats", maxLines = 2)
+                    }
+                }
+
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(Dimens.SPACING_1),
+                ) {
+                    Text("Classroom selection:")
+
+                    val dropdownExpanded = remember { mutableStateOf(false) }
+                    TextButton(
+                        onClick = { dropdownExpanded.value = true },
+                        colors = ButtonDefaults.textButtonColors(contentColor = LocalContentColor.current)
+                    ) {
+                        Text(text = config.classroomFillOrder.prettyName, maxLines = 2)
+
+                        Image(
+                            painter = painterResource("icons/arrow_drop_down.svg"),
+                            contentDescription = null,
+                            colorFilter = ColorFilter.tint(LocalContentColor.current)
+                        )
+
+                        DropdownMenu(
+                            expanded = dropdownExpanded.value,
+                            onDismissRequest = { dropdownExpanded.value = false }
+                        ) {
+                            ClassroomFillOrder.values().forEach { classroomFillOrder ->
+                                DropdownMenuItem(
+                                    onClick = {
+                                        GlobalState.scheduleConfiguration = config.copy(
+                                            classroomFillOrder = classroomFillOrder,
+                                        )
+                                        dropdownExpanded.value = false
+                                    }
+                                ) {
+                                    Column(
+                                        modifier = Modifier.padding(vertical = Dimens.SPACING_2),
+                                        verticalArrangement = Arrangement.spacedBy(Dimens.SPACING_1),
+                                    ) {
+                                        Text(text = classroomFillOrder.prettyName)
+
+                                        CompositionLocalProvider(
+                                            LocalContentAlpha provides ContentAlpha.disabled
+                                        ) {
+                                            Text(
+                                                text = classroomFillOrder.description,
+                                                fontSize = Dimens.FONT_SMALL,
+                                            )
+                                        }
+                                    }
+                                }
+                            }
+                        }
                     }
                 }
             }

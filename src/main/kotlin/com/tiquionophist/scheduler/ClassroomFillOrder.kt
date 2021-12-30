@@ -11,26 +11,14 @@ import com.tiquionophist.core.Teacher
  * This is just the marker enum for which strategy is used; it can then [make] a corresponding
  * [ClassroomFillOrderInstance] which is the stateful object that does actual classroom assignments.
  */
-enum class ClassroomFillOrder {
-    /**
-     * Teachers are always assigned to the same classroom; each class comes to them.
-     */
-    BY_TEACHER,
+enum class ClassroomFillOrder(val description: String) {
+    BY_TEACHER("Teachers are always assigned to the same classroom; each class comes to them."),
 
-    /**
-     * Classes are always assigned to the same classroom; each teacher comes to them.
-     */
-    BY_CLASS,
+    BY_CLASS("Classes are always assigned to the same classroom; each teacher comes to them."),
 
-    /**
-     * Subjects are always assigned to the same classroom; each teacher and class comes to them.
-     */
-    BY_SUBJECT,
+    BY_SUBJECT("Subjects are always assigned to the same classroom; each teacher and class comes to them."),
 
-    /**
-     * Classrooms are assigned arbitrarily.
-     */
-    ARBITRARY;
+    ARBITRARY("Classrooms are assigned arbitrarily.");
 
     /**
      * Returns a new [ClassroomFillOrderInstance] based on this strategy which can assign classrooms for lessons.
