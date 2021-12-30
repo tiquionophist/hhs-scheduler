@@ -76,7 +76,7 @@ fun RunScheduleButton() {
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(Dimens.SPACING_3)
     ) {
-        val schedulerSettingsState = remember { mutableStateOf(SchedulerSettings.default) }
+        val schedulerSettingsState = remember { mutableStateOf(SchedulerSettings()) }
 
         val schedulerSettingsDialogVisibleState = remember { mutableStateOf(false) }
         IconButton(onClick = { schedulerSettingsDialogVisibleState.value = true }) {

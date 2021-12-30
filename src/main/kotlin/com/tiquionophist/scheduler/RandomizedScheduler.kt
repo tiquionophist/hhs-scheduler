@@ -27,13 +27,16 @@ class RandomizedScheduler(
     private val rounds: Int,
 
     /**
-     * Optional configuration for how the random seed for each round is generated. The input is the round index
-     * (starting from 0), returning the random seed to be used, or null if it should not be randomized (to allow
-     * [ExhaustiveScheduler] to reuse this algorithm).
+     * Optional configuration for how the random seed for each round is generated. If the function itself is null then
+     * no randomization will be done. Otherwise, each new round the function will be called with the round index as
+     * input (starting from 0) and return the random seed to be used. If the function returns null then a random seed
+     * based on the system time will be used.
      */
-    private val randomSeed: (Int) -> Long? = { it.toLong() }
+    private val randomSeed: ((Int) -> Long?)? = { it.toLong() },
 ) : Scheduler {
     override suspend fun schedule(configuration: ScheduleConfiguration): Schedule? {
+        val defaultRandom by lazy { Random(System.currentTimeMillis()) }
+
         repeat(rounds) { round ->
             yield() // yield computation after each round to allow cancellation
 
@@ -48,7 +51,7 @@ class RandomizedScheduler(
                             ?: EnumMap(Subject::class.java)
                     }
                 ),
-                random = randomSeed(round)?.let { Random(it) },
+                random = randomSeed?.let { it.invoke(round)?.let { seed -> Random(seed) } ?: defaultRandom },
                 attempts = attemptsPerRound?.let { AttemptWrapper(it) }
             )?.let {
                 return it

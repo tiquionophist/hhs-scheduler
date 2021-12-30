@@ -11,6 +11,7 @@ import androidx.compose.foundation.shape.AbsoluteRoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material.Button
 import androidx.compose.material.ButtonDefaults
+import androidx.compose.material.ContentAlpha
 import androidx.compose.material.LocalContentAlpha
 import androidx.compose.material.LocalContentColor
 import androidx.compose.material.LocalTextStyle
@@ -83,6 +84,10 @@ fun NumberPicker(
                 )
             }
 
+            val contentColor = LocalContentColor.current.let {
+                if (enabled) it else it.copy(alpha = ContentAlpha.disabled)
+            }
+
             BasicTextField(
                 modifier = Modifier
                     .widthIn(max = textFieldWidth)
@@ -90,8 +95,8 @@ fun NumberPicker(
                 value = if (clearedState.value) "" else value.toString(),
                 singleLine = true,
                 enabled = enabled,
-                cursorBrush = SolidColor(LocalContentColor.current),
-                textStyle = LocalTextStyle.current.merge(TextStyle(color = LocalContentColor.current)),
+                cursorBrush = SolidColor(contentColor),
+                textStyle = LocalTextStyle.current.merge(TextStyle(color = contentColor)),
                 onValueChange = { newValue ->
                     clearedState.value = newValue.isEmpty()
                     newValue.toIntOrNull()?.let { setValue(it) }
