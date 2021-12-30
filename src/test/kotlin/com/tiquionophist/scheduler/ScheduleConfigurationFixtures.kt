@@ -186,7 +186,10 @@ object ScheduleConfigurationFixtures {
     val possibleConfigurations = listOf(
         trivialConfiguration,
         trivialConfiguration.copy(allowSubsequentSubjectsRepeats = false),
-        easyConfiguration,
+        easyConfiguration.copy(classroomFillOrder = ClassroomFillOrder.BY_TEACHER),
+        easyConfiguration.copy(classroomFillOrder = ClassroomFillOrder.BY_SUBJECT),
+        easyConfiguration.copy(classroomFillOrder = ClassroomFillOrder.BY_CLASS),
+        easyConfiguration.copy(classroomFillOrder = ClassroomFillOrder.ARBITRARY),
         easyConfigurationNoSameDayRepeats,
         easyConfigurationDifferentClassFrequencies,
         mediumConfiguration,
