@@ -7,11 +7,9 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Icon
 import androidx.compose.material.LocalContentAlpha
 import androidx.compose.material.LocalContentColor
-import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -40,7 +38,7 @@ fun NotificationContainer(content: @Composable () -> Unit) {
             }
 
             Box(modifier = Modifier.padding(Dimens.NOTIFICATION_MARGIN).align(Alignment.TopStart)) {
-                Surface(shape = RoundedCornerShape(Dimens.CORNER_ROUNDING), elevation = Dimens.TOOLTIP_ELEVATION) {
+                TooltipSurface {
                     Column(
                         modifier = Modifier
                             .clickable { GlobalState.currentNotification = null }

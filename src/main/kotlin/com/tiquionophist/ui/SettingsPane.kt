@@ -1,10 +1,13 @@
 package com.tiquionophist.ui
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.TooltipArea
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.material.IconButton
 import androidx.compose.material.LocalContentAlpha
 import androidx.compose.material.LocalContentColor
@@ -18,9 +21,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.res.painterResource
 import com.tiquionophist.core.ScheduleConfiguration
+import com.tiquionophist.ui.common.CheckboxWithLabel
 import com.tiquionophist.ui.common.ConfirmationDialog
 import com.tiquionophist.ui.common.IconAndTextButton
 import com.tiquionophist.ui.common.NumberPicker
+import com.tiquionophist.ui.common.TooltipSurface
 
 /**
  * Row of scheduling-wide settings, placed at the bottom of the window.
@@ -84,6 +89,60 @@ fun SettingsPane() {
                         },
                         min = 1,
                     )
+                }
+
+                TooltipArea(
+                    tooltip = {
+                        TooltipSurface {
+                            Box(Modifier.padding(Dimens.SPACING_2).widthIn(max = Dimens.Dialog.MAX_TEXT_WIDTH)) {
+                                Text(
+                                    "Whether to allow the same subject (excluding free periods) to be scheduled for " +
+                                            "the same class more than once on the same day."
+                                )
+                            }
+                        }
+                    }
+                ) {
+                    CheckboxWithLabel(
+                        checked = GlobalState.scheduleConfiguration.allowSameDaySubjectRepeats,
+                        onCheckedChange = {
+                            GlobalState.scheduleConfiguration = GlobalState.scheduleConfiguration.copy(
+                                allowSameDaySubjectRepeats =
+                                !GlobalState.scheduleConfiguration.allowSameDaySubjectRepeats,
+                            )
+                        }
+                    ) {
+                        Text("Allow same-day subject repeats")
+                    }
+                }
+
+                TooltipArea(
+                    tooltip = {
+                        TooltipSurface {
+                            Box(Modifier.padding(Dimens.SPACING_2).widthIn(max = Dimens.Dialog.MAX_TEXT_WIDTH)) {
+                                Text(
+                                    "Whether to allow the same subject (excluding free periods) to be scheduled for " +
+                                            "the same class back-to-back on the same day. Does not affect scheduling " +
+                                            "between the end of the previous day and the first period of the " +
+                                            "following day."
+                                )
+                            }
+                        }
+                    }
+                ) {
+                    CheckboxWithLabel(
+                        checked = GlobalState.scheduleConfiguration.allowSubsequentSubjectsRepeats &&
+                                GlobalState.scheduleConfiguration.allowSameDaySubjectRepeats,
+                        enabled = GlobalState.scheduleConfiguration.allowSameDaySubjectRepeats,
+                        onCheckedChange = {
+                            GlobalState.scheduleConfiguration = GlobalState.scheduleConfiguration.copy(
+                                allowSubsequentSubjectsRepeats =
+                                !GlobalState.scheduleConfiguration.allowSubsequentSubjectsRepeats,
+                            )
+                        }
+                    ) {
+                        Text("Allow subsequent subject repeats")
+                    }
                 }
             }
 

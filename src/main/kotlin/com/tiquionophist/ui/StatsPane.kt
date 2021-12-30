@@ -98,7 +98,6 @@ fun StatsPane() {
                 CheckboxWithLabel(
                     checked = GlobalState.showUnusedSubjects,
                     onCheckedChange = { GlobalState.showUnusedSubjects = it },
-                    modifier = Modifier.padding(Dimens.SPACING_2),
                 ) {
                     Text(text = "Show unused subjects", maxLines = 1)
                 }
@@ -106,7 +105,6 @@ fun StatsPane() {
                 CheckboxWithLabel(
                     checked = GlobalState.showUnusedTeachers,
                     onCheckedChange = { GlobalState.showUnusedTeachers = it },
-                    modifier = Modifier.padding(Dimens.SPACING_2),
                 ) {
                     Text(text = "Show unused teachers", maxLines = 1)
                 }

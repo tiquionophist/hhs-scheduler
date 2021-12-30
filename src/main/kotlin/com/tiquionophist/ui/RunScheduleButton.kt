@@ -10,7 +10,6 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Button
 import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.CircularProgressIndicator
@@ -19,7 +18,6 @@ import androidx.compose.material.IconButton
 import androidx.compose.material.LocalContentAlpha
 import androidx.compose.material.LocalContentColor
 import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
@@ -33,6 +31,7 @@ import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
 import com.tiquionophist.ui.common.ErrorDialog
 import com.tiquionophist.ui.common.IconAndTextButton
+import com.tiquionophist.ui.common.TooltipSurface
 import com.tiquionophist.ui.common.liveDurationState
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -103,7 +102,7 @@ fun RunScheduleButton() {
         if (validationErrors.isNotEmpty()) {
             TooltipArea(
                 tooltip = {
-                    Surface(shape = RoundedCornerShape(Dimens.CORNER_ROUNDING), elevation = Dimens.TOOLTIP_ELEVATION) {
+                    TooltipSurface {
                         Column(
                             modifier = Modifier.padding(Dimens.SPACING_2),
                             verticalArrangement = Arrangement.spacedBy(Dimens.SPACING_2),

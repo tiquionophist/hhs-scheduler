@@ -176,9 +176,7 @@ class RandomizedScheduler(
                         ?.takeIf { it != Subject.EMPTY }
                         ?.let { blockedSubjects.add(it) }
                 }
-            }
-
-            if (!configuration.allowSubsequentSubjects) {
+            } else if (!configuration.allowSubsequentSubjectsRepeats) {
                 for (subsequentPeriodIndex in subsequentPeriodIndexes(periodIndex = periodIndex)) {
                     val lesson = lessons[classIndex][subsequentPeriodIndex]
                     lesson?.subject

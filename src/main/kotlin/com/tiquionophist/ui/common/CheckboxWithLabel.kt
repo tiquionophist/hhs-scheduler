@@ -1,13 +1,18 @@
 package com.tiquionophist.ui.common
 
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.Checkbox
 import androidx.compose.material.CheckboxColors
 import androidx.compose.material.CheckboxDefaults
+import androidx.compose.material.ContentAlpha
+import androidx.compose.material.LocalContentAlpha
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.Dp
@@ -19,18 +24,24 @@ fun CheckboxWithLabel(
     checked: Boolean,
     onCheckedChange: (Boolean) -> Unit,
     modifier: Modifier = Modifier,
+    enabled: Boolean = true,
+    padding: PaddingValues = PaddingValues(all = Dimens.SPACING_2),
     checkboxPadding: Dp = Dimens.SPACING_2,
     colors: CheckboxColors = CheckboxDefaults.colors(checkedColor = ThemeColors.current.selected),
     content: @Composable () -> Unit,
 ) {
     Row(
-        modifier = modifier.clickable { onCheckedChange(!checked) },
+        modifier = modifier.clickable(enabled = enabled) { onCheckedChange(!checked) }.padding(padding),
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        Checkbox(checked = checked, onCheckedChange = null, colors = colors)
+        Checkbox(checked = checked, enabled = enabled, onCheckedChange = null, colors = colors)
 
         Spacer(Modifier.width(checkboxPadding))
 
-        content()
+        if (enabled) {
+            content()
+        } else {
+            CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.disabled, content = content)
+        }
     }
 }
