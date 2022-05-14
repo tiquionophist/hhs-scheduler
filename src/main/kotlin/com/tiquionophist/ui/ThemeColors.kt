@@ -14,15 +14,13 @@ import androidx.compose.ui.graphics.Color
 @Composable
 fun Modifier.enabledIf(enabled: Boolean) = if (enabled) this else alpha(ThemeColors.current.disabledAlpha)
 
-@Suppress("FunctionNaming")
 private fun Color(all: Int) = Color(red = all, green = all, blue = all)
 
-@Suppress("MagicNumber")
 data class ThemeColors(
     private val materialColors: Colors,
 
-    val primary: Color = Color(42, 149, 232),
-    val selected: Color = Color(22, 199, 28),
+    val primary: Color = Color(red = 42, green = 149, blue = 232),
+    val selected: Color = Color(red = 22, green = 199, blue = 28),
 
     val divider: Color,
     val weakDivider: Color,
