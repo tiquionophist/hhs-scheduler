@@ -25,7 +25,7 @@ import com.tiquionophist.ui.common.Table
 import com.tiquionophist.ui.common.TableDivider
 import com.tiquionophist.util.prettyName
 import java.math.BigDecimal
-import java.math.RoundingMode
+import java.text.DecimalFormat
 
 private object StatNameColumn : Column<Pair<Stat, BigDecimal>> {
     override fun horizontalAlignment(rowIndex: Int) = Alignment.Start
@@ -40,12 +40,16 @@ private object StatNameColumn : Column<Pair<Stat, BigDecimal>> {
 }
 
 private object StatValueColumn : Column<Pair<Stat, BigDecimal>> {
+    private val format = DecimalFormat("0.00").apply {
+        positivePrefix = "+"
+    }
+
     override fun horizontalAlignment(rowIndex: Int) = Alignment.End
 
     @Composable
     override fun content(value: Pair<Stat, BigDecimal>) {
         Text(
-            text = value.second.setScale(2, RoundingMode.HALF_EVEN).toPlainString(),
+            text = format.format(value.second),
             modifier = Modifier.padding(Dimens.SPACING_2),
         )
     }
