@@ -329,7 +329,7 @@ fun <T> Table(
                 }
 
                 val totalWidth = colWidths.sumOf { requireNotNull(it) { "null col width" } } +
-                        verticalDividerWidths.values.sum()
+                    verticalDividerWidths.values.sum()
                 val totalHeight = (rowHeights.sum() + horizontalDividerHeights.values.sum())
                     .coerceAtLeast(0)
 

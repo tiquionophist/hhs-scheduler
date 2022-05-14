@@ -109,7 +109,7 @@ internal class ScheduleConfigurationTest {
                     ),
                     errors = listOf(
                         "Classroom Chemistry must be occupied at least 30 times per week (by Chemistry, Physics), " +
-                                "which is impossible."
+                            "which is impossible."
                     ),
                 ),
             )

@@ -119,7 +119,7 @@ object SaveFileIO {
                         if (schedule.configuration.classes < classes - 1) {
                             error(
                                 "Save file has ${classes - 1} classes; cannot write " +
-                                        "${schedule.configuration.classes} since this would lose students."
+                                    "${schedule.configuration.classes} since this would lose students."
                             )
                         }
                     }

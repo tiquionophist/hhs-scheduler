@@ -9,6 +9,8 @@ complexity:
     active: false
 
 naming:
+  FunctionNaming:
+    functionPattern: '([A-Za-z][a-zA-Z0-9]*)|(.)'
   MatchingDeclarationName:
     active: false
 

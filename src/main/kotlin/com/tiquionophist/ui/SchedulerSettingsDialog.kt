@@ -106,8 +106,8 @@ fun SchedulerSettingsDialog(
                             ) {
                                 Text(
                                     "Scheduler settings control the algorithm used to generate a schedule. This " +
-                                            "should generally work out of the box, but allows for some tuning for " +
-                                            "advanced users."
+                                        "should generally work out of the box, but allows for some tuning for " +
+                                        "advanced users."
                                 )
 
                                 Divider()
@@ -172,8 +172,8 @@ private fun SchedulerSettings(settingsState: MutableState<SchedulerSettings>) {
 
     SettingWithDescription(
         description = "Exhaustive scheduling disables randomness and guarantees that a solution will be found if one " +
-                "exists. Tends to run much more slowly than a non-exhaustive search and produce schedules that are " +
-                "more uniform (i.e. scheduling the same subject back-to-back before moving on to the next subject)."
+            "exists. Tends to run much more slowly than a non-exhaustive search and produce schedules that are " +
+            "more uniform (i.e. scheduling the same subject back-to-back before moving on to the next subject)."
     ) {
         CheckboxWithLabel(
             checked = settings.exhaustive,
@@ -198,8 +198,8 @@ private fun RandomizedSettings(settingsState: MutableState<SchedulerSettings>) {
 
     SettingWithDescription(
         description = "The RNG seed used to randomly choose the next lesson assignment. Unlikely to have a " +
-                "noticeable effect on performance. If disabled, uses the system time so that re-runs will have a " +
-                "new seed."
+            "noticeable effect on performance. If disabled, uses the system time so that re-runs will have a " +
+            "new seed."
     ) {
         val enabled = settings.customRandomSeedEnabled
 
@@ -256,10 +256,10 @@ private fun RandomizedSettings(settingsState: MutableState<SchedulerSettings>) {
 
         Text(
             "Limit the number of end states (when no more lessons can be added to the schedule) reached before the " +
-                    "algorithm starts again from scratch with the next random seed. Limiting attempts per round is " +
-                    "very effective in avoiding local maxima (i.e. when we have all but the last period scheduled). " +
-                    "Limiting the total number of rounds prevents the algorithm from running forever; if many runs " +
-                    "fail to find a solution it is likely that one does not exist."
+                "algorithm starts again from scratch with the next random seed. Limiting attempts per round is " +
+                "very effective in avoiding local maxima (i.e. when we have all but the last period scheduled). " +
+                "Limiting the total number of rounds prevents the algorithm from running forever; if many runs " +
+                "fail to find a solution it is likely that one does not exist."
         )
     }
 }
@@ -271,8 +271,8 @@ private fun FillOrderSelector(
 ) {
     SettingWithDescription(
         description = "The fill order determines whether each class is filled out for each period in the week before " +
-                "moving onto the next class, or whether each period is filled out for each class before moving onto " +
-                "the next period. This has complicated implications on performance of the scheduler."
+            "moving onto the next class, or whether each period is filled out for each class before moving onto " +
+            "the next period. This has complicated implications on performance of the scheduler."
     ) {
         Text("Fill order:")
 

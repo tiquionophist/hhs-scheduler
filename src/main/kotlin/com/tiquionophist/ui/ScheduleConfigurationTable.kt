@@ -135,10 +135,10 @@ private class SubjectFrequencyPickerColumn(
                         Box(Modifier.padding(Dimens.SPACING_2).widthIn(max = Dimens.Dialog.MAX_TEXT_WIDTH)) {
                             Text(
                                 "If enabled, the number of times each subject is taught per week can be configured " +
-                                        "class-by-class. If disabled, the subjects are taught the same number of " +
-                                        "times for every class.\n\n" +
-                                        "WARNING: when disabling, the currently selected frequencies are used for " +
-                                        "all classes, overwriting their current settings."
+                                    "class-by-class. If disabled, the subjects are taught the same number of " +
+                                    "times for every class.\n\n" +
+                                    "WARNING: when disabling, the currently selected frequencies are used for " +
+                                    "all classes, overwriting their current settings."
                             )
                         }
                     }

@@ -36,62 +36,62 @@ enum class ClassroomFillOrder(val description: String) {
      * Verifies that [schedule] has the correct classroom assignments according to this [ClassroomFillOrder].
      */
     fun verify(schedule: Schedule) {
-       when (this) {
-           BY_TEACHER -> {
-               val teacherClassroomNumbers = mutableMapOf<Teacher, Int>()
-               for (cls in schedule.lessons) {
-                   for (lesson in cls) {
-                       val teacher = lesson.teacher
-                       val classroom = lesson.assignedClassroom
-                       if (teacher != null && classroom is AssignedClassroom.NumberedClassroom) {
-                           val expectedNumber = teacherClassroomNumbers[teacher]
-                           if (expectedNumber == null) {
-                               teacherClassroomNumbers[teacher] = classroom.number
-                           } else {
-                               require(expectedNumber == classroom.number) {
-                                   "$teacher teaches in both $expectedNumber and ${classroom.number}"
-                               }
-                           }
-                       }
-                   }
-               }
-           }
+        when (this) {
+            BY_TEACHER -> {
+                val teacherClassroomNumbers = mutableMapOf<Teacher, Int>()
+                for (cls in schedule.lessons) {
+                    for (lesson in cls) {
+                        val teacher = lesson.teacher
+                        val classroom = lesson.assignedClassroom
+                        if (teacher != null && classroom is AssignedClassroom.NumberedClassroom) {
+                            val expectedNumber = teacherClassroomNumbers[teacher]
+                            if (expectedNumber == null) {
+                                teacherClassroomNumbers[teacher] = classroom.number
+                            } else {
+                                require(expectedNumber == classroom.number) {
+                                    "$teacher teaches in both $expectedNumber and ${classroom.number}"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
 
-           BY_CLASS -> {
-               for ((classIndex, cls) in schedule.lessons.withIndex()) {
-                   for (lesson in cls) {
-                       val classroom = lesson.assignedClassroom
-                       if (classroom is AssignedClassroom.NumberedClassroom) {
-                           require(classroom.number == classIndex + 1) {
-                               "class ${classIndex + 1} was taught in classroom ${classroom.number}"
-                           }
-                       }
-                   }
-               }
-           }
+            BY_CLASS -> {
+                for ((classIndex, cls) in schedule.lessons.withIndex()) {
+                    for (lesson in cls) {
+                        val classroom = lesson.assignedClassroom
+                        if (classroom is AssignedClassroom.NumberedClassroom) {
+                            require(classroom.number == classIndex + 1) {
+                                "class ${classIndex + 1} was taught in classroom ${classroom.number}"
+                            }
+                        }
+                    }
+                }
+            }
 
-           BY_SUBJECT -> {
-               val subjectClassroomNumbers = mutableMapOf<Subject, Int>()
-               for (cls in schedule.lessons) {
-                   for (lesson in cls) {
-                       val subject = lesson.subject
-                       val classroom = lesson.assignedClassroom
-                       if (classroom is AssignedClassroom.NumberedClassroom) {
-                           val expectedNumber = subjectClassroomNumbers[subject]
-                           if (expectedNumber == null) {
-                               subjectClassroomNumbers[subject] = classroom.number
-                           } else {
-                               require(expectedNumber == classroom.number) {
-                                   "$subject is taught in both $expectedNumber and ${classroom.number}"
-                               }
-                           }
-                       }
-                   }
-               }
-           }
+            BY_SUBJECT -> {
+                val subjectClassroomNumbers = mutableMapOf<Subject, Int>()
+                for (cls in schedule.lessons) {
+                    for (lesson in cls) {
+                        val subject = lesson.subject
+                        val classroom = lesson.assignedClassroom
+                        if (classroom is AssignedClassroom.NumberedClassroom) {
+                            val expectedNumber = subjectClassroomNumbers[subject]
+                            if (expectedNumber == null) {
+                                subjectClassroomNumbers[subject] = classroom.number
+                            } else {
+                                require(expectedNumber == classroom.number) {
+                                    "$subject is taught in both $expectedNumber and ${classroom.number}"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
 
-           ARBITRARY -> Unit // no-op: arbitrary
-       }
+            ARBITRARY -> Unit // no-op: arbitrary
+        }
     }
 }
 

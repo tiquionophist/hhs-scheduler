@@ -123,7 +123,7 @@ data class ScheduleConfiguration(
         subjectFrequency.forEachIndexed { classIndex, classFrequency ->
             if (classFrequency.values.sum() != periodsPerWeek) {
                 errors += "${classFrequency.values.sum()} subjects assigned per week for class ${classIndex + 1}; " +
-                        "must be $periodsPerWeek."
+                    "must be $periodsPerWeek."
             }
         }
 
@@ -161,7 +161,7 @@ data class ScheduleConfiguration(
                 }
 
                 errors += "${classroom.canonicalName} must be occupied at least $classesPerWeek times per week (by " +
-                        "${subjectsInClassroom.sorted().joinToString { it.prettyName }}), which is impossible."
+                    "${subjectsInClassroom.sorted().joinToString { it.prettyName }}), which is impossible."
             }
         }
 

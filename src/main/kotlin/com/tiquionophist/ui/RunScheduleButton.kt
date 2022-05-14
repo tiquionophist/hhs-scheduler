@@ -40,7 +40,7 @@ private class ErrorDialogState(
 private const val SCHEDULE_NOT_FOUND_TITLE = "No schedule found"
 private const val SCHEDULE_NOT_FOUND_MESSAGE =
     "No schedule could be found. This likely means that no schedule is possible for these settings, or that the " +
-            "scheduler settings are too strict to find it."
+        "scheduler settings are too strict to find it."
 
 private const val EXCEPTION_TITLE = "Exception thrown!"
 private const val EXCEPTION_MESSAGE =

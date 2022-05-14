@@ -129,7 +129,7 @@ fun SettingsPane(classIndexState: MutableState<Int?>) {
                                 Box(Modifier.padding(Dimens.SPACING_2).widthIn(max = Dimens.Dialog.MAX_TEXT_WIDTH)) {
                                     Text(
                                         "Whether to allow the same subject (excluding free periods) to be scheduled " +
-                                                "for the same class more than once on the same day."
+                                            "for the same class more than once on the same day."
                                     )
                                 }
                             }
@@ -154,9 +154,9 @@ fun SettingsPane(classIndexState: MutableState<Int?>) {
                                 Box(Modifier.padding(Dimens.SPACING_2).widthIn(max = Dimens.Dialog.MAX_TEXT_WIDTH)) {
                                     Text(
                                         "Whether to allow the same subject (excluding free periods) to be scheduled " +
-                                                "for the same class back-to-back on the same day. Does not affect " +
-                                                "scheduling between the end of the previous day and the first period " +
-                                                "of the following day."
+                                            "for the same class back-to-back on the same day. Does not affect " +
+                                            "scheduling between the end of the previous day and the first period " +
+                                            "of the following day."
                                     )
                                 }
                             }
