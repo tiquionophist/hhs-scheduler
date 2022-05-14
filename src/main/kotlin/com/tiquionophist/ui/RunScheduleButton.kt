@@ -134,7 +134,7 @@ fun RunScheduleButton(
 
                     Spacer(Modifier.width(Dimens.SPACING_2))
 
-                    val loadingCoroutineScope = rememberCoroutineScope { Dispatchers.Main }
+                    val loadingCoroutineScope = rememberCoroutineScope { Dispatchers.Default }
                     val durationState = remember { liveDurationState(loadingCoroutineScope) }
                     val seconds = durationState.value.toDouble(DurationUnit.SECONDS)
                     Text("Running for %.1fs".format(seconds))
