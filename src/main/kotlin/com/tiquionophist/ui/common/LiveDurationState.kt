@@ -6,6 +6,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlin.time.Duration
+import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.TimeSource
 
 /**
@@ -16,7 +17,7 @@ import kotlin.time.TimeSource
  */
 fun liveDurationState(
     coroutineScope: CoroutineScope,
-    increment: Duration = @Suppress("MagicNumber") Duration.milliseconds(100),
+    increment: Duration = 100.milliseconds,
 ): State<Duration> {
     val state = mutableStateOf(Duration.ZERO)
     val start = TimeSource.Monotonic.markNow()

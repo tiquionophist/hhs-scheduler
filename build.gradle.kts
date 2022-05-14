@@ -8,11 +8,11 @@ import java.util.zip.ZipEntry
 import java.util.zip.ZipOutputStream
 
 plugins {
-    kotlin("jvm") version "1.5.31"
+    kotlin("jvm") version "1.6.10"
     kotlin("plugin.serialization") version "1.5.30"
     jacoco
     id("io.gitlab.arturbosch.detekt") version "1.20.0"
-    id("org.jetbrains.compose") version "1.0.0"
+    id("org.jetbrains.compose") version "1.1.1"
 }
 
 repositories {
