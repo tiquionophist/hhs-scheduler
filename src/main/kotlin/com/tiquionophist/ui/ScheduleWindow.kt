@@ -23,6 +23,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.RectangleShape
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.window.Window
@@ -59,6 +60,7 @@ fun ScheduleWindow(
 ) {
     Window(
         title = "Schedule ${computedSchedule.index + 1}",
+        icon = painterResource("app_icon.png"),
         onCloseRequest = onClose,
         resizable = false,
         state = rememberWindowState(
