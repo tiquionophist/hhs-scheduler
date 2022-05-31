@@ -1,9 +1,9 @@
 # HHS+ Scheduler
 
-A standalone companion to the adult game [HHS+](https://www.henthighschool.com/hhsplus/) (NSFW)
-which generates class schedules based on teacher assignments and the number of times each subject
-should be taught per week. This makes it easy to specify the way you want your school to be run and
-let this program figure out how to satisfy those requirements.
+A standalone companion to the adult game [HHS+](https://henthighschool.net/) (NSFW) which generates
+class schedules based on teacher assignments and the number of times each subject should be taught
+per week. This makes it easy to specify the way you want your school to be run and let this program
+figure out how to satisfy those requirements.
 
 ## Screenshots
 
