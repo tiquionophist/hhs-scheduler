@@ -59,6 +59,13 @@ data class ScheduleConfiguration(
     val teacherExperience: Map<Teacher, Map<Subject, Float>>? = null,
 
     /**
+     * A map from each [Subject] to whether the subject can currently be taught in the school.
+     *
+     * Only populated when loading from a save file.
+     */
+    val allowedSubjects: Map<Subject, Boolean>? = null,
+
+    /**
      * For each class, a map from each [Subject] to the number of times per week it ought to be taught for that class
      * (including free periods).
      */

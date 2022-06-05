@@ -1,12 +1,12 @@
 package com.tiquionophist.ui
 
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.TooltipArea
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
@@ -14,9 +14,9 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.widthIn
 import androidx.compose.material.Checkbox
 import androidx.compose.material.CheckboxDefaults
+import androidx.compose.material.LocalContentColor
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
@@ -25,8 +25,10 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.lerp
 import androidx.compose.ui.graphics.painter.BitmapPainter
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import com.tiquionophist.core.ScheduleConfiguration
 import com.tiquionophist.core.Subject
@@ -37,7 +39,7 @@ import com.tiquionophist.ui.common.ColumnWithHeader
 import com.tiquionophist.ui.common.NumberPicker
 import com.tiquionophist.ui.common.Table
 import com.tiquionophist.ui.common.TableDivider
-import com.tiquionophist.ui.common.TooltipSurface
+import com.tiquionophist.ui.common.Tooltip
 import com.tiquionophist.util.pluralizedCount
 import com.tiquionophist.util.prettyName
 
@@ -93,12 +95,23 @@ private class SubjectNameColumn(private val classIndex: Int?) : ColumnWithHeader
 
     @Composable
     override fun itemContent(value: Subject) {
-        Text(
-            text = value.prettyName,
-            modifier = Modifier
-                .padding(Dimens.SPACING_2)
-                .enabledIf(GlobalState.scheduleConfiguration.subjectEnabled(subject = value, classIndex = classIndex)),
-        )
+        Row(
+            modifier = Modifier.padding(Dimens.SPACING_2),
+            horizontalArrangement = Arrangement.spacedBy(Dimens.SPACING_2),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            val config = GlobalState.scheduleConfiguration
+
+            Text(
+                text = value.prettyName,
+                modifier = Modifier
+                    .enabledIf(config.subjectEnabled(subject = value, classIndex = classIndex)),
+            )
+
+            if (config.allowedSubjects?.get(value) == false) {
+                SubjectLockedIcon(subject = value)
+            }
+        }
     }
 }
 
@@ -130,20 +143,11 @@ private class SubjectFrequencyPickerColumn(
                 )
             }
 
-            TooltipArea(
-                tooltip = {
-                    TooltipSurface {
-                        Box(Modifier.padding(Dimens.SPACING_2).widthIn(max = Dimens.Dialog.MAX_TEXT_WIDTH)) {
-                            Text(
-                                "If enabled, the number of times each subject is taught per week can be configured " +
-                                    "class-by-class. If disabled, the subjects are taught the same number of " +
-                                    "times for every class.\n\n" +
-                                    "WARNING: when disabling, the currently selected frequencies are used for " +
-                                    "all classes, overwriting their current settings."
-                            )
-                        }
-                    }
-                }
+            Tooltip(
+                "If enabled, the number of times each subject is taught per week can be configured class-by-class. " +
+                    "If disabled, the subjects are taught the same number of times for every class.\n\n" +
+                    "WARNING: when disabling, the currently selected frequencies are used for all classes, " +
+                    "overwriting their current settings."
             ) {
                 CheckboxWithLabel(
                     checked = perClassSchedulingEnabled,
@@ -178,6 +182,7 @@ private class SubjectFrequencyPickerColumn(
     override fun itemContent(value: Subject) {
         val config = GlobalState.scheduleConfiguration
         val classIndex = classIndexState.value
+        val subjectLocked = config.allowedSubjects?.get(value) == false
         if (value == Subject.EMPTY) {
             Text(
                 modifier = Modifier.padding(Dimens.SPACING_2),
@@ -204,7 +209,7 @@ private class SubjectFrequencyPickerColumn(
                     )
                 },
                 min = 0,
-                max = config.periodsPerWeek,
+                max = if (subjectLocked) 0 else config.periodsPerWeek,
             )
         }
     }
@@ -301,10 +306,11 @@ private class SubjectTeacherAssignmentsColumn(private val teacher: Teacher) : Co
         val contains = currentAssignments.contains(value)
 
         val teacherExp = config.teacherExperience?.get(teacher)
+        val subjectLocked = config.allowedSubjects?.get(value) == false
 
         Box(
             modifier = Modifier
-                .clickable {
+                .clickable(enabled = !subjectLocked) {
                     val newAssignments = if (contains) {
                         currentAssignments.minus(value)
                     } else {
@@ -342,7 +348,26 @@ private class SubjectTeacherAssignmentsColumn(private val teacher: Teacher) : Co
                 onCheckedChange = null,
                 colors = CheckboxDefaults.colors(checkedColor = ThemeColors.current.selected)
             )
+
+            if (subjectLocked) {
+                Box(Modifier.align(Alignment.CenterEnd).padding(Dimens.SPACING_3)) {
+                    SubjectLockedIcon(subject = value)
+                }
+            }
         }
+    }
+}
+
+@Composable
+private fun SubjectLockedIcon(subject: Subject) {
+    Tooltip("${subject.prettyName} cannot currently be taught") {
+        Image(
+            modifier = Modifier.size(Dimens.SPACING_3),
+            painter = painterResource("icons/lock.svg"),
+            contentDescription = "Locked",
+            colorFilter = ColorFilter.tint(LocalContentColor.current),
+            alpha = ThemeColors.current.disabledAlpha,
+        )
     }
 }
 
@@ -384,13 +409,16 @@ fun ScheduleConfigurationTable(classIndexState: MutableState<Int?>) {
 
     val fixedRows = listOf(null)
 
-    val subjectRows = remember(GlobalState.showUnusedSubjects, configuration) {
-        if (GlobalState.showUnusedSubjects) {
-            subjects
-        } else {
-            subjects.filter { configuration.subjectEnabled(subject = it, classIndex = classIndexState.value) }
-                .takeUnless { it.minus(Subject.EMPTY).isEmpty() } ?: subjects // don't allow empty subjects
-        }
+    val subjectRows = remember(GlobalState.showUnusedSubjects, GlobalState.showLockedSubjects, configuration) {
+        subjects
+            .filter {
+                val enabled = configuration.subjectEnabled(subject = it, classIndex = classIndexState.value)
+                val locked = configuration.allowedSubjects?.get(it) == false
+
+                (GlobalState.showUnusedSubjects || enabled) && (GlobalState.showLockedSubjects || !locked)
+            }
+            .takeUnless { it.minus(Subject.EMPTY).isEmpty() }
+            ?: subjects // don't allow empty subjects
     }
 
     Table(

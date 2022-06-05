@@ -4,13 +4,11 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.TooltipArea
 import androidx.compose.foundation.TooltipPlacement
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.widthIn
 import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.ContentAlpha
 import androidx.compose.material.DropdownMenu
@@ -40,6 +38,7 @@ import com.tiquionophist.ui.common.CheckboxWithLabel
 import com.tiquionophist.ui.common.ConfirmationDialog
 import com.tiquionophist.ui.common.IconAndTextButton
 import com.tiquionophist.ui.common.NumberPicker
+import com.tiquionophist.ui.common.Tooltip
 import com.tiquionophist.ui.common.TooltipSurface
 import com.tiquionophist.util.prettyName
 
@@ -123,17 +122,9 @@ fun SettingsPane(classIndexState: MutableState<Int?>) {
                 }
 
                 Column {
-                    TooltipArea(
-                        tooltip = {
-                            TooltipSurface {
-                                Box(Modifier.padding(Dimens.SPACING_2).widthIn(max = Dimens.Dialog.MAX_TEXT_WIDTH)) {
-                                    Text(
-                                        "Whether to allow the same subject (excluding free periods) to be scheduled " +
-                                            "for the same class more than once on the same day."
-                                    )
-                                }
-                            }
-                        }
+                    Tooltip(
+                        "Whether to allow the same subject (excluding free periods) to be scheduled for the same " +
+                            "class more than once on the same day."
                     ) {
                         CheckboxWithLabel(
                             checked = config.allowSameDaySubjectRepeats,
@@ -148,19 +139,10 @@ fun SettingsPane(classIndexState: MutableState<Int?>) {
                         }
                     }
 
-                    TooltipArea(
-                        tooltip = {
-                            TooltipSurface {
-                                Box(Modifier.padding(Dimens.SPACING_2).widthIn(max = Dimens.Dialog.MAX_TEXT_WIDTH)) {
-                                    Text(
-                                        "Whether to allow the same subject (excluding free periods) to be scheduled " +
-                                            "for the same class back-to-back on the same day. Does not affect " +
-                                            "scheduling between the end of the previous day and the first period " +
-                                            "of the following day."
-                                    )
-                                }
-                            }
-                        }
+                    Tooltip(
+                        "Whether to allow the same subject (excluding free periods) to be scheduled for the same " +
+                            "class back-to-back on the same day. Does not affect scheduling between the end of the " +
+                            "previous day and the first period of the following day."
                     ) {
                         CheckboxWithLabel(
                             checked = config.allowSubsequentSubjectsRepeats && config.allowSameDaySubjectRepeats,

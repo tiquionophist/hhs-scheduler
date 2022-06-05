@@ -19,6 +19,9 @@ data class SaveData(
     @JacksonXmlProperty(localName = "ListPerson1")
     @JacksonXmlElementWrapper
     val people: People,
+
+    @JacksonXmlProperty(localName = "ListOfSubjects1")
+    val schoolSubjects: SchoolSubjects,
 ) {
     /**
      * Wrapper class for the list of [SchoolClass]es to avoid Jackson weirdness between the wrapper element name and the
@@ -38,6 +41,27 @@ data class SaveData(
         @JacksonXmlElementWrapper(useWrapping = false)
         @JacksonXmlProperty(localName = "Person")
         val people: List<Person> = listOf()
+    )
+
+    /**
+     * Wrapper class for the list of the [SchoolSubject]s to avoid Jackson weirdness between the wrapper element name
+     * and the name of each class in the list.
+     */
+    data class SchoolSubjects(
+        @JacksonXmlElementWrapper(useWrapping = false)
+        @JacksonXmlProperty(localName = "SchoolSubject")
+        val items: List<SchoolSubject> = listOf(),
+    )
+
+    /**
+     * A single subject in the school, reading only whether the class is currently available to be taught.
+     */
+    data class SchoolSubject(
+        @JacksonXmlProperty(localName = "Name")
+        val name: String = "",
+
+        @JacksonXmlProperty(localName = "CanBeTaught")
+        val canBeTaught: Boolean = false,
     )
 
     /**
@@ -241,6 +265,14 @@ data class SaveData(
                     .toMap()
                 teacher to expMap
             },
+            allowedSubjects = schoolSubjects.items
+                .mapNotNull { schoolSubject ->
+                    subjectNameToEnum(schoolSubject.name)?.let { subject ->
+                        subject to schoolSubject.canBeTaught
+                    }
+                }
+                .toMap()
+                .minus(Subject.EMPTY),
             subjectFrequency = nonEmptyClasses.map { it.toSubjectFrequency() },
         )
     }

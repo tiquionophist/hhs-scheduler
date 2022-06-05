@@ -131,7 +131,13 @@ internal class SaveDataTest {
                                     subjectInstanceExp = SaveData.SubjectExp(items = listOf()),
                                 ),
                             )
-                        )
+                        ),
+                        schoolSubjects = SaveData.SchoolSubjects(
+                            items = listOf(
+                                SaveData.SchoolSubject(name = "s1", canBeTaught = false),
+                                SaveData.SchoolSubject(name = "s2", canBeTaught = true),
+                            )
+                        ),
                     ),
                     serialized = """
                         <SaveData>
@@ -177,6 +183,18 @@ internal class SaveDataTest {
                                     <SubjectInstanceExp/>
                                 </Person>
                             </ListPerson1>
+                            
+                            <ListOfSubjects1>
+                                <SchoolSubject>
+                                    <Name>s1</Name>
+                                    <CanBeTaught>false</CanBeTaught>
+                                </SchoolSubject>
+                                
+                                <SchoolSubject>
+                                    <Name>s2</Name>
+                                    <CanBeTaught>true</CanBeTaught>
+                                </SchoolSubject>
+                            </ListOfSubjects1>
                         </SaveData>
                         """
                         .replace("""\s""".toRegex(), "")

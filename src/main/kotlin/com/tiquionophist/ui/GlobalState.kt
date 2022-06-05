@@ -22,6 +22,7 @@ object GlobalState {
 
     var showLexvilleTeachers by mutableStateOf(false)
     var showUnusedSubjects by mutableStateOf(true)
+    var showLockedSubjects by mutableStateOf(false)
     var showUnusedTeachers by mutableStateOf(true)
     var showTeacherExp by mutableStateOf(false)
 
