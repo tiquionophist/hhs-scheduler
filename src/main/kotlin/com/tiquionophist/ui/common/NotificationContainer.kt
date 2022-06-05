@@ -1,12 +1,16 @@
 package com.tiquionophist.ui.common
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.material.Icon
 import androidx.compose.material.LocalContentAlpha
 import androidx.compose.material.LocalContentColor
@@ -18,6 +22,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import com.tiquionophist.ui.Dimens
 import com.tiquionophist.ui.GlobalState
+import com.tiquionophist.ui.ThemeColors
 import kotlinx.coroutines.delay
 
 @Composable
@@ -37,35 +42,51 @@ fun NotificationContainer(content: @Composable () -> Unit) {
                 }
             }
 
-            Box(modifier = Modifier.padding(Dimens.NOTIFICATION_MARGIN).align(Alignment.TopStart)) {
+            Box(
+                modifier = Modifier
+                    .padding(Dimens.NOTIFICATION_MARGIN)
+                    .align(Alignment.TopStart)
+                    .width(Dimens.NOTIFICATION_WIDTH)
+            ) {
                 TooltipSurface {
-                    Column(
-                        modifier = Modifier
-                            .clickable { GlobalState.currentNotification = null }
-                            .padding(Dimens.SPACING_3),
-                        verticalArrangement = Arrangement.spacedBy(Dimens.SPACING_2),
-                    ) {
-                        Row(
-                            verticalAlignment = Alignment.Bottom,
-                            horizontalArrangement = Arrangement.spacedBy(Dimens.SPACING_2)
-                        ) {
-                            notification.iconFilename?.let { iconFilename ->
-                                Icon(
-                                    modifier = Modifier.size(Dimens.NOTIFICATION_ICON_SIZE),
-                                    painter = painterResource("icons/$iconFilename.svg"),
-                                    contentDescription = null,
-                                    tint = (notification.iconTint ?: LocalContentColor.current)
-                                        .copy(alpha = LocalContentAlpha.current)
-                                )
-                            }
-
-                            Text(
-                                text = notification.title,
-                                fontSize = Dimens.Dialog.TITLE_FONT_SIZE
+                    Column(Modifier.fillMaxWidth()) {
+                        if (notification.progress != null) {
+                            Box(
+                                Modifier
+                                    .fillMaxWidth(fraction = notification.progress.toFloat())
+                                    .height(Dimens.SPACING_2)
+                                    .background(ThemeColors.current.selected)
                             )
                         }
 
-                        Text(notification.message)
+                        Column(
+                            modifier = Modifier
+                                .clickable { GlobalState.currentNotification = null }
+                                .padding(Dimens.SPACING_3),
+                            verticalArrangement = Arrangement.spacedBy(Dimens.SPACING_2),
+                        ) {
+                            Row(
+                                verticalAlignment = Alignment.Bottom,
+                                horizontalArrangement = Arrangement.spacedBy(Dimens.SPACING_2)
+                            ) {
+                                notification.iconFilename?.let { iconFilename ->
+                                    Icon(
+                                        modifier = Modifier.size(Dimens.NOTIFICATION_ICON_SIZE),
+                                        painter = painterResource("icons/$iconFilename.svg"),
+                                        contentDescription = null,
+                                        tint = (notification.iconTint ?: LocalContentColor.current)
+                                            .copy(alpha = LocalContentAlpha.current)
+                                    )
+                                }
+
+                                Text(
+                                    text = notification.title,
+                                    fontSize = Dimens.Dialog.TITLE_FONT_SIZE
+                                )
+                            }
+
+                            Text(notification.message)
+                        }
                     }
                 }
             }

@@ -43,6 +43,8 @@ object Dimens {
 
     val NOTIFICATION_MARGIN = 35.dp
 
+    val NOTIFICATION_WIDTH = 720.dp
+
     @Composable
     fun apply(content: @Composable () -> Unit) {
         ProvideTextStyle(TextStyle(fontSize = FONT_NORMAL), content)

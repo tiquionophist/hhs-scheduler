@@ -26,10 +26,12 @@ object SaveFileIO {
     /**
      * Reads the game save at [file] into a [SaveData] which wraps the XML data in the save file.
      */
-    fun read(file: File): SaveData {
+    fun read(file: File, onReadSaveFile: () -> Unit = {}, onDecodeAndUnzip: () -> Unit = {}): SaveData {
         val saveFile = xmlMapper.readValue(file, SaveFile::class.java)
+        onReadSaveFile()
 
         EncodingUtil.decodeAndUnzip(saveFile.data).use { inputStream ->
+            onDecodeAndUnzip()
             return xmlMapper.readValue(inputStream, SaveData::class.java)
         }
     }

@@ -13,4 +13,5 @@ data class Notification(
     val iconFilename: String? = null,
     val iconTint: Color? = null,
     val duration: Duration? = 5.seconds,
+    val progress: Double? = null,
 )
