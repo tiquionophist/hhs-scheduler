@@ -8,10 +8,18 @@ complexity:
   LongParameterList:
     active: false
 
+coroutines:
+  InjectDispatcher:
+    active: false
+
 naming:
   FunctionNaming:
     functionPattern: '([A-Za-z][a-zA-Z0-9]*)|(.)'
   MatchingDeclarationName:
+    active: false
+
+potential-bugs:
+  UnsafeCallOnNullableType:
     active: false
 
 style:

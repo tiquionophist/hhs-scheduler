@@ -23,7 +23,7 @@ data class Lesson(val subject: Subject, val teacher: Teacher?, val assignedClass
             require(allowedTeachers.contains(teacher)) {
                 "${teacher.fullName} not allowed to teach ${subject.prettyName}"
             }
-            require(assignedClassroom != null) { "${subject.prettyName} was not assigned a classroom" }
+            requireNotNull(assignedClassroom) { "${subject.prettyName} was not assigned a classroom" }
 
             val classrooms = subject.classrooms
             if (classrooms == null) {

@@ -11,7 +11,7 @@ plugins {
     kotlin("jvm") version "1.6.10"
     kotlin("plugin.serialization") version "1.6.10"
     jacoco
-    id("io.gitlab.arturbosch.detekt") version "1.20.0"
+    id("io.gitlab.arturbosch.detekt") version "1.21.0-RC1"
     id("org.jetbrains.compose") version "1.1.1"
 }
 
@@ -62,9 +62,14 @@ tasks.jacocoTestReport {
 }
 
 detekt {
-    toolVersion = "1.20.0"
     config = files("detekt.yml")
     buildUponDefaultConfig = true
+}
+
+tasks.check {
+    // run detekt with type resolution
+    dependsOn("detektMain")
+    dependsOn("detektTest")
 }
 
 val resourcesDir: File = sourceSets["main"].resources.sourceDirectories.first()
