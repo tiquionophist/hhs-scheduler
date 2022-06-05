@@ -1,11 +1,13 @@
 package com.tiquionophist.ui
 
+import androidx.compose.foundation.TooltipArea
 import androidx.compose.foundation.VerticalScrollbar
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.rememberScrollbarAdapter
 import androidx.compose.foundation.verticalScroll
@@ -23,6 +25,7 @@ import com.tiquionophist.ui.common.Column
 import com.tiquionophist.ui.common.MatchingWidthColumn
 import com.tiquionophist.ui.common.Table
 import com.tiquionophist.ui.common.TableDivider
+import com.tiquionophist.ui.common.TooltipSurface
 import com.tiquionophist.util.prettyName
 import java.math.BigDecimal
 import java.text.DecimalFormat
@@ -112,6 +115,27 @@ fun StatsPane(classIndex: Int?) {
                     onCheckedChange = { GlobalState.showUnusedTeachers = it },
                 ) {
                     Text(text = "Show unused teachers", maxLines = 1)
+                }
+
+                TooltipArea(
+                    tooltip = {
+                        TooltipSurface {
+                            Box(Modifier.padding(Dimens.SPACING_2).widthIn(max = Dimens.Dialog.MAX_TEXT_WIDTH)) {
+                                Text(
+                                    "Whether to display the subject experience each teacher has in the scheduling " +
+                                        "table; only available after importing from a game save file."
+                                )
+                            }
+                        }
+                    }
+                ) {
+                    CheckboxWithLabel(
+                        checked = GlobalState.showTeacherExp,
+                        onCheckedChange = { GlobalState.showTeacherExp = it },
+                        enabled = GlobalState.scheduleConfiguration.teacherExperience != null,
+                    ) {
+                        Text(text = "Show teacher exp", maxLines = 1)
+                    }
                 }
             }
 

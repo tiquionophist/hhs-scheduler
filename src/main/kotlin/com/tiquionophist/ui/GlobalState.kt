@@ -23,6 +23,7 @@ object GlobalState {
     var showLexvilleTeachers by mutableStateOf(false)
     var showUnusedSubjects by mutableStateOf(true)
     var showUnusedTeachers by mutableStateOf(true)
+    var showTeacherExp by mutableStateOf(false)
 
     var currentNotification by mutableStateOf<Notification?>(null)
 }

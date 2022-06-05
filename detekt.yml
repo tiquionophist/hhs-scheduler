@@ -23,5 +23,8 @@ potential-bugs:
     active: false
 
 style:
+  MagicNumber:
+    active: true
+    ignoreNumbers: ['-1', '0', '1', '2', '100']
   ReturnCount:
     active: false

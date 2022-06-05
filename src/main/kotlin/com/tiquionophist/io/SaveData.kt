@@ -88,7 +88,7 @@ data class SaveData(
         fun toSubjectFrequency(): Map<Subject, Int> {
             val subjects = listOf(monday.strings, tuesday.strings, wednesday.strings, thursday.strings, friday.strings)
                 .flatten()
-                .map { subjectNameToEnum(it) }
+                .mapNotNull { subjectNameToEnum(it) }
 
             return subjects.fold(mapOf()) { map, subject ->
                 map.plus(subject to (map[subject] ?: 0) + 1)
@@ -161,7 +161,7 @@ data class SaveData(
     )
 
     /**
-     * A single person in the game; if they are a teacher then [teacherSubjects] will be set.
+     * A single person in the game; if they are a teacher then [teacherSubjects], [subjectFamilyExp], etc. will be set.
      */
     data class Person(
         @JacksonXmlProperty(localName = "Forename")
@@ -172,6 +172,12 @@ data class SaveData(
 
         @JacksonXmlProperty(localName = "TeacherSubjects")
         val teacherSubjects: TeacherSubjects?,
+
+        @JacksonXmlProperty(localName = "SubjectFamilyExp")
+        val subjectFamilyExp: SubjectExp?,
+
+        @JacksonXmlProperty(localName = "SubjectInstanceExp")
+        val subjectInstanceExp: SubjectExp?,
     )
 
     /**
@@ -182,6 +188,26 @@ data class SaveData(
         @JacksonXmlElementWrapper(useWrapping = false)
         @JacksonXmlProperty(localName = "string")
         val subjects: List<String> = listOf()
+    )
+
+    /**
+     * Wrapper class for the subject/subject family experience map of each teacher.
+     */
+    data class SubjectExp(
+        @JacksonXmlElementWrapper(useWrapping = false)
+        @JacksonXmlProperty(localName = "Item")
+        val items: List<FloatValue> = listOf(),
+    )
+
+    /**
+     * Wrapper class for a key-value pair where the key is a [String] and the value a [Float].
+     */
+    data class FloatValue(
+        @JacksonXmlProperty(localName = "Key")
+        val key: String = "",
+
+        @JacksonXmlProperty(localName = "Value")
+        val value: Float = 0f,
     )
 
     /**
@@ -199,10 +225,21 @@ data class SaveData(
             teacherAssignments = teachers.associate { person ->
                 val teacher = Teacher(firstName = person.firstName, lastName = person.lastName)
                 val subjects = person.teacherSubjects!!.subjects
-                    .map { subjectNameToEnum(it) }
+                    .mapNotNull { subjectNameToEnum(it) }
                     .toSet()
 
                 teacher to subjects
+            },
+            teacherExperience = teachers.associate { person ->
+                val teacher = Teacher(firstName = person.firstName, lastName = person.lastName)
+                val expMap = person.subjectInstanceExp!!.items
+                    .mapNotNull { (key, value) ->
+                        subjectNameToEnum(key)?.let { subject ->
+                            subject to value.coerceIn(0f..100f)
+                        }
+                    }
+                    .toMap()
+                teacher to expMap
             },
             subjectFrequency = nonEmptyClasses.map { it.toSubjectFrequency() },
         )
@@ -225,14 +262,13 @@ data class SaveData(
          * Convert [subjectName] from game save XML to a [Subject], which requires a bit of transformation from its
          * [Subject.prettyName].
          */
-        private fun subjectNameToEnum(subjectName: String): Subject {
+        private fun subjectNameToEnum(subjectName: String): Subject? {
             if (subjectName.isEmpty()) return Subject.EMPTY
 
             val transformedName = subjectName
                 .replace("Sex Education", "Sex Ed")
                 .replace("Anatomy Class", "Anatomy")
             return Subject.values().firstOrNull { it.prettyName == transformedName }
-                ?: error("no Subject matching $subjectName")
         }
 
         /**

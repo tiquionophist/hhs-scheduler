@@ -35,6 +35,9 @@ data class ThemeColors(
     val surface3: Color = materialColors.surface,
 
     val disabledAlpha: Float = 0.3f,
+
+    val expStart: Color = Color.Red.copy(alpha = disabledAlpha),
+    val expStop: Color = Color.Green.copy(alpha = disabledAlpha),
 ) {
     companion object {
         private val light = ThemeColors(

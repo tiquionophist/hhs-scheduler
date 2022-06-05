@@ -52,6 +52,13 @@ data class ScheduleConfiguration(
     val teacherAssignments: Map<Teacher, Set<Subject>> = emptyMap(),
 
     /**
+     * A map from each [Teacher] to a map from each [Subject] to their experience in that subject, from 0 to 100.
+     *
+     * Only populated when loading from a save file.
+     */
+    val teacherExperience: Map<Teacher, Map<Subject, Float>>? = null,
+
+    /**
      * For each class, a map from each [Subject] to the number of times per week it ought to be taught for that class
      * (including free periods).
      */

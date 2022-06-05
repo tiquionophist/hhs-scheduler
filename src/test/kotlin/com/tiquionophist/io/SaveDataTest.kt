@@ -107,17 +107,28 @@ internal class SaveDataTest {
                                 SaveData.Person(
                                     firstName = "First1",
                                     lastName = "Last1",
-                                    teacherSubjects = SaveData.TeacherSubjects(subjects = listOf())
+                                    teacherSubjects = SaveData.TeacherSubjects(subjects = listOf()),
+                                    subjectFamilyExp = SaveData.SubjectExp(items = listOf()),
+                                    subjectInstanceExp = SaveData.SubjectExp(items = listOf()),
                                 ),
                                 SaveData.Person(
                                     firstName = "First2",
                                     lastName = "Last2",
-                                    teacherSubjects = SaveData.TeacherSubjects(subjects = listOf("s1", "s2", "s3"))
+                                    teacherSubjects = SaveData.TeacherSubjects(subjects = listOf("s1", "s2", "s3")),
+                                    subjectFamilyExp = SaveData.SubjectExp(items = listOf()),
+                                    subjectInstanceExp = SaveData.SubjectExp(
+                                        items = listOf(
+                                            SaveData.FloatValue("s1", 3.14f),
+                                            SaveData.FloatValue("s2", 100f),
+                                        )
+                                    ),
                                 ),
                                 SaveData.Person(
                                     firstName = "First3",
                                     lastName = "Last3",
-                                    teacherSubjects = SaveData.TeacherSubjects(subjects = listOf("x1"))
+                                    teacherSubjects = SaveData.TeacherSubjects(subjects = listOf("x1")),
+                                    subjectFamilyExp = SaveData.SubjectExp(items = listOf()),
+                                    subjectInstanceExp = SaveData.SubjectExp(items = listOf()),
                                 ),
                             )
                         )
@@ -131,6 +142,8 @@ internal class SaveDataTest {
                                     <Forename>First1</Forename>
                                     <Lastname>Last1</Lastname>
                                     <TeacherSubjects/>
+                                    <SubjectFamilyExp/>
+                                    <SubjectInstanceExp/>
                                 </Person>
 
                                 <Person>
@@ -141,6 +154,17 @@ internal class SaveDataTest {
                                         <string>s2</string>
                                         <string>s3</string>
                                     </TeacherSubjects>
+                                    <SubjectFamilyExp/>
+                                    <SubjectInstanceExp>
+                                        <Item>
+                                            <Key>s1</Key>
+                                            <Value>3.14</Value>
+                                        </Item>
+                                        <Item>
+                                            <Key>s2</Key>
+                                            <Value>100.0</Value>
+                                        </Item>
+                                    </SubjectInstanceExp>
                                 </Person>
 
                                 <Person>
@@ -149,6 +173,8 @@ internal class SaveDataTest {
                                     <TeacherSubjects>
                                         <string>x1</string>
                                     </TeacherSubjects>
+                                    <SubjectFamilyExp/>
+                                    <SubjectInstanceExp/>
                                 </Person>
                             </ListPerson1>
                         </SaveData>

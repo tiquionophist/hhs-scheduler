@@ -25,6 +25,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.lerp
 import androidx.compose.ui.graphics.painter.BitmapPainter
 import androidx.compose.ui.text.style.TextAlign
 import com.tiquionophist.core.ScheduleConfiguration
@@ -299,6 +300,8 @@ private class SubjectTeacherAssignmentsColumn(private val teacher: Teacher) : Co
         val currentAssignments = config.teacherAssignments.getOrDefault(teacher, emptySet())
         val contains = currentAssignments.contains(value)
 
+        val teacherExp = config.teacherExperience?.get(teacher)
+
         Box(
             modifier = Modifier
                 .clickable {
@@ -316,10 +319,20 @@ private class SubjectTeacherAssignmentsColumn(private val teacher: Teacher) : Co
                 }
                 .fillMaxSize()
                 .background(
-                    color = if (contains) {
-                        ThemeColors.current.selected.copy(alpha = ThemeColors.current.disabledAlpha)
-                    } else {
-                        Color.Unspecified
+                    color = when {
+                        GlobalState.showTeacherExp -> {
+                            teacherExp?.get(value)
+                                ?.let { exp ->
+                                    lerp(
+                                        start = ThemeColors.current.expStart,
+                                        stop = ThemeColors.current.expStop,
+                                        fraction = exp / 100,
+                                    )
+                                }
+                                ?: Color.Unspecified
+                        }
+                        contains -> ThemeColors.current.selected.copy(alpha = ThemeColors.current.disabledAlpha)
+                        else -> Color.Unspecified
                     }
                 ),
         ) {
