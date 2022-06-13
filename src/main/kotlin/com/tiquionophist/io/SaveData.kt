@@ -299,7 +299,6 @@ data class SaveData(
 
             val transformedName = subjectName
                 .replace("Sex Education", "Sex Ed")
-                .replace("Anatomy Class", "Anatomy")
             return Subject.values().firstOrNull { it.prettyName == transformedName }
         }
 
@@ -312,7 +311,6 @@ data class SaveData(
 
             return subject.prettyName
                 .replace("Sex Ed", "Sex Education")
-                .replace("Anatomy", "Anatomy Class")
         }
     }
 }
