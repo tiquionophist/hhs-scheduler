@@ -97,9 +97,13 @@ object ScheduleConfigurationFixtures {
             Teacher.CARMEN_SMITH to setOf(Subject.ART),
             Teacher.CLAIRE_FUZUSHI to setOf(Subject.SCHOOL_SPORT, Subject.SWIMMING),
             Teacher.JESSICA_UNDERWOOD to setOf(Subject.ANATOMY, Subject.COMPUTER_SCIENCE),
-            Teacher.NINA_PARKER to setOf(Subject.THEORETICAL_SEX_ED),
+            Teacher.NINA_PARKER to setOf(Subject.THEORETICAL_SEX_EDUCATION),
             Teacher.RONDA_BELLS to setOf(Subject.SCHOOL_SPORT, Subject.SWIMMING),
-            Teacher.SAMANTHA_KELLER to setOf(Subject.BONDAGE, Subject.PRACTICAL_SEX_ED, Subject.THEORETICAL_SEX_ED),
+            Teacher.SAMANTHA_KELLER to setOf(
+                Subject.BONDAGE,
+                Subject.PRACTICAL_SEX_EDUCATION,
+                Subject.THEORETICAL_SEX_EDUCATION,
+            ),
         ),
         subjectFrequency = List(6) {
             mapOf(
@@ -110,11 +114,11 @@ object ScheduleConfigurationFixtures {
                 Subject.COMPUTER_SCIENCE to 2,
                 Subject.MATH to 3,
                 Subject.PHILOSOPHY to 2,
-                Subject.PRACTICAL_SEX_ED to 1,
+                Subject.PRACTICAL_SEX_EDUCATION to 1,
                 Subject.RELIGION to 1,
                 Subject.SCHOOL_SPORT to 1,
                 Subject.SWIMMING to 2,
-                Subject.THEORETICAL_SEX_ED to 1,
+                Subject.THEORETICAL_SEX_EDUCATION to 1,
             )
         },
     )
@@ -130,9 +134,17 @@ object ScheduleConfigurationFixtures {
             Teacher.CLAIRE_FUZUSHI to setOf(Subject.SCHOOL_SPORT, Subject.SWIMMING),
             Teacher.JESSICA_UNDERWOOD to setOf(Subject.ANATOMY, Subject.COMPUTER_SCIENCE),
             Teacher.LARA_ELLIS to setOf(Subject.ENGLISH, Subject.GEOGRAPHY, Subject.HISTORY),
-            Teacher.NINA_PARKER to setOf(Subject.BONDAGE, Subject.PRACTICAL_SEX_ED, Subject.THEORETICAL_SEX_ED),
+            Teacher.NINA_PARKER to setOf(
+                Subject.BONDAGE,
+                Subject.PRACTICAL_SEX_EDUCATION,
+                Subject.THEORETICAL_SEX_EDUCATION,
+            ),
             Teacher.RONDA_BELLS to setOf(Subject.SCHOOL_SPORT, Subject.SWIMMING),
-            Teacher.SAMANTHA_KELLER to setOf(Subject.BONDAGE, Subject.PRACTICAL_SEX_ED, Subject.THEORETICAL_SEX_ED),
+            Teacher.SAMANTHA_KELLER to setOf(
+                Subject.BONDAGE,
+                Subject.PRACTICAL_SEX_EDUCATION,
+                Subject.THEORETICAL_SEX_EDUCATION,
+            ),
         ),
         subjectFrequency = List(8) {
             mapOf(
@@ -146,11 +158,11 @@ object ScheduleConfigurationFixtures {
                 Subject.HISTORY to 1,
                 Subject.MATH to 2,
                 Subject.PHILOSOPHY to 1,
-                Subject.PRACTICAL_SEX_ED to 1,
+                Subject.PRACTICAL_SEX_EDUCATION to 1,
                 Subject.RELIGION to 1,
                 Subject.SCHOOL_SPORT to 1,
                 Subject.SWIMMING to 2,
-                Subject.THEORETICAL_SEX_ED to 1,
+                Subject.THEORETICAL_SEX_EDUCATION to 1,
                 Subject.EMPTY to 1,
             )
         },

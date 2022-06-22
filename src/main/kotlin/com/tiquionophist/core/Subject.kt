@@ -78,7 +78,7 @@ enum class Subject(
         classrooms = EnumSet.of(Classroom.CHEMISTRY),
         stats = StatSet(Stat.INTELLIGENCE to "0.3")
     ),
-    PRACTICAL_SEX_ED(
+    PRACTICAL_SEX_EDUCATION(
         stats = StatSet(
             Stat.AROUSAL to "5.0",
             Stat.CORRUPTION to "0.05",
@@ -99,7 +99,7 @@ enum class Subject(
         classrooms = EnumSet.of(Classroom.SWIMMING_POOL),
         stats = StatSet(Stat.STAMINA to "0.6", Stat.HAPPINESS to "0.1", Stat.CHARISMA to "0.05")
     ),
-    THEORETICAL_SEX_ED(
+    THEORETICAL_SEX_EDUCATION(
         stats = StatSet(
             Stat.AROUSAL to "1.0",
             Stat.CORRUPTION to "0.05",
