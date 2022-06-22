@@ -121,7 +121,7 @@ data class ScheduleConfiguration(
     fun classStats(classIndex: Int): StatSet {
         return subjectFrequency[classIndex]
             .flatMap { (subject, times) -> List(times) { subject.stats } }
-            .sum()
+            .fold(StatSet()) { acc, stats -> acc + stats }
     }
 
     /**

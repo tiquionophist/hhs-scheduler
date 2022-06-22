@@ -51,14 +51,3 @@ data class StatSet(val stats: EnumMap<Stat, BigDecimal>) {
         return StatSet(stats = map)
     }
 }
-
-/**
- * Sums these [StatSet]s.
- */
-fun Iterable<StatSet>.sum(): StatSet {
-    var sum = StatSet()
-    for (element in this) {
-        sum += element
-    }
-    return sum
-}
