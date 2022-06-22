@@ -22,7 +22,7 @@ import com.tiquionophist.ui.Dimens
 fun ConfirmationDialog(
     windowTitle: String,
     prompt: String,
-    cancelText: String = "Cancel",
+    cancelText: String? = "Cancel",
     acceptText: String = "OK",
     onAccept: () -> Unit = {},
     onDecline: () -> Unit = {},
@@ -44,8 +44,10 @@ fun ConfirmationDialog(
                     modifier = Modifier.align(Alignment.End),
                     horizontalArrangement = Arrangement.spacedBy(Dimens.SPACING_2),
                 ) {
-                    TextButton(onClick = onDecline) {
-                        Text(cancelText)
+                    if (cancelText != null) {
+                        TextButton(onClick = onDecline) {
+                            Text(cancelText)
+                        }
                     }
 
                     Button(onClick = onAccept) {

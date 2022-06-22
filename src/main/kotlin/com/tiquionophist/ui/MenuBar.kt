@@ -10,6 +10,7 @@ import androidx.compose.ui.window.FrameWindowScope
 import androidx.compose.ui.window.MenuBar
 import com.tiquionophist.core.ScheduleConfiguration
 import com.tiquionophist.io.SaveFileIO
+import com.tiquionophist.ui.common.ConfirmationDialog
 import com.tiquionophist.ui.common.ErrorDialog
 import com.tiquionophist.ui.common.FilePicker
 import com.tiquionophist.ui.common.Notification
@@ -33,11 +34,23 @@ private val appVersion: String? by lazy { appProperties?.getProperty("version") 
 @Composable
 fun FrameWindowScope.MenuBar() {
     val throwableState = remember { mutableStateOf<Throwable?>(null) }
+    val confirmConfigurationState = remember { mutableStateOf(false) }
 
     throwableState.value?.let { throwable ->
         ErrorDialog(
             throwable = throwable,
             onClose = { throwableState.value = null }
+        )
+    }
+
+    if (confirmConfigurationState.value) {
+        ConfirmationDialog(
+            windowTitle = "Confirm imported schedule configuration",
+            prompt = "The imported schedule has different subject frequencies across classes so per-class " +
+                "scheduling has been enabled. Disable it to have subjects taught the same amount across all classes.",
+            cancelText = null,
+            onAccept = { confirmConfigurationState.value = false },
+            onDecline = { confirmConfigurationState.value = false },
         )
     }
 
@@ -138,7 +151,15 @@ fun FrameWindowScope.MenuBar() {
                                     iconTint = tint,
                                 )
 
-                                GlobalState.scheduleConfiguration = result.getOrThrow()
+                                val configuration = result.getOrThrow()
+                                val sameSubjectFrequencyInAllClasses = configuration.subjectFrequency.toSet().size == 1
+
+                                GlobalState.scheduleConfiguration = configuration
+                                GlobalState.currentClassIndex = if (sameSubjectFrequencyInAllClasses) null else 0
+
+                                if (!sameSubjectFrequencyInAllClasses) {
+                                    confirmConfigurationState.value = true
+                                }
                             } else {
                                 throwableState.value = result.exceptionOrNull()
                             }

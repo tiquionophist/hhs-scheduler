@@ -10,8 +10,6 @@ import androidx.compose.material.LocalMinimumTouchTargetEnforcement
 import androidx.compose.material.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
@@ -56,9 +54,6 @@ fun main() {
 
 @Composable
 private fun MainContent() {
-    // null when all classes are the same, otherwise the index of the class being controlled now
-    val classIndexState = remember { mutableStateOf<Int?>(null) }
-
     ContentWithPane(
         direction = PaneDirection.BOTTOM,
         content = {
@@ -73,9 +68,9 @@ private fun MainContent() {
                             Box(
                                 modifier = Modifier
                                     .fillMaxHeightVerticalScroll(verticalScrollState)
-                                    .fillMaxWidthHorizontalScroll(horizontalScrollState)
+                                    .fillMaxWidthHorizontalScroll(horizontalScrollState),
                             ) {
-                                ScheduleConfigurationTable(classIndexState = classIndexState)
+                                ScheduleConfigurationTable()
                             }
 
                             VerticalScrollbar(
@@ -90,9 +85,9 @@ private fun MainContent() {
                         }
                     }
                 },
-                pane = { StatsPane(classIndex = classIndexState.value) }
+                pane = { StatsPane() }
             )
         },
-        pane = { SettingsPane(classIndexState = classIndexState) }
+        pane = { SettingsPane() }
     )
 }

@@ -20,6 +20,9 @@ object GlobalState {
     var customTeachers by mutableStateOf(emptySet<Teacher>())
     var computedSchedules by mutableStateOf(listOf<ComputedSchedule>())
 
+    // null when all classes are the same, otherwise the index of the class being controlled now
+    var currentClassIndex by mutableStateOf<Int?>(null)
+
     var showLexvilleTeachers by mutableStateOf(false)
     var showUnusedSubjects by mutableStateOf(true)
     var showLockedSubjects by mutableStateOf(false)

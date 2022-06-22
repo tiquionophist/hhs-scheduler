@@ -20,7 +20,6 @@ import androidx.compose.material.LocalContentColor
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -118,9 +117,7 @@ private class SubjectNameColumn(private val classIndex: Int?) : ColumnWithHeader
 /**
  * A column displaying a number picker for the frequency of each [Subject] in the schedule.
  */
-private class SubjectFrequencyPickerColumn(
-    private val classIndexState: MutableState<Int?>,
-) : ColumnWithHeader<Subject> {
+private object SubjectFrequencyPickerColumn : ColumnWithHeader<Subject> {
     override val headerVerticalAlignment = Alignment.Bottom
 
     @Composable
@@ -129,7 +126,7 @@ private class SubjectFrequencyPickerColumn(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.spacedBy(Dimens.SPACING_2),
         ) {
-            val classIndex = classIndexState.value
+            val classIndex = GlobalState.currentClassIndex
             val perClassSchedulingEnabled = classIndex != null
 
             if (perClassSchedulingEnabled) {
@@ -139,7 +136,7 @@ private class SubjectFrequencyPickerColumn(
                     value = classIndex!! + 1,
                     min = 1,
                     max = GlobalState.scheduleConfiguration.classes,
-                    onValueChange = { classIndexState.value = it - 1 }
+                    onValueChange = { GlobalState.currentClassIndex = it - 1 }
                 )
             }
 
@@ -152,7 +149,7 @@ private class SubjectFrequencyPickerColumn(
                 CheckboxWithLabel(
                     checked = perClassSchedulingEnabled,
                     onCheckedChange = {
-                        classIndexState.value = if (perClassSchedulingEnabled) null else 0
+                        GlobalState.currentClassIndex = if (perClassSchedulingEnabled) null else 0
 
                         // if disabling per-class scheduling, reset all subject frequencies to the frequencies
                         // of the first class
@@ -181,7 +178,7 @@ private class SubjectFrequencyPickerColumn(
     @Composable
     override fun itemContent(value: Subject) {
         val config = GlobalState.scheduleConfiguration
-        val classIndex = classIndexState.value
+        val classIndex = GlobalState.currentClassIndex
         val subjectLocked = config.allowedSubjects?.get(value) == false
         if (value == Subject.EMPTY) {
             Text(
@@ -375,7 +372,7 @@ private fun SubjectLockedIcon(subject: Subject) {
  * A grid-based view of the teacher/subject assignments and frequencies in [GlobalState.scheduleConfiguration].
  */
 @Composable
-fun ScheduleConfigurationTable(classIndexState: MutableState<Int?>) {
+fun ScheduleConfigurationTable() {
     val configuration = GlobalState.scheduleConfiguration
     val scheduledTeachers = configuration.teacherAssignments.keys
 
@@ -401,10 +398,10 @@ fun ScheduleConfigurationTable(classIndexState: MutableState<Int?>) {
     }
 
     val fixedColumns = listOf(
-        SubjectIconColumn(classIndex = classIndexState.value),
-        SubjectNameColumn(classIndex = classIndexState.value),
-        SubjectFrequencyPickerColumn(classIndexState = classIndexState),
-        TotalTeacherAssignmentsColumn(classIndex = classIndexState.value),
+        SubjectIconColumn(classIndex = GlobalState.currentClassIndex),
+        SubjectNameColumn(classIndex = GlobalState.currentClassIndex),
+        SubjectFrequencyPickerColumn,
+        TotalTeacherAssignmentsColumn(classIndex = GlobalState.currentClassIndex),
     )
 
     val fixedRows = listOf(null)
@@ -412,7 +409,7 @@ fun ScheduleConfigurationTable(classIndexState: MutableState<Int?>) {
     val subjectRows = remember(GlobalState.showUnusedSubjects, GlobalState.showLockedSubjects, configuration) {
         subjects
             .filter {
-                val enabled = configuration.subjectEnabled(subject = it, classIndex = classIndexState.value)
+                val enabled = configuration.subjectEnabled(subject = it, classIndex = GlobalState.currentClassIndex)
                 val locked = configuration.allowedSubjects?.get(it) == false
 
                 (GlobalState.showUnusedSubjects || enabled) && (GlobalState.showLockedSubjects || !locked)

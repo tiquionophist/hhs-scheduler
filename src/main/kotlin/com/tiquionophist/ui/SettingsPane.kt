@@ -23,7 +23,6 @@ import androidx.compose.material.Text
 import androidx.compose.material.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
-import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -46,7 +45,7 @@ import com.tiquionophist.util.prettyName
  * Row of scheduling-wide settings, placed at the bottom of the window.
  */
 @Composable
-fun SettingsPane(classIndexState: MutableState<Int?>) {
+fun SettingsPane() {
     Surface(color = ThemeColors.current.surface3) {
         Row(
             modifier = Modifier.fillMaxWidth().padding(horizontal = Dimens.SPACING_3, vertical = Dimens.SPACING_2),
@@ -102,14 +101,14 @@ fun SettingsPane(classIndexState: MutableState<Int?>) {
                         onValueChange = { newValue ->
                             // if we're adding new classes, we need to add new subject frequencies. Copy them from the
                             // currently selected class frequencies
-                            val currentFrequency = config.subjectFrequency[classIndexState.value ?: 0]
+                            val currentFrequency = config.subjectFrequency[GlobalState.currentClassIndex ?: 0]
                             val missingFrequencies = List((newValue - config.classes).coerceAtLeast(0)) {
                                 currentFrequency
                             }
 
                             val droppedFrequencies = (config.classes - newValue).coerceAtLeast(0)
 
-                            classIndexState.value = classIndexState.value?.coerceAtMost(newValue - 1)
+                            GlobalState.currentClassIndex = GlobalState.currentClassIndex?.coerceAtMost(newValue - 1)
                             GlobalState.scheduleConfiguration = config.copy(
                                 classes = newValue,
                                 subjectFrequency = config.subjectFrequency
