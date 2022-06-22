@@ -32,6 +32,7 @@ fun MatchingWidthColumn(
                     it.maxIntrinsicWidth(constraints.maxHeight)
                 }
             }
+                .coerceAtLeast(constraints.minWidth)
 
             val placeables = measurables.map {
                 it.measure(constraints.copy(minWidth = goalWidth, maxWidth = goalWidth))

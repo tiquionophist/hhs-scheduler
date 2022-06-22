@@ -157,6 +157,7 @@ fun <T> Table(
     verticalDividers: Map<Int, TableDivider> = mapOf(),
     horizontalDividers: Map<Int, TableDivider> = mapOf(),
     fillMaxHeight: Boolean = false,
+    fillMaxWidth: Boolean = false,
     modifier: Modifier = Modifier
 ) {
     val numCols = columns.size
@@ -315,6 +316,18 @@ fun <T> Table(
                         val ratio = (totalRowHeight + missing).toFloat() / totalRowHeight
                         repeat(numRows) { rowIndex ->
                             rowHeights[rowIndex] = (rowHeights[rowIndex] * ratio).roundToInt()
+                        }
+                    }
+                }
+
+                if (fillMaxWidth) {
+                    val totalRowWidth = colWidths.sumOf { requireNotNull(it) { "null col width" } }
+                    val baseTotalWidth = totalRowWidth + verticalDividerWidths.values.sum()
+                    val missing = constraints.maxWidth - baseTotalWidth
+                    if (missing > 0) {
+                        val ratio = (totalRowWidth + missing).toFloat() / totalRowWidth
+                        repeat(numCols) { colIndex ->
+                            colWidths[colIndex] = (colWidths[colIndex]!! * ratio).roundToInt()
                         }
                     }
                 }

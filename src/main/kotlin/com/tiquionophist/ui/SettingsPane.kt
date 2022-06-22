@@ -193,9 +193,7 @@ fun SettingsPane() {
                                     ) {
                                         Text(text = classroomFillOrder.prettyName)
 
-                                        CompositionLocalProvider(
-                                            LocalContentAlpha provides ContentAlpha.disabled
-                                        ) {
+                                        CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.disabled) {
                                             Text(
                                                 text = classroomFillOrder.description,
                                                 fontSize = Dimens.FONT_SMALL,

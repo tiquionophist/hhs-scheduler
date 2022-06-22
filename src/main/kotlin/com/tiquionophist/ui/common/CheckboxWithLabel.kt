@@ -28,11 +28,12 @@ fun CheckboxWithLabel(
     padding: PaddingValues = PaddingValues(all = Dimens.SPACING_2),
     checkboxPadding: Dp = Dimens.SPACING_2,
     colors: CheckboxColors = CheckboxDefaults.colors(checkedColor = ThemeColors.current.selected),
+    verticalAlignment: Alignment.Vertical = Alignment.CenterVertically,
     content: @Composable () -> Unit,
 ) {
     Row(
         modifier = modifier.clickable(enabled = enabled) { onCheckedChange(!checked) }.padding(padding),
-        verticalAlignment = Alignment.CenterVertically,
+        verticalAlignment = verticalAlignment,
     ) {
         Checkbox(checked = checked, enabled = enabled, onCheckedChange = null, colors = colors)
 

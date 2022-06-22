@@ -1,18 +1,24 @@
 package com.tiquionophist.ui
 
 import androidx.compose.foundation.VerticalScrollbar
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.rememberScrollbarAdapter
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.ContentAlpha
+import androidx.compose.material.LocalContentAlpha
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -24,7 +30,7 @@ import com.tiquionophist.ui.common.Column
 import com.tiquionophist.ui.common.MatchingWidthColumn
 import com.tiquionophist.ui.common.Table
 import com.tiquionophist.ui.common.TableDivider
-import com.tiquionophist.ui.common.Tooltip
+import com.tiquionophist.ui.common.fillParent
 import com.tiquionophist.util.prettyName
 import java.math.BigDecimal
 import java.text.DecimalFormat
@@ -63,9 +69,9 @@ private object StatValueColumn : Column<Pair<Stat, BigDecimal>> {
 @Composable
 fun StatsPane() {
     Surface(color = ThemeColors.current.surface2) {
-        Box(modifier = Modifier.fillMaxHeight()) {
+        Box {
             val scrollState = rememberScrollState()
-            MatchingWidthColumn(Modifier.verticalScroll(scrollState), min = false) {
+            MatchingWidthColumn(Modifier.verticalScroll(scrollState).widthIn(min = 300.dp), min = false) {
                 Text(
                     maxLines = 1,
                     text = "Weekly class effects",
@@ -80,7 +86,6 @@ fun StatsPane() {
                         .sortedBy { it.first.prettyName }
                 }
 
-                // TODO use new column width which fills remaining space but has minimum of ColumnWidth.MatchContent
                 Table(
                     columns = listOf(StatNameColumn, StatValueColumn),
                     rows = stats,
@@ -97,7 +102,9 @@ fun StatsPane() {
                                 ThemeColors.current.weakDivider
                             }
                         )
-                    }.toMap()
+                    }.toMap(),
+                    fillMaxWidth = true,
+                    modifier = Modifier.width(IntrinsicSize.Min),
                 )
 
                 Spacer(Modifier.height(Dimens.SPACING_3))
@@ -109,19 +116,7 @@ fun StatsPane() {
                     Text(text = "Show unused subjects", maxLines = 1)
                 }
 
-                Tooltip(
-                    "Whether to show subjects which have not been unlocked in the school; only available after " +
-                        "importing from a game save file."
-                ) {
-                    CheckboxWithLabel(
-                        modifier = Modifier.fillMaxWidth(),
-                        checked = GlobalState.showLockedSubjects,
-                        onCheckedChange = { GlobalState.showLockedSubjects = it },
-                        enabled = GlobalState.scheduleConfiguration.allowedSubjects != null,
-                    ) {
-                        Text(text = "Show locked subjects", maxLines = 1)
-                    }
-                }
+                Spacer(Modifier.height(Dimens.SPACING_2))
 
                 CheckboxWithLabel(
                     checked = GlobalState.showUnusedTeachers,
@@ -130,17 +125,45 @@ fun StatsPane() {
                     Text(text = "Show unused teachers", maxLines = 1)
                 }
 
-                Tooltip(
-                    "Whether to display the subject experience each teacher has in the scheduling table; " +
-                        "only available after importing from a game save file."
+                Spacer(Modifier.height(Dimens.SPACING_2))
+
+                CheckboxWithLabel(
+                    checked = GlobalState.showLockedSubjects,
+                    onCheckedChange = { GlobalState.showLockedSubjects = it },
+                    enabled = GlobalState.scheduleConfiguration.allowedSubjects != null,
                 ) {
-                    CheckboxWithLabel(
-                        modifier = Modifier.fillMaxWidth(),
-                        checked = GlobalState.showTeacherExp,
-                        onCheckedChange = { GlobalState.showTeacherExp = it },
-                        enabled = GlobalState.scheduleConfiguration.teacherExperience != null,
-                    ) {
-                        Text(text = "Show teacher exp", maxLines = 1)
+                    Column(verticalArrangement = Arrangement.spacedBy(Dimens.SPACING_1)) {
+                        Text(text = "Show locked subjects", maxLines = 1)
+
+                        CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.disabled) {
+                            Text(
+                                text = "Whether to show subjects which have not been unlocked in the school; " +
+                                    "only available after importing from a game save file.",
+                                fontSize = Dimens.FONT_SMALL,
+                                modifier = Modifier.fillParent(),
+                            )
+                        }
+                    }
+                }
+
+                Spacer(Modifier.height(Dimens.SPACING_2))
+
+                CheckboxWithLabel(
+                    checked = GlobalState.showTeacherExp,
+                    onCheckedChange = { GlobalState.showTeacherExp = it },
+                    enabled = GlobalState.scheduleConfiguration.teacherExperience != null,
+                ) {
+                    Column(verticalArrangement = Arrangement.spacedBy(Dimens.SPACING_1)) {
+                        Text(text = "Show teacher experience", maxLines = 1)
+
+                        CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.disabled) {
+                            Text(
+                                text = "Whether to display the subject experience each teacher has in the scheduling " +
+                                    "table; only available after importing from a game save file.",
+                                fontSize = Dimens.FONT_SMALL,
+                                modifier = Modifier.fillParent(),
+                            )
+                        }
                     }
                 }
             }
