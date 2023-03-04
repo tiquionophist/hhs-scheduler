@@ -1,5 +1,5 @@
 complexity:
-  ComplexMethod:
+  CyclomaticComplexMethod:
     active: false
   NestedBlockDepth:
     active: false
