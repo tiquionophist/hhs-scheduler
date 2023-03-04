@@ -35,9 +35,7 @@ fun main() {
         ) {
             ThemeColors.apply(light = ApplicationPreferences.lightMode) {
                 Dimens.apply {
-                    CompositionLocalProvider(
-                        LocalMinimumTouchTargetEnforcement provides false
-                    ) {
+                    CompositionLocalProvider(LocalMinimumTouchTargetEnforcement provides false) {
                         MenuBar()
                         CustomTeacherDialogHandler.content()
                         ScheduleWindowHandler.content()

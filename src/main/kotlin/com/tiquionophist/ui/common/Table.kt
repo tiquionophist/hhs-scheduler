@@ -26,6 +26,9 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.tiquionophist.ui.Dimens
 import com.tiquionophist.ui.ThemeColors
+import kotlinx.collections.immutable.ImmutableList
+import kotlinx.collections.immutable.ImmutableMap
+import kotlinx.collections.immutable.persistentMapOf
 import kotlin.math.max
 import kotlin.math.roundToInt
 
@@ -152,13 +155,13 @@ data class TableDivider(
  */
 @Composable
 fun <T> Table(
-    columns: List<Column<T>>,
-    rows: List<T>,
-    verticalDividers: Map<Int, TableDivider> = mapOf(),
-    horizontalDividers: Map<Int, TableDivider> = mapOf(),
+    columns: ImmutableList<Column<T>>,
+    rows: ImmutableList<T>,
+    verticalDividers: ImmutableMap<Int, TableDivider> = persistentMapOf(),
+    horizontalDividers: ImmutableMap<Int, TableDivider> = persistentMapOf(),
     fillMaxHeight: Boolean = false,
     fillMaxWidth: Boolean = false,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     val numCols = columns.size
     val numRows = rows.size

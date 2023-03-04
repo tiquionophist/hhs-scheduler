@@ -35,7 +35,7 @@ import kotlinx.coroutines.launch
 private sealed class ExportStatus {
     object NotStarted : ExportStatus()
     object InProgress : ExportStatus()
-    class Error(val throwable: Throwable) : ExportStatus()
+    data class Error(val throwable: Throwable) : ExportStatus()
     object Success : ExportStatus()
 }
 

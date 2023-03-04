@@ -25,6 +25,8 @@ import com.tiquionophist.ui.common.ColumnWithHeader
 import com.tiquionophist.ui.common.Table
 import com.tiquionophist.ui.common.TableDivider
 import com.tiquionophist.util.prettyName
+import kotlinx.collections.immutable.toImmutableList
+import kotlinx.collections.immutable.toImmutableMap
 
 /**
  * A column which displays the period number for each period index row.
@@ -132,11 +134,11 @@ fun ScheduleTable(configuration: ScheduleConfiguration, schedule: Schedule, clas
             ScheduleDayColumn(dayName = dayNames[day], lessons = chunkedLessons[day])
         }
 
-        listOf(periodNamesColumn).plus(scheduleDayColumns)
+        listOf(periodNamesColumn).plus(scheduleDayColumns).toImmutableList()
     }
 
     val rows = remember(configuration.periodsPerDay) {
-        listOf(null).plus(List(configuration.periodsPerDay) { it })
+        listOf(null).plus(List(configuration.periodsPerDay) { it }).toImmutableList()
     }
 
     Table(
@@ -147,12 +149,12 @@ fun ScheduleTable(configuration: ScheduleConfiguration, schedule: Schedule, clas
             rowIndex + 1 to TableDivider(
                 color = if (rowIndex == 0) ThemeColors.current.divider else ThemeColors.current.weakDivider
             )
-        }.toMap(),
+        }.toMap().toImmutableMap(),
         // strong divider after the period name column, weak dividers between each day column
         verticalDividers = List(columns.size - 1) { colIndex ->
             colIndex + 1 to TableDivider(
                 color = if (colIndex == 0) ThemeColors.current.divider else ThemeColors.current.weakDivider
             )
-        }.toMap(),
+        }.toMap().toImmutableMap(),
     )
 }

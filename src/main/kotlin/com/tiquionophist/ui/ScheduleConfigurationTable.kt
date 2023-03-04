@@ -41,6 +41,8 @@ import com.tiquionophist.ui.common.TableDivider
 import com.tiquionophist.ui.common.Tooltip
 import com.tiquionophist.util.pluralizedCount
 import com.tiquionophist.util.prettyName
+import kotlinx.collections.immutable.toImmutableList
+import kotlinx.collections.immutable.toImmutableMap
 
 /**
  * Subjects displayed in the table, in order.
@@ -424,8 +426,9 @@ fun ScheduleConfigurationTable() {
                 teachers.map { teacher ->
                     SubjectTeacherAssignmentsColumn(teacher)
                 }
-            ),
-        rows = fixedRows.plus(subjectRows),
+            )
+            .toImmutableList(),
+        rows = fixedRows.plus(subjectRows).toImmutableList(),
         fillMaxHeight = true,
         verticalDividers = mapOf(
             // strong divider after fixed columns
@@ -441,7 +444,7 @@ fun ScheduleConfigurationTable() {
             List(teachers.size - 1) { teacherIndex ->
                 Pair(teacherIndex + fixedColumns.size + 1, TableDivider(color = ThemeColors.current.weakDivider))
             }
-        ),
+        ).toImmutableMap(),
         horizontalDividers = mapOf(
             // strong divider after header row
             fixedRows.size to TableDivider(
@@ -453,6 +456,6 @@ fun ScheduleConfigurationTable() {
             List(subjectRows.size - 1) { subjectIndex ->
                 Pair(subjectIndex + fixedRows.size + 1, TableDivider(color = ThemeColors.current.weakDivider))
             }
-        ),
+        ).toImmutableMap(),
     )
 }

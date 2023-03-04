@@ -26,6 +26,7 @@ dependencies {
 
     implementation(compose.desktop.currentOs)
 
+    implementation("org.jetbrains.kotlinx:kotlinx-collections-immutable:0.3.5")
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.5.0")
     implementation("com.fasterxml.jackson.dataformat:jackson-dataformat-xml:2.14.2")
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.14.2")
@@ -38,11 +39,17 @@ tasks.withType<KotlinCompile>().configureEach {
     kotlinOptions {
         jvmTarget = "16"
         allWarningsAsErrors = true
+
+        val composeReportsDir = buildDir.resolve("compose").absolutePath
         freeCompilerArgs = listOf(
             "-opt-in=kotlin.time.ExperimentalTime",
             "-opt-in=kotlinx.serialization.ExperimentalSerializationApi",
             "-opt-in=androidx.compose.foundation.ExperimentalFoundationApi",
             "-opt-in=androidx.compose.ui.ExperimentalComposeUiApi",
+            "-P",
+            "plugin:androidx.compose.compiler.plugins.kotlin:metricsDestination=$composeReportsDir",
+            "-P",
+            "plugin:androidx.compose.compiler.plugins.kotlin:reportsDestination=$composeReportsDir",
         )
     }
 }

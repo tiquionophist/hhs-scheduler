@@ -1,5 +1,6 @@
 package com.tiquionophist.core
 
+import androidx.compose.runtime.Immutable
 import com.tiquionophist.util.prettyName
 import java.util.EnumMap
 
@@ -9,6 +10,7 @@ import java.util.EnumMap
  * The list is formatted as [classIndex -> [periodIndex -> lesson]], i.e. the class being taught for class index 1 and
  * period index 2 is classes[1][2].
  */
+@Immutable
 data class Schedule(val lessons: List<List<Lesson>>) {
     /**
      * Verifies that this schedule is valid, throwing an [IllegalArgumentException] if it is not.

@@ -1,5 +1,6 @@
 package com.tiquionophist.core
 
+import androidx.compose.runtime.Immutable
 import com.tiquionophist.scheduler.ClassroomFillOrder
 import com.tiquionophist.util.flattenToSet
 import com.tiquionophist.util.prettyName
@@ -14,6 +15,7 @@ import java.util.EnumMap
 /**
  * User-provided inputs that a generated schedule must satisfy.
  */
+@Immutable
 @Serializable
 data class ScheduleConfiguration(
     val daysPerWeek: Int = 5,
