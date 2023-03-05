@@ -221,6 +221,7 @@ private object SubjectFrequencyPickerColumn : ColumnWithHeader<Subject> {
             NumberPicker(
                 modifier = Modifier.padding(Dimens.SPACING_2),
                 value = config.subjectFrequency[classIndex ?: 0][value] ?: 0,
+                enabled = !subjectLocked,
                 onValueChange = { newValue ->
                     GlobalState.scheduleConfiguration = config.copy(
                         subjectFrequency = ScheduleConfiguration.fillFreePeriods(
@@ -238,7 +239,7 @@ private object SubjectFrequencyPickerColumn : ColumnWithHeader<Subject> {
                     )
                 },
                 min = 0,
-                max = if (subjectLocked) 0 else config.periodsPerWeek,
+                max = config.periodsPerWeek,
             )
         }
     }
@@ -375,6 +376,7 @@ private class SubjectTeacherAssignmentsColumn(private val teacher: Teacher) : Co
                 modifier = Modifier.align(Alignment.Center),
                 checked = contains,
                 onCheckedChange = null,
+                enabled = !subjectLocked,
                 colors = CheckboxDefaults.colors(checkedColor = ThemeColors.current.selected)
             )
 
