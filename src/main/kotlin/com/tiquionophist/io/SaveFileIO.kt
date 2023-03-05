@@ -45,30 +45,39 @@ object SaveFileIO {
             "must have $PERIODS_PER_WEEK periods/week"
         }
 
-        sourceFile.inputStream().use { inputStream ->
-            val reader: XMLStreamReader = XMLInputFactory.newFactory().createXMLStreamReader(inputStream)
-            destinationFile.outputStream().use { outputStream ->
-                val writer = XMLOutputFactory.newFactory().createXMLStreamWriter(outputStream)
-                reader.mirrorTo(writer) {
-                    if (reader.isStartElement && reader.localName == "Data") {
-                        val elementText = reader.elementText
-                        EncodingUtil.decodeAndUnzip(elementText).use { unzippedStream ->
-                            val encoded = EncodingUtil.zipAndEncode { zippedStream ->
-                                val dataReader = XMLInputFactory.newFactory().createXMLStreamReader(unzippedStream)
-                                val dataWriter = XMLOutputFactory.newFactory().createXMLStreamWriter(zippedStream)
+        try {
+            sourceFile.inputStream().use { inputStream ->
+                val reader: XMLStreamReader = XMLInputFactory.newFactory().createXMLStreamReader(inputStream)
+                destinationFile.outputStream().use { outputStream ->
+                    val writer = XMLOutputFactory.newFactory().createXMLStreamWriter(outputStream)
+                    reader.mirrorTo(writer) {
+                        if (reader.isStartElement && reader.localName == "Data") {
+                            val elementText = reader.elementText
+                            EncodingUtil.decodeAndUnzip(elementText).use { unzippedStream ->
+                                val encoded = EncodingUtil.zipAndEncode { zippedStream ->
+                                    val dataReader = XMLInputFactory.newFactory().createXMLStreamReader(unzippedStream)
+                                    val dataWriter = XMLOutputFactory.newFactory().createXMLStreamWriter(zippedStream)
 
-                                transformSaveData(schedule = schedule, reader = dataReader, writer = dataWriter)
+                                    transformSaveData(schedule = schedule, reader = dataReader, writer = dataWriter)
+                                }
+
+                                writer.writeCharacters(encoded)
+                                writer.writeEndElement()
                             }
 
-                            writer.writeCharacters(encoded)
-                            writer.writeEndElement()
+                            require(reader.isEndElement)
+                            reader.next()
                         }
-
-                        require(reader.isEndElement)
-                        reader.next()
                     }
                 }
             }
+        } catch (ex: Throwable) {
+            // attempt to delete partially-created destination file if an exception was thrown
+            try {
+                destinationFile.delete()
+            } catch (ignored: Throwable) {}
+
+            throw ex
         }
     }
 
