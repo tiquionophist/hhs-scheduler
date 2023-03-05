@@ -38,6 +38,9 @@ data class ThemeColors(
 
     val expStart: Color = Color.Red.copy(alpha = disabledAlpha),
     val expStop: Color = Color.Green.copy(alpha = disabledAlpha),
+
+    val good: Color,
+    val bad: Color,
 ) {
     companion object {
         private val light = ThemeColors(
@@ -49,6 +52,9 @@ data class ThemeColors(
             surface1 = Color(all = 248),
             surface2 = Color(all = 234),
             surface3 = Color(all = 220),
+
+            good = Color(18, 153, 10),
+            bad = Color(221, 13, 3),
         )
         private val dark = ThemeColors(
             materialColors = darkColors(),
@@ -59,6 +65,9 @@ data class ThemeColors(
             surface1 = Color(all = 22),
             surface2 = Color(all = 36),
             surface3 = Color(all = 50),
+
+            good = Color(33, 203, 11),
+            bad = Color(253, 18, 2),
         )
 
         val current: ThemeColors

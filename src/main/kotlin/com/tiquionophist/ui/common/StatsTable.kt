@@ -22,7 +22,9 @@ import kotlinx.collections.immutable.toImmutableMap
 import java.math.BigDecimal
 
 @Immutable
-private data class StatValue(val value: BigDecimal)
+private data class StatValue(val value: BigDecimal) {
+    fun isGood(stat: Stat): Boolean = stat.positiveBetter == (value.signum() == 1)
+}
 
 private object StatNameColumn : Column<Pair<Stat, StatValue>> {
     override fun horizontalAlignment(rowIndex: Int) = Alignment.Start
@@ -43,6 +45,7 @@ private object StatValueColumn : Column<Pair<Stat, StatValue>> {
     override fun content(value: Pair<Stat, StatValue>) {
         Text(
             text = Stat.format.format(value.second.value),
+            color = if (value.second.isGood(stat = value.first)) ThemeColors.current.good else ThemeColors.current.bad,
             modifier = Modifier.padding(Dimens.SPACING_2),
         )
     }

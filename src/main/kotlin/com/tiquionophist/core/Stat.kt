@@ -8,20 +8,20 @@ import java.util.EnumMap
 /**
  * The set of stats that can be gained (or lost) by students/teachers as a result of the classes they attend/teach.
  */
-enum class Stat {
-    AROUSAL,
-    AUTHORITY,
-    CHARISMA,
-    CORRUPTION,
-    EDUCATION,
-    ENERGY,
-    HAPPINESS,
-    INHIBITION,
-    INTELLIGENCE,
-    LOYALTY,
-    LUST,
-    STAMINA,
-    WILLPOWER;
+enum class Stat(val positiveBetter: Boolean) {
+    AROUSAL(positiveBetter = true),
+    AUTHORITY(positiveBetter = true), // unsure what effects student authority have
+    CHARISMA(positiveBetter = true),
+    CORRUPTION(positiveBetter = true),
+    EDUCATION(positiveBetter = true),
+    ENERGY(positiveBetter = true),
+    HAPPINESS(positiveBetter = true),
+    INHIBITION(positiveBetter = false),
+    INTELLIGENCE(positiveBetter = true),
+    LOYALTY(positiveBetter = true),
+    LUST(positiveBetter = true),
+    STAMINA(positiveBetter = true),
+    WILLPOWER(positiveBetter = false);
 
     companion object {
         val format = DecimalFormat("0.00").apply {
