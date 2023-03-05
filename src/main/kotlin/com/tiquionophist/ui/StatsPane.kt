@@ -17,7 +17,6 @@ import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
-import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -27,7 +26,6 @@ import com.tiquionophist.ui.common.CheckboxWithLabel
 import com.tiquionophist.ui.common.MatchingWidthColumn
 import com.tiquionophist.ui.common.StatsTable
 import com.tiquionophist.ui.common.fillParent
-import java.math.BigDecimal
 
 /**
  * Shows the weekly stat effects of [GlobalState.scheduleConfiguration], placed at the right of the window.

@@ -45,6 +45,7 @@ object SaveFileIO {
             "must have $PERIODS_PER_WEEK periods/week"
         }
 
+        @Suppress("TooGenericExceptionCaught")
         try {
             sourceFile.inputStream().use { inputStream ->
                 val reader: XMLStreamReader = XMLInputFactory.newFactory().createXMLStreamReader(inputStream)
