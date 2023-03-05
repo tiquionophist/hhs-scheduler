@@ -14,11 +14,24 @@ fun Tooltip(
     text: String,
     content: @Composable () -> Unit,
 ) {
+    Tooltip(
+        tooltipContent = {
+            Text(text)
+        },
+        content = content
+    )
+}
+
+@Composable
+fun Tooltip(
+    tooltipContent: @Composable () -> Unit,
+    content: @Composable () -> Unit,
+) {
     TooltipArea(
         tooltip = {
             TooltipSurface {
                 Box(Modifier.padding(Dimens.SPACING_2).widthIn(max = Dimens.Dialog.MAX_TEXT_WIDTH)) {
-                    Text(text)
+                    tooltipContent()
                 }
             }
         },

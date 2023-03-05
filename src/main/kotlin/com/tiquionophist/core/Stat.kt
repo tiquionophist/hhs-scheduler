@@ -2,6 +2,7 @@ package com.tiquionophist.core
 
 import androidx.compose.runtime.Immutable
 import java.math.BigDecimal
+import java.text.DecimalFormat
 import java.util.EnumMap
 
 /**
@@ -20,7 +21,13 @@ enum class Stat {
     LOYALTY,
     LUST,
     STAMINA,
-    WILLPOWER,
+    WILLPOWER;
+
+    companion object {
+        val format = DecimalFormat("0.00").apply {
+            positivePrefix = "+"
+        }
+    }
 }
 
 /**

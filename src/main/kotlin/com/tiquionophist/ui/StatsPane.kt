@@ -4,11 +4,9 @@ import androidx.compose.foundation.VerticalScrollbar
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.rememberScrollbarAdapter
@@ -25,51 +23,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import com.tiquionophist.core.Stat
 import com.tiquionophist.ui.common.CheckboxWithLabel
-import com.tiquionophist.ui.common.Column
 import com.tiquionophist.ui.common.MatchingWidthColumn
-import com.tiquionophist.ui.common.Table
-import com.tiquionophist.ui.common.TableDivider
+import com.tiquionophist.ui.common.StatsTable
 import com.tiquionophist.ui.common.fillParent
-import com.tiquionophist.util.prettyName
-import kotlinx.collections.immutable.persistentListOf
-import kotlinx.collections.immutable.persistentMapOf
-import kotlinx.collections.immutable.toImmutableList
-import kotlinx.collections.immutable.toImmutableMap
 import java.math.BigDecimal
-import java.text.DecimalFormat
-
-@Immutable
-data class StatValue(val value: BigDecimal)
-
-private object StatNameColumn : Column<Pair<Stat, StatValue>> {
-    override fun horizontalAlignment(rowIndex: Int) = Alignment.Start
-
-    @Composable
-    override fun content(value: Pair<Stat, StatValue>) {
-        Text(
-            text = value.first.prettyName,
-            modifier = Modifier.padding(Dimens.SPACING_2),
-        )
-    }
-}
-
-private object StatValueColumn : Column<Pair<Stat, StatValue>> {
-    private val format = DecimalFormat("0.00").apply {
-        positivePrefix = "+"
-    }
-
-    override fun horizontalAlignment(rowIndex: Int) = Alignment.End
-
-    @Composable
-    override fun content(value: Pair<Stat, StatValue>) {
-        Text(
-            text = format.format(value.second.value),
-            modifier = Modifier.padding(Dimens.SPACING_2),
-        )
-    }
-}
 
 /**
  * Shows the weekly stat effects of [GlobalState.scheduleConfiguration], placed at the right of the window.
@@ -89,33 +47,9 @@ fun StatsPane() {
 
                 val stats = remember(GlobalState.scheduleConfiguration, GlobalState.currentClassIndex) {
                     GlobalState.scheduleConfiguration.classStats(classIndex = GlobalState.currentClassIndex ?: 0)
-                        .stats
-                        .mapValues { StatValue(it.value) }
-                        .toList()
-                        .sortedBy { it.first.prettyName }
-                        .toImmutableList()
                 }
 
-                Table(
-                    columns = persistentListOf(StatNameColumn, StatValueColumn),
-                    rows = stats,
-                    verticalDividers = persistentMapOf(
-                        0 to TableDivider(dividerSize = 0.dp, paddingAfter = Dimens.SPACING_2),
-                        1 to TableDivider(color = ThemeColors.current.weakDivider),
-                        2 to TableDivider(dividerSize = 0.dp, paddingAfter = Dimens.SPACING_2),
-                    ),
-                    horizontalDividers = List(stats.size + 1) { rowIndex ->
-                        rowIndex to TableDivider(
-                            color = if (rowIndex == 0 || rowIndex == stats.size) {
-                                ThemeColors.current.divider
-                            } else {
-                                ThemeColors.current.weakDivider
-                            }
-                        )
-                    }.toMap().toImmutableMap(),
-                    fillMaxWidth = true,
-                    modifier = Modifier.width(IntrinsicSize.Min),
-                )
+                StatsTable(stats = stats)
 
                 Spacer(Modifier.height(Dimens.SPACING_3))
 

@@ -36,6 +36,7 @@ import com.tiquionophist.ui.common.CheckboxWithLabel
 import com.tiquionophist.ui.common.ColumnWidth
 import com.tiquionophist.ui.common.ColumnWithHeader
 import com.tiquionophist.ui.common.NumberPicker
+import com.tiquionophist.ui.common.StatsTable
 import com.tiquionophist.ui.common.Table
 import com.tiquionophist.ui.common.TableDivider
 import com.tiquionophist.ui.common.Tooltip
@@ -68,49 +69,78 @@ private fun ScheduleConfiguration.subjectEnabled(subject: Subject, classIndex: I
 }
 
 /**
- * A column displaying the icon for each [Subject].
+ * A column displaying the icon and name of each [Subject].
  */
-private class SubjectIconColumn(private val classIndex: Int?) : ColumnWithHeader<Subject> {
-    @Composable
-    override fun itemContent(value: Subject) {
-        value.imageBitmap?.let { imageBitmap ->
-            Image(
-                painter = BitmapPainter(imageBitmap),
-                contentDescription = value.prettyName,
-                modifier = Modifier
-                    .padding(horizontal = Dimens.SPACING_2)
-                    .size(Dimens.ScheduleConfigurationTable.SUBJECT_ICON_SIZE)
-                    .enabledIf(
-                        GlobalState.scheduleConfiguration.subjectEnabled(subject = value, classIndex = classIndex)
-                    ),
-            )
-        }
-    }
-}
-
-/**
- * A column displaying the name of each [Subject].
- */
-private class SubjectNameColumn(private val classIndex: Int?) : ColumnWithHeader<Subject> {
+private class SubjectColumn(private val classIndex: Int?) : ColumnWithHeader<Subject> {
     override val itemHorizontalAlignment = Alignment.Start
 
     @Composable
     override fun itemContent(value: Subject) {
-        Row(
-            modifier = Modifier.padding(Dimens.SPACING_2),
-            horizontalArrangement = Arrangement.spacedBy(Dimens.SPACING_2),
-            verticalAlignment = Alignment.CenterVertically,
+        Tooltip(
+            tooltipContent = {
+                Column {
+                    if (value != Subject.EMPTY) {
+                        val classrooms = remember(value) {
+                            value.classrooms
+                                ?.map { it.canonicalName }
+                                ?.sorted()
+                                ?.joinToString()
+                                ?: "any classroom"
+                        }
+
+                        Text("Taught in $classrooms")
+                    }
+
+                    Spacer(Modifier.height(Dimens.SPACING_3))
+
+                    Text("Class effects:")
+
+                    Spacer(Modifier.height(Dimens.SPACING_1))
+
+                    StatsTable(value.stats)
+                }
+            }
         ) {
-            val config = GlobalState.scheduleConfiguration
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                val imageBitmap = value.imageBitmap
+                if (imageBitmap != null) {
+                    Image(
+                        painter = BitmapPainter(imageBitmap),
+                        contentDescription = value.prettyName,
+                        modifier = Modifier
+                            .padding(horizontal = Dimens.SPACING_2)
+                            .size(Dimens.ScheduleConfigurationTable.SUBJECT_ICON_SIZE)
+                            .enabledIf(
+                                GlobalState.scheduleConfiguration.subjectEnabled(
+                                    subject = value,
+                                    classIndex = classIndex
+                                )
+                            ),
+                    )
+                } else {
+                    Box(
+                        modifier = Modifier
+                            .padding(horizontal = Dimens.SPACING_2)
+                            .size(Dimens.ScheduleConfigurationTable.SUBJECT_ICON_SIZE)
+                    )
+                }
 
-            Text(
-                text = value.prettyName,
-                modifier = Modifier
-                    .enabledIf(config.subjectEnabled(subject = value, classIndex = classIndex)),
-            )
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(Dimens.SPACING_2),
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    val config = GlobalState.scheduleConfiguration
 
-            if (config.allowedSubjects?.get(value) == false) {
-                SubjectLockedIcon(subject = value)
+                    Text(
+                        text = value.prettyName,
+                        modifier = Modifier
+                            .enabledIf(config.subjectEnabled(subject = value, classIndex = classIndex)),
+                    )
+
+                    if (config.allowedSubjects?.get(value) == false) {
+                        SubjectLockedIcon(subject = value)
+                    }
+                }
             }
         }
     }
@@ -400,8 +430,7 @@ fun ScheduleConfigurationTable() {
     }
 
     val fixedColumns = listOf(
-        SubjectIconColumn(classIndex = GlobalState.currentClassIndex),
-        SubjectNameColumn(classIndex = GlobalState.currentClassIndex),
+        SubjectColumn(classIndex = GlobalState.currentClassIndex),
         SubjectFrequencyPickerColumn,
         TotalTeacherAssignmentsColumn(classIndex = GlobalState.currentClassIndex),
     )
