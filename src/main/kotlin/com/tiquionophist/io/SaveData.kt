@@ -255,6 +255,11 @@ data class SaveData(
                     teacher to subjects
                 },
             teacherExperience = people.people
+                .filter { person ->
+                    Teacher.DEFAULT_TEACHERS.plus(Teacher.LEXVILLE_TEACHERS).any { teacher ->
+                        teacher.firstName == person.firstName && teacher.lastName == person.lastName
+                    }
+                }
                 .associate { person ->
                     val teacher = Teacher(firstName = person.firstName, lastName = person.lastName)
                     val expMap = person.subjectInstanceExp!!.items
