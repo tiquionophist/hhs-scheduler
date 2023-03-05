@@ -239,32 +239,33 @@ data class SaveData(
      * frequency based on [schoolClasses].
      */
     fun toScheduleConfiguration(): ScheduleConfiguration {
-        val teachers = people.people.filter { !it.teacherSubjects?.subjects.isNullOrEmpty() }
-
         // drop the last class since it just contains unassigned students
         val nonEmptyClasses = schoolClasses.classes.dropLast(1)
 
         return ScheduleConfiguration(
             classes = nonEmptyClasses.size,
-            teacherAssignments = teachers.associate { person ->
-                val teacher = Teacher(firstName = person.firstName, lastName = person.lastName)
-                val subjects = person.teacherSubjects!!.subjects
-                    .mapNotNull { subjectNameToEnum(it) }
-                    .toSet()
+            teacherAssignments = people.people
+                .filter { !it.teacherSubjects?.subjects.isNullOrEmpty() }
+                .associate { person ->
+                    val teacher = Teacher(firstName = person.firstName, lastName = person.lastName)
+                    val subjects = person.teacherSubjects!!.subjects
+                        .mapNotNull { subjectNameToEnum(it) }
+                        .toSet()
 
-                teacher to subjects
-            },
-            teacherExperience = teachers.associate { person ->
-                val teacher = Teacher(firstName = person.firstName, lastName = person.lastName)
-                val expMap = person.subjectInstanceExp!!.items
-                    .mapNotNull { (key, value) ->
-                        subjectNameToEnum(key)?.let { subject ->
-                            subject to value.coerceIn(0f..100f)
+                    teacher to subjects
+                },
+            teacherExperience = people.people
+                .associate { person ->
+                    val teacher = Teacher(firstName = person.firstName, lastName = person.lastName)
+                    val expMap = person.subjectInstanceExp!!.items
+                        .mapNotNull { (key, value) ->
+                            subjectNameToEnum(key)?.let { subject ->
+                                subject to value.coerceIn(0f..100f)
+                            }
                         }
-                    }
-                    .toMap()
-                teacher to expMap
-            },
+                        .toMap()
+                    teacher to expMap
+                },
             allowedSubjects = schoolSubjects.items
                 .mapNotNull { schoolSubject ->
                     subjectNameToEnum(schoolSubject.name)?.let { subject ->
