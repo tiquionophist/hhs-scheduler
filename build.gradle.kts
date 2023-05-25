@@ -42,7 +42,6 @@ dependencies {
 
 tasks.withType<KotlinCompile>().configureEach {
     kotlinOptions {
-        jvmTarget = "16"
         allWarningsAsErrors = true
 
         val composeReportsDir = buildDir.resolve("compose").absolutePath
