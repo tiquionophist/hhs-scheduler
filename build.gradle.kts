@@ -9,7 +9,7 @@ import java.util.zip.ZipOutputStream
 
 plugins {
     kotlin("jvm") version "1.8.20"
-    kotlin("plugin.serialization") version "1.8.0"
+    kotlin("plugin.serialization") version "1.8.20"
     jacoco
     id("io.gitlab.arturbosch.detekt") version "1.22.0"
     id("org.jetbrains.compose") version "1.4.0"
@@ -27,7 +27,7 @@ dependencies {
     implementation(compose.desktop.currentOs)
 
     implementation("org.jetbrains.kotlinx:kotlinx-collections-immutable:0.3.5")
-    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.5.0")
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.5.1")
     implementation("com.fasterxml.jackson.dataformat:jackson-dataformat-xml:2.14.2")
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.14.2")
 
