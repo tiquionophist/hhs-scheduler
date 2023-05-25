@@ -11,7 +11,7 @@ plugins {
     kotlin("jvm") version "1.8.20"
     kotlin("plugin.serialization") version "1.8.20"
     jacoco
-    id("io.gitlab.arturbosch.detekt") version "1.22.0"
+    id("io.gitlab.arturbosch.detekt") version "1.23.0"
     id("org.jetbrains.compose") version "1.4.0"
 }
 
@@ -22,7 +22,7 @@ repositories {
 }
 
 dependencies {
-    detektPlugins("io.gitlab.arturbosch.detekt:detekt-formatting:1.22.0")
+    detektPlugins("io.gitlab.arturbosch.detekt:detekt-formatting:1.23.0")
 
     implementation(compose.desktop.currentOs)
 
