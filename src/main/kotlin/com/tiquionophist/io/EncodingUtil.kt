@@ -10,21 +10,34 @@ import java.util.zip.GZIPOutputStream
 
 object EncodingUtil {
     /**
+     * Returns an [InputStream] which contains the gunzipped stream of the contents of [inputStream].
+     */
+    fun unzip(inputStream: InputStream): InputStream {
+        return GZIPInputStream(inputStream)
+    }
+
+    /**
+     * Returns the gzipped data written to the [OutputStream] in [block].
+     */
+    fun zip(block: (OutputStream) -> Unit): ByteArray {
+        val byteArrayOutputStream = ByteArrayOutputStream()
+        GZIPOutputStream(byteArrayOutputStream).use(block)
+        return byteArrayOutputStream.toByteArray()
+    }
+
+    /**
      * Returns an [InputStream] which contains the Base64-decoded then gunzipped stream of the contents of [data].
      */
     fun decodeAndUnzip(data: String): InputStream {
         val decoded = Base64.getDecoder().decode(data)
-        return GZIPInputStream(ByteArrayInputStream(decoded))
+        return unzip(ByteArrayInputStream(decoded))
     }
 
     /**
      * Returns the gzipped then Base64-encoded data written to the [OutputStream] in [block].
      */
     fun zipAndEncode(block: (OutputStream) -> Unit): String {
-        val byteArrayOutputStream = ByteArrayOutputStream()
-        GZIPOutputStream(byteArrayOutputStream).use(block)
-
-        val encoded = Base64.getEncoder().encode(byteArrayOutputStream.toByteArray())
+        val encoded = Base64.getEncoder().encode(zip(block))
         return encoded.decodeToString()
     }
 }

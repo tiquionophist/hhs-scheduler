@@ -5,13 +5,27 @@ import com.fasterxml.jackson.dataformat.xml.XmlMapper
 import com.fasterxml.jackson.module.kotlin.kotlinModule
 import com.tiquionophist.core.Teacher
 import com.tiquionophist.ui.ComputedSchedule
+import org.jetbrains.exposed.sql.Column
+import org.jetbrains.exposed.sql.Database
+import org.jetbrains.exposed.sql.Table
+import org.jetbrains.exposed.sql.selectAll
+import org.jetbrains.exposed.sql.statements.api.ExposedBlob
+import org.jetbrains.exposed.sql.transactions.TransactionManager
+import org.jetbrains.exposed.sql.transactions.transaction
+import org.jetbrains.exposed.sql.update
 import java.io.File
+import java.io.InputStream
+import java.sql.Connection
 import javax.xml.stream.XMLInputFactory
 import javax.xml.stream.XMLOutputFactory
 import javax.xml.stream.XMLStreamReader
 import javax.xml.stream.XMLStreamWriter
 
 object SaveFileIO {
+    private object SaveInfoTable : Table(name = "hhs_SaveInfo") {
+        val data: Column<ExposedBlob> = blob("Data")
+    }
+
     /**
      * The required number of periods per week in save game files, since they are hardcoded to 5 days/week and 4
      * periods/day.
@@ -24,13 +38,44 @@ object SaveFileIO {
         .build()
 
     /**
+     * Extracts the game "data" from the given [file]; this data is the main contents of the game save which is encoded
+     * as a blob in either the files top-level XML structure or SQLite database.
+     */
+    fun extractData(file: File, onReadSaveFile: () -> Unit = {}): InputStream {
+        return when (SaveFileType.ofFile(file)) {
+            SaveFileType.XML -> {
+                val saveFile = xmlMapper.readValue(file, SaveFile::class.java)
+
+                onReadSaveFile()
+
+                EncodingUtil.decodeAndUnzip(saveFile.data)
+            }
+
+            SaveFileType.SQL -> {
+                val blob = transaction(openSqliteDb(file)) {
+                    val saveInfos = SaveInfoTable
+                        .selectAll()
+                        .toList()
+
+                    require(saveInfos.size == 1) {
+                        "expecting exactly one ${SaveInfoTable.tableName} row; found ${saveInfos.size}"
+                    }
+
+                    saveInfos.first()[SaveInfoTable.data]
+                }
+
+                onReadSaveFile()
+
+                EncodingUtil.unzip(blob.inputStream)
+            }
+        }
+    }
+
+    /**
      * Reads the game save at [file] into a [SaveData] which wraps the XML data in the save file.
      */
     fun read(file: File, onReadSaveFile: () -> Unit = {}, onDecodeAndUnzip: () -> Unit = {}): SaveData {
-        val saveFile = xmlMapper.readValue(file, SaveFile::class.java)
-        onReadSaveFile()
-
-        EncodingUtil.decodeAndUnzip(saveFile.data).use { inputStream ->
+        extractData(file, onReadSaveFile = onReadSaveFile).use { inputStream ->
             onDecodeAndUnzip()
             return xmlMapper.readValue(inputStream, SaveData::class.java)
         }
@@ -47,30 +92,9 @@ object SaveFileIO {
 
         @Suppress("TooGenericExceptionCaught")
         try {
-            sourceFile.inputStream().use { inputStream ->
-                val reader: XMLStreamReader = XMLInputFactory.newFactory().createXMLStreamReader(inputStream)
-                destinationFile.outputStream().use { outputStream ->
-                    val writer = XMLOutputFactory.newFactory().createXMLStreamWriter(outputStream)
-                    reader.mirrorTo(writer) {
-                        if (reader.isStartElement && reader.localName == "Data") {
-                            val elementText = reader.elementText
-                            EncodingUtil.decodeAndUnzip(elementText).use { unzippedStream ->
-                                val encoded = EncodingUtil.zipAndEncode { zippedStream ->
-                                    val dataReader = XMLInputFactory.newFactory().createXMLStreamReader(unzippedStream)
-                                    val dataWriter = XMLOutputFactory.newFactory().createXMLStreamWriter(zippedStream)
-
-                                    transformSaveData(schedule = schedule, reader = dataReader, writer = dataWriter)
-                                }
-
-                                writer.writeCharacters(encoded)
-                                writer.writeEndElement()
-                            }
-
-                            require(reader.isEndElement)
-                            reader.next()
-                        }
-                    }
-                }
+            when (SaveFileType.ofFile(sourceFile)) {
+                SaveFileType.XML -> copyXmlSaveFile(schedule, sourceFile, destinationFile)
+                SaveFileType.SQL -> copySqlSaveFile(schedule, sourceFile, destinationFile)
             }
         } catch (ex: Throwable) {
             // attempt to delete partially-created destination file if an exception was thrown
@@ -79,6 +103,53 @@ object SaveFileIO {
             } catch (ignored: Throwable) {}
 
             throw ex
+        }
+    }
+
+    private fun copyXmlSaveFile(schedule: ComputedSchedule, sourceFile: File, destinationFile: File) {
+        sourceFile.inputStream().use { inputStream ->
+            val reader: XMLStreamReader = XMLInputFactory.newFactory().createXMLStreamReader(inputStream)
+            destinationFile.outputStream().use { outputStream ->
+                val writer = XMLOutputFactory.newFactory().createXMLStreamWriter(outputStream)
+                reader.mirrorTo(writer) {
+                    if (reader.isStartElement && reader.localName == "Data") {
+                        val elementText = reader.elementText
+                        EncodingUtil.decodeAndUnzip(elementText).use { unzippedStream ->
+                            val encoded = EncodingUtil.zipAndEncode { zippedStream ->
+                                val dataReader = XMLInputFactory.newFactory().createXMLStreamReader(unzippedStream)
+                                val dataWriter = XMLOutputFactory.newFactory().createXMLStreamWriter(zippedStream)
+
+                                transformSaveData(schedule = schedule, reader = dataReader, writer = dataWriter)
+                            }
+
+                            writer.writeCharacters(encoded)
+                            writer.writeEndElement()
+                        }
+
+                        require(reader.isEndElement)
+                        reader.next()
+                    }
+                }
+            }
+        }
+    }
+
+    private fun copySqlSaveFile(schedule: ComputedSchedule, sourceFile: File, destinationFile: File) {
+        sourceFile.copyTo(destinationFile, overwrite = true)
+
+        val newData = extractData(sourceFile).use { originalStream ->
+            EncodingUtil.zip { zippedStream ->
+                val dataReader = XMLInputFactory.newFactory().createXMLStreamReader(originalStream)
+                val dataWriter = XMLOutputFactory.newFactory().createXMLStreamWriter(zippedStream)
+
+                transformSaveData(schedule = schedule, reader = dataReader, writer = dataWriter)
+            }
+        }
+
+        transaction(openSqliteDb(destinationFile)) {
+            SaveInfoTable.update {
+                it[data] = ExposedBlob(newData)
+            }
         }
     }
 
@@ -174,5 +245,10 @@ object SaveFileIO {
                 }
             }
         }
+    }
+
+    private fun openSqliteDb(file: File): Database {
+        TransactionManager.manager.defaultIsolationLevel = Connection.TRANSACTION_SERIALIZABLE
+        return Database.connect("jdbc:sqlite:${file.absolutePath}", "org.sqlite.JDBC")
     }
 }

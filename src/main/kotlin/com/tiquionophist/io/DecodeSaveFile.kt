@@ -11,8 +11,7 @@ fun main(args: Array<String>) {
     val destinationFile = args.getOrNull(1)?.let { File(it) }
         ?: sourceFile.resolveSibling("${sourceFile.nameWithoutExtension}-DECODED.xml")
 
-    val saveFile = SaveFileIO.xmlMapper.readValue(sourceFile, SaveFile::class.java)
-    EncodingUtil.decodeAndUnzip(saveFile.data).use { inputStream ->
+    SaveFileIO.extractData(sourceFile).use { inputStream ->
         destinationFile.outputStream().use { outputStream ->
             inputStream.transferTo(outputStream)
         }
