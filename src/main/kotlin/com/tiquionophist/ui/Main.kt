@@ -6,7 +6,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.rememberScrollbarAdapter
 import androidx.compose.material.ExperimentalMaterialApi
-import androidx.compose.material.LocalMinimumTouchTargetEnforcement
+import androidx.compose.material.LocalMinimumInteractiveComponentEnforcement
 import androidx.compose.material.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
@@ -35,7 +35,7 @@ fun main() {
         ) {
             ThemeColors.apply(light = ApplicationPreferences.lightMode) {
                 Dimens.apply {
-                    CompositionLocalProvider(LocalMinimumTouchTargetEnforcement provides false) {
+                    CompositionLocalProvider(LocalMinimumInteractiveComponentEnforcement provides false) {
                         MenuBar()
                         CustomTeacherDialogHandler.content()
                         ScheduleWindowHandler.content()
