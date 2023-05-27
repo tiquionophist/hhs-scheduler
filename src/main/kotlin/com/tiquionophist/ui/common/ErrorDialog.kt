@@ -9,7 +9,6 @@ import androidx.compose.material.Button
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
-import androidx.compose.material.TextButton
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Warning
 import androidx.compose.runtime.Composable
@@ -22,8 +21,6 @@ import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.rememberDialogState
 import com.tiquionophist.ui.Dimens
-import java.awt.Toolkit
-import java.awt.datatransfer.StringSelection
 
 @Composable
 fun ErrorDialog(
@@ -68,16 +65,7 @@ fun ErrorDialog(
                     horizontalArrangement = Arrangement.spacedBy(Dimens.SPACING_2)
                 ) {
                     if (throwable != null) {
-                        TextButton(
-                            onClick = {
-                                val stringSelection = StringSelection(throwable.stackTraceToString())
-                                Toolkit.getDefaultToolkit()
-                                    .systemClipboard
-                                    .setContents(stringSelection, stringSelection)
-                            }
-                        ) {
-                            Text("Copy stack trace")
-                        }
+                        CopyStackTraceButton(throwable)
                     }
 
                     Button(onClick = onClose) {

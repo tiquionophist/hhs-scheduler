@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -36,6 +37,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.rememberDialogState
 import com.tiquionophist.io.SaveFileIO
+import com.tiquionophist.ui.common.CopyStackTraceButton
 import com.tiquionophist.ui.common.FilePicker
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -158,8 +160,11 @@ private fun ScheduleExportDialogContent(computedSchedule: ComputedSchedule) {
                 )
             }
             is ExportStatus.Error -> {
-                val throwable = (status as ExportStatus.Error).throwable
-                Text("Error: ${throwable.message}", color = MaterialTheme.colors.error)
+                Row(horizontalArrangement = Arrangement.SpaceBetween, modifier = Modifier.fillMaxWidth()) {
+                    val throwable = (status as ExportStatus.Error).throwable
+                    Text("Error: ${throwable.message}", color = MaterialTheme.colors.error)
+                    CopyStackTraceButton(throwable)
+                }
             }
         }
     }
