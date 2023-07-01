@@ -98,7 +98,7 @@ compose.desktop {
             targetFormats(TargetFormat.Msi)
 
             // remove logging and crypto libraries to slightly reduce application size
-            modules = arrayListOf("java.base", "java.desktop")
+            modules = arrayListOf("java.base", "java.desktop", "java.sql")
 
             windows {
                 iconFile.set(resourcesDir.resolve("app_icon.ico"))
