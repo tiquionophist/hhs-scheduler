@@ -1,14 +1,18 @@
 package com.tiquionophist.io
 
-import com.tiquionophist.io.SaveFileIOTest.Companion.testFile
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.params.ParameterizedTest
-import org.junit.jupiter.params.provider.EnumSource
+import org.junit.jupiter.params.provider.MethodSource
 
-class SaveFileTypeTest {
+internal class SaveFileTypeTest {
     @ParameterizedTest
-    @EnumSource(SaveFileType::class)
-    fun testOfFile(saveFileType: SaveFileType) {
-        assertEquals(saveFileType, SaveFileType.ofFile(saveFileType.testFile))
+    @MethodSource("testSaveFiles")
+    fun testOfFile(testSaveFile: SaveFileIOTest.TestSaveFile) {
+        assertEquals(testSaveFile.type, SaveFileType.ofFile(testSaveFile.file))
+    }
+
+    companion object {
+        @JvmStatic
+        fun testSaveFiles() = SaveFileIOTest.testSaveFiles()
     }
 }

@@ -11,16 +11,18 @@ import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.assertThrows
 import org.junit.jupiter.params.ParameterizedTest
-import org.junit.jupiter.params.provider.EnumSource
+import org.junit.jupiter.params.provider.MethodSource
 import java.io.File
 
 internal class SaveFileIOTest {
+    data class TestSaveFile(val file: File, val type: SaveFileType)
+
     private val scheduler = ExhaustiveScheduler(fillOrder = RandomizedScheduler.ScheduleFillOrder.CLASS_BY_CLASS)
 
     @ParameterizedTest
-    @EnumSource(SaveFileType::class)
-    fun testRead(saveFileType: SaveFileType) {
-        val saveData = SaveFileIO.read(saveFileType.testFile)
+    @MethodSource("testSaveFiles")
+    fun testRead(testSaveFile: TestSaveFile) {
+        val saveData = SaveFileIO.read(testSaveFile.file)
 
         val scheduleConfiguration = saveData.toScheduleConfiguration()
         assertEquals(saveFileConfiguration.normalize(), scheduleConfiguration.normalize())
@@ -28,13 +30,13 @@ internal class SaveFileIOTest {
     }
 
     @ParameterizedTest
-    @EnumSource(SaveFileType::class)
-    fun testWrite(saveFileType: SaveFileType) {
+    @MethodSource("testSaveFiles")
+    fun testWrite(testSaveFile: TestSaveFile) {
         val schedule = runBlocking { scheduler.schedule(saveFileConfiguration)!! }
 
         SaveFileIO.write(
             schedule = ComputedSchedule(configuration = saveFileConfiguration, schedule = schedule),
-            sourceFile = saveFileType.testFile,
+            sourceFile = testSaveFile.file,
             destinationFile = outFile,
         )
 
@@ -42,8 +44,8 @@ internal class SaveFileIOTest {
     }
 
     @ParameterizedTest
-    @EnumSource(SaveFileType::class)
-    fun testWriteMoreClassesXml(saveFileType: SaveFileType) {
+    @MethodSource("testSaveFiles")
+    fun testWriteMoreClassesXml(testSaveFile: TestSaveFile) {
         val configuration = saveFileConfiguration.copy(
             classes = saveFileConfiguration.classes + 1,
             // copy the first class subject frequency to the end so we have the right number
@@ -54,7 +56,7 @@ internal class SaveFileIOTest {
 
         SaveFileIO.write(
             schedule = ComputedSchedule(configuration = configuration, schedule = schedule),
-            sourceFile = saveFileType.testFile,
+            sourceFile = testSaveFile.file,
             destinationFile = outFile,
         )
 
@@ -62,15 +64,15 @@ internal class SaveFileIOTest {
     }
 
     @ParameterizedTest
-    @EnumSource(SaveFileType::class)
-    fun testWriteFewerClasses(saveFileType: SaveFileType) {
+    @MethodSource("testSaveFiles")
+    fun testWriteFewerClasses(testSaveFile: TestSaveFile) {
         val configuration = saveFileConfiguration.copy(classes = saveFileConfiguration.classes - 1)
         val schedule = runBlocking { scheduler.schedule(configuration)!! }
 
         val exception = assertThrows<IllegalStateException> {
             SaveFileIO.write(
                 schedule = ComputedSchedule(configuration = configuration, schedule = schedule),
-                sourceFile = saveFileType.testFile,
+                sourceFile = testSaveFile.file,
                 destinationFile = outFile,
             )
         }
@@ -136,10 +138,13 @@ internal class SaveFileIOTest {
          */
         private fun ScheduleConfiguration.normalize() = copy(teacherExperience = emptyMap())
 
-        val SaveFileType.testFile: File
-            get() = when (this) {
-                SaveFileType.XML -> resourcesDir.resolve("test-save-file-xml.sav")
-                SaveFileType.SQL -> resourcesDir.resolve("test-save-file-sql.sav")
-            }
+        @JvmStatic
+        fun testSaveFiles(): List<TestSaveFile> {
+            return listOf(
+                TestSaveFile(resourcesDir.resolve("test-save-file-xml.sav"), SaveFileType.XML),
+                TestSaveFile(resourcesDir.resolve("test-save-file-sql.sav"), SaveFileType.SQL),
+                TestSaveFile(resourcesDir.resolve("test-save-file-sql-1.11.sav"), SaveFileType.SQL),
+            )
+        }
     }
 }
