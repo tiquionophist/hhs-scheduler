@@ -34,6 +34,7 @@ fun XMLStreamReader.mirrorTo(writer: XMLStreamWriter, intercept: () -> Boolean =
                 }
                 XMLStreamReader.END_ELEMENT -> writer.writeEndElement()
                 XMLStreamReader.CHARACTERS -> writer.writeCharacters(text)
+                XMLStreamReader.CDATA -> writer.writeCData(text)
                 // TODO add remaining event types to be safe
                 else -> error("unhandled XML event type: $eventType")
             }

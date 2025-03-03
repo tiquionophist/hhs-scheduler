@@ -236,11 +236,11 @@ object SaveFileIO {
 
                 reader.isCharacters -> {
                     if (inForename) {
-                        currentFirstName = currentFirstName!! + reader.text
+                        currentFirstName = currentFirstName?.let { it + reader.text }
                     }
 
                     if (inLastname) {
-                        currentLastName = currentLastName!! + reader.text
+                        currentLastName = currentLastName?.let { it + reader.text }
                     }
                 }
             }
