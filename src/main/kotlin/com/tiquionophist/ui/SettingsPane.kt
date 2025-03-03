@@ -1,5 +1,6 @@
 package com.tiquionophist.ui
 
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.TooltipArea
 import androidx.compose.foundation.TooltipPlacement
@@ -28,10 +29,16 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.ColorFilter
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
+import com.tiquionophist.Res
 import com.tiquionophist.core.ScheduleConfiguration
+import com.tiquionophist.ic_arrow_drop_down
+import com.tiquionophist.ic_dark_mode
+import com.tiquionophist.ic_delete
+import com.tiquionophist.ic_error
+import com.tiquionophist.ic_light_mode
+import com.tiquionophist.ic_settings
 import com.tiquionophist.scheduler.ClassroomFillOrder
 import com.tiquionophist.ui.common.CheckboxWithLabel
 import com.tiquionophist.ui.common.ConfirmationDialog
@@ -40,10 +47,12 @@ import com.tiquionophist.ui.common.NumberPicker
 import com.tiquionophist.ui.common.Tooltip
 import com.tiquionophist.ui.common.TooltipSurface
 import com.tiquionophist.util.prettyName
+import org.jetbrains.compose.resources.painterResource
 
 /**
  * Row of scheduling-wide settings, placed at the bottom of the window.
  */
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun SettingsPane() {
     Surface(color = ThemeColors.current.surface3) {
@@ -59,9 +68,14 @@ fun SettingsPane() {
                 val config = GlobalState.scheduleConfiguration
 
                 IconButton(onClick = { ApplicationPreferences.lightMode = !ApplicationPreferences.lightMode }) {
-                    val filename = if (ApplicationPreferences.lightMode) "light_mode" else "dark_mode"
                     Image(
-                        painter = painterResource("icons/$filename.svg"),
+                        painter = painterResource(
+                            if (ApplicationPreferences.lightMode) {
+                                Res.drawable.ic_light_mode
+                            } else {
+                                Res.drawable.ic_dark_mode
+                            }
+                        ),
                         contentDescription = "Light/dark mode",
                         colorFilter = ColorFilter.tint(LocalContentColor.current),
                         alpha = LocalContentAlpha.current,
@@ -86,7 +100,7 @@ fun SettingsPane() {
 
                 IconAndTextButton(
                     text = "Clear schedule",
-                    iconFilename = "delete",
+                    iconRes = Res.drawable.ic_delete,
                     onClick = { confirmDialogVisible.value = true }
                 )
 
@@ -169,7 +183,7 @@ fun SettingsPane() {
                         Text(text = config.classroomFillOrder.prettyName, maxLines = 2)
 
                         Image(
-                            painter = painterResource("icons/arrow_drop_down.svg"),
+                            painter = painterResource(Res.drawable.ic_arrow_drop_down),
                             contentDescription = null,
                             colorFilter = ColorFilter.tint(LocalContentColor.current)
                         )
@@ -216,7 +230,7 @@ fun SettingsPane() {
                 val schedulerSettingsDialogVisibleState = remember { mutableStateOf(false) }
                 IconButton(onClick = { schedulerSettingsDialogVisibleState.value = true }) {
                     Image(
-                        painter = painterResource("icons/settings.svg"),
+                        painter = painterResource(Res.drawable.ic_settings),
                         contentDescription = "Scheduler settings",
                         colorFilter = ColorFilter.tint(LocalContentColor.current),
                         alpha = LocalContentAlpha.current,
@@ -253,7 +267,7 @@ fun SettingsPane() {
                         )
                     ) {
                         Icon(
-                            painter = painterResource("icons/error.svg"),
+                            painter = painterResource(Res.drawable.ic_error),
                             contentDescription = "Error",
                             tint = MaterialTheme.colors.error,
                         )

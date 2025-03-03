@@ -21,7 +21,9 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.vector.ImageVector
+import com.tiquionophist.Res
 import com.tiquionophist.core.ScheduleConfiguration
+import com.tiquionophist.ic_stop
 import com.tiquionophist.ui.common.ErrorDialog
 import com.tiquionophist.ui.common.IconAndTextButton
 import com.tiquionophist.ui.common.liveDurationState
@@ -73,7 +75,7 @@ fun RunScheduleButton(
         if (loading) {
             IconAndTextButton(
                 text = "Cancel",
-                iconFilename = "stop",
+                iconRes = Res.drawable.ic_stop,
                 colors = ButtonDefaults.buttonColors(backgroundColor = MaterialTheme.colors.error),
                 onClick = {
                     jobState.value?.cancel()

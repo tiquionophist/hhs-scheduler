@@ -21,6 +21,7 @@ import androidx.compose.ui.input.key.type
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.window.Dialog
+import androidx.compose.ui.window.DialogWindow
 import androidx.compose.ui.window.WindowPosition
 import androidx.compose.ui.window.rememberDialogState
 import com.tiquionophist.core.Teacher
@@ -62,7 +63,7 @@ fun CustomTeacherDialog(onClose: () -> Unit) {
         }
     }
 
-    Dialog(
+    DialogWindow(
         title = "Add custom teacher",
         onCloseRequest = onClose,
         state = rememberDialogState(

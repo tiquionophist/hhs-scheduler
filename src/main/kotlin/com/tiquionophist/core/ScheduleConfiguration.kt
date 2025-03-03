@@ -4,6 +4,7 @@ import androidx.compose.runtime.Immutable
 import com.tiquionophist.scheduler.ClassroomFillOrder
 import com.tiquionophist.util.flattenToSet
 import com.tiquionophist.util.prettyName
+import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
 import kotlinx.serialization.json.Json
@@ -184,6 +185,7 @@ data class ScheduleConfiguration(
         return errors
     }
 
+    @OptIn(ExperimentalSerializationApi::class)
     fun save(file: File) {
         file.outputStream().use { json.encodeToStream(this, it) }
     }
@@ -200,6 +202,7 @@ data class ScheduleConfiguration(
             allowStructuredMapKeys = true
         }
 
+        @OptIn(ExperimentalSerializationApi::class)
         fun loadOrError(file: File): ScheduleConfiguration {
             return file.inputStream().use { json.decodeFromStream(it) }
         }

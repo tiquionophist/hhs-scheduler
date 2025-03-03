@@ -12,16 +12,18 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.WindowPlacement
 import androidx.compose.ui.window.application
 import androidx.compose.ui.window.rememberWindowState
+import com.tiquionophist.Res
+import com.tiquionophist.app_icon
 import com.tiquionophist.ui.common.ContentWithPane
 import com.tiquionophist.ui.common.NotificationContainer
 import com.tiquionophist.ui.common.PaneDirection
 import com.tiquionophist.ui.common.fillMaxHeightVerticalScroll
 import com.tiquionophist.ui.common.fillMaxWidthHorizontalScroll
+import org.jetbrains.compose.resources.painterResource
 
 // TODO investigate text field focus (cursor remains after unfocused)
 @ExperimentalMaterialApi
@@ -30,7 +32,7 @@ fun main() {
         Window(
             onCloseRequest = ::exitApplication,
             title = "HHS+ Scheduler",
-            icon = painterResource("app_icon.png"),
+            icon = painterResource(Res.drawable.app_icon),
             state = rememberWindowState(placement = WindowPlacement.Maximized),
         ) {
             ThemeColors.apply(light = ApplicationPreferences.lightMode) {

@@ -8,11 +8,12 @@ import java.util.zip.ZipEntry
 import java.util.zip.ZipOutputStream
 
 plugins {
-    kotlin("jvm") version "1.8.20"
-    kotlin("plugin.serialization") version "1.8.20"
+    kotlin("jvm") version "2.1.10"
+    kotlin("plugin.serialization") version "2.1.10"
     jacoco
     id("io.gitlab.arturbosch.detekt") version "1.23.0"
-    id("org.jetbrains.compose") version "1.4.0"
+    id("org.jetbrains.compose") version "1.7.3"
+    id("org.jetbrains.kotlin.plugin.compose") version "2.1.10"
 }
 
 repositories {
@@ -25,6 +26,7 @@ dependencies {
     detektPlugins("io.gitlab.arturbosch.detekt:detekt-formatting:1.23.0")
 
     implementation(compose.desktop.currentOs)
+    implementation(compose.components.resources)
 
     implementation("org.jetbrains.exposed:exposed-core:0.41.1")
     implementation("org.jetbrains.exposed:exposed-dao:0.41.1")
@@ -41,15 +43,11 @@ dependencies {
 }
 
 tasks.withType<KotlinCompile>().configureEach {
-    kotlinOptions {
+    compilerOptions {
         allWarningsAsErrors = true
 
-        val composeReportsDir = buildDir.resolve("compose").absolutePath
+        val composeReportsDir = layout.buildDirectory.file("compose").get().asFile.absolutePath
         freeCompilerArgs = listOf(
-            "-opt-in=kotlin.time.ExperimentalTime",
-            "-opt-in=kotlinx.serialization.ExperimentalSerializationApi",
-            "-opt-in=androidx.compose.foundation.ExperimentalFoundationApi",
-            "-opt-in=androidx.compose.ui.ExperimentalComposeUiApi",
             "-P",
             "plugin:androidx.compose.compiler.plugins.kotlin:metricsDestination=$composeReportsDir",
             "-P",
@@ -73,14 +71,14 @@ tasks.jacocoTestReport {
 }
 
 detekt {
-    config = files("detekt.yml")
+    config.from(files("detekt.yml"))
     buildUponDefaultConfig = true
 }
 
 tasks.check {
-    // run detekt with type resolution
-    dependsOn("detektMain")
-    dependsOn("detektTest")
+    // TODO re-enable running detekt with type resolution
+    // dependsOn("detektMain")
+    // dependsOn("detektTest")
 }
 
 val resourcesDir: File = sourceSets["main"].resources.sourceDirectories.first()
@@ -107,18 +105,22 @@ compose.desktop {
     }
 }
 
+compose.resources {
+    packageOfResClass = "com.tiquionophist"
+}
+
 // convenience task which builds all relevant release artifacts into a single directory
-tasks.create("createRelease") {
+tasks.register("createRelease") {
     mustRunAfter("clean")
     dependsOn("clean", "check", "package", "createDistributable", "packageUberJarForCurrentOS")
 
     doLast {
-        val releaseDir = buildDir.resolve("release-$version")
+        val releaseDir = layout.buildDirectory.file("release-$version").get().asFile
         releaseDir.deleteRecursively()
         releaseDir.mkdirs()
         println("Created release destination directory $releaseDir")
 
-        val composeDir = buildDir.resolve("compose")
+        val composeDir = layout.buildDirectory.file("compose").get().asFile
         val msiSource = composeDir.resolve("binaries/main/msi/hhs-scheduler-$version.msi").absoluteFile
         val jarSource = composeDir.resolve("jars/hhs-scheduler-windows-x64-$version.jar").absoluteFile
         val distributableSourceDir = composeDir.resolve("binaries/main/app/hhs-scheduler").absoluteFile

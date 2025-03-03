@@ -34,12 +34,13 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.ColorFilter
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.window.Dialog
+import androidx.compose.ui.window.DialogWindow
 import androidx.compose.ui.window.rememberDialogState
+import com.tiquionophist.Res
 import com.tiquionophist.core.Scheduler
+import com.tiquionophist.ic_arrow_drop_down
 import com.tiquionophist.scheduler.ExhaustiveScheduler
 import com.tiquionophist.scheduler.RandomizedScheduler
 import com.tiquionophist.ui.common.CheckboxWithLabel
@@ -48,6 +49,7 @@ import com.tiquionophist.ui.common.NumberPicker
 import com.tiquionophist.ui.common.PaneDirection
 import com.tiquionophist.ui.common.topBorder
 import com.tiquionophist.util.prettyName
+import org.jetbrains.compose.resources.painterResource
 
 private val DIALOG_WIDTH = 800.dp
 private val DIALOG_HEIGHT = 700.dp
@@ -84,7 +86,7 @@ fun SchedulerSettingsDialog(
     initialSchedulerSettings: SchedulerSettings,
     onClose: (SchedulerSettings?) -> Unit
 ) {
-    Dialog(
+    DialogWindow(
         state = rememberDialogState(
             size = DpSize(width = DIALOG_WIDTH, height = DIALOG_HEIGHT)
         ),
@@ -285,7 +287,7 @@ private fun FillOrderSelector(
                 Text(fillOrder.prettyName)
 
                 Image(
-                    painter = painterResource("icons/arrow_drop_down.svg"),
+                    painter = painterResource(Res.drawable.ic_arrow_drop_down),
                     contentDescription = null,
                     colorFilter = ColorFilter.tint(LocalContentColor.current)
                 )

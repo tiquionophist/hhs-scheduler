@@ -24,12 +24,15 @@ import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.layout.Measurable
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import com.tiquionophist.Res
+import com.tiquionophist.ic_minus
+import com.tiquionophist.ic_plus
 import com.tiquionophist.ui.Dimens
+import org.jetbrains.compose.resources.painterResource
 import java.lang.Integer.max
 import java.lang.Integer.min
 
@@ -77,7 +80,7 @@ fun NumberPicker(
             ) {
                 Image(
                     modifier = Modifier.size(buttonIconSize),
-                    painter = painterResource("icons/minus.svg"),
+                    painter = painterResource(Res.drawable.ic_minus),
                     contentDescription = "Minus",
                     colorFilter = ColorFilter.tint(LocalContentColor.current),
                     alpha = LocalContentAlpha.current,
@@ -121,7 +124,7 @@ fun NumberPicker(
             ) {
                 Image(
                     modifier = Modifier.size(buttonIconSize),
-                    painter = painterResource("icons/plus.svg"),
+                    painter = painterResource(Res.drawable.ic_plus),
                     contentDescription = "Plus",
                     colorFilter = ColorFilter.tint(LocalContentColor.current),
                     alpha = LocalContentAlpha.current,

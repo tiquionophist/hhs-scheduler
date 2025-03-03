@@ -34,7 +34,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.window.Dialog
+import androidx.compose.ui.window.DialogWindow
 import androidx.compose.ui.window.rememberDialogState
 import com.tiquionophist.io.SaveFileIO
 import com.tiquionophist.ui.common.CopyStackTraceButton
@@ -53,7 +53,7 @@ private val DIALOG_HEIGHT = 200.dp
 
 @Composable
 fun ScheduleExportDialog(computedSchedule: ComputedSchedule, onClose: () -> Unit) {
-    Dialog(
+    DialogWindow(
         state = rememberDialogState(size = DpSize(width = Dp.Unspecified, height = Dp.Unspecified)),
         title = "Export schedule",
         resizable = false,

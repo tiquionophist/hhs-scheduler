@@ -19,11 +19,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.painterResource
 import com.tiquionophist.ui.Dimens
 import com.tiquionophist.ui.GlobalState
 import com.tiquionophist.ui.ThemeColors
 import kotlinx.coroutines.delay
+import org.jetbrains.compose.resources.painterResource
 
 @Composable
 fun NotificationContainer(content: @Composable () -> Unit) {
@@ -69,10 +69,10 @@ fun NotificationContainer(content: @Composable () -> Unit) {
                                 verticalAlignment = Alignment.Bottom,
                                 horizontalArrangement = Arrangement.spacedBy(Dimens.SPACING_2)
                             ) {
-                                notification.iconFilename?.let { iconFilename ->
+                                notification.iconRes?.let { iconRes ->
                                     Icon(
                                         modifier = Modifier.size(Dimens.NOTIFICATION_ICON_SIZE),
-                                        painter = painterResource("icons/$iconFilename.svg"),
+                                        painter = painterResource(iconRes),
                                         contentDescription = null,
                                         tint = (notification.iconTint ?: LocalContentColor.current)
                                             .copy(alpha = LocalContentAlpha.current)

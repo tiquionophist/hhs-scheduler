@@ -12,8 +12,9 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.ColorFilter
-import androidx.compose.ui.res.painterResource
 import com.tiquionophist.ui.Dimens
+import org.jetbrains.compose.resources.DrawableResource
+import org.jetbrains.compose.resources.painterResource
 
 /**
  * A simpler wrapper around [Button] with content that has an SVG icon and text.
@@ -21,14 +22,14 @@ import com.tiquionophist.ui.Dimens
 @Composable
 fun IconAndTextButton(
     text: String,
-    iconFilename: String,
+    iconRes: DrawableResource,
     iconContentDescription: String? = null,
     colors: ButtonColors = ButtonDefaults.buttonColors(),
     onClick: () -> Unit,
 ) {
     Button(colors = colors, onClick = onClick) {
         Image(
-            painter = painterResource("icons/$iconFilename.svg"),
+            painter = painterResource(iconRes),
             contentDescription = iconContentDescription,
             colorFilter = ColorFilter.tint(LocalContentColor.current),
             alpha = LocalContentAlpha.current,

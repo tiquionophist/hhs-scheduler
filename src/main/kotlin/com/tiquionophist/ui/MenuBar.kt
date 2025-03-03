@@ -8,7 +8,9 @@ import androidx.compose.ui.input.key.Key
 import androidx.compose.ui.input.key.KeyShortcut
 import androidx.compose.ui.window.FrameWindowScope
 import androidx.compose.ui.window.MenuBar
+import com.tiquionophist.Res
 import com.tiquionophist.core.ScheduleConfiguration
+import com.tiquionophist.ic_done
 import com.tiquionophist.io.SaveFileIO
 import com.tiquionophist.ui.common.ConfirmationDialog
 import com.tiquionophist.ui.common.ErrorDialog
@@ -68,7 +70,7 @@ fun FrameWindowScope.MenuBar() {
                             GlobalState.currentNotification = Notification(
                                 title = "Configuration saved",
                                 message = "Successfully saved configuration to ${file.canonicalPath}.",
-                                iconFilename = "done",
+                                iconRes = Res.drawable.ic_done,
                                 iconTint = tint,
                             )
                         } else {
@@ -86,7 +88,7 @@ fun FrameWindowScope.MenuBar() {
                         GlobalState.currentNotification = Notification(
                             title = "Configuration loaded",
                             message = "Successfully loaded configuration from ${file.canonicalPath}.",
-                            iconFilename = "done",
+                            iconRes = Res.drawable.ic_done,
                             iconTint = tint,
                         )
 
@@ -147,7 +149,7 @@ fun FrameWindowScope.MenuBar() {
                                 GlobalState.currentNotification = Notification(
                                     title = "Configuration imported",
                                     message = "Successfully imported configuration from ${file.canonicalPath}.",
-                                    iconFilename = "done",
+                                    iconRes = Res.drawable.ic_done,
                                     iconTint = tint,
                                 )
 

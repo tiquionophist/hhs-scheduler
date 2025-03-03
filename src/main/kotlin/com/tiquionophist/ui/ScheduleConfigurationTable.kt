@@ -27,11 +27,12 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.lerp
 import androidx.compose.ui.graphics.painter.BitmapPainter
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
+import com.tiquionophist.Res
 import com.tiquionophist.core.ScheduleConfiguration
 import com.tiquionophist.core.Subject
 import com.tiquionophist.core.Teacher
+import com.tiquionophist.ic_lock
 import com.tiquionophist.ui.common.CheckboxWithLabel
 import com.tiquionophist.ui.common.ColumnWidth
 import com.tiquionophist.ui.common.ColumnWithHeader
@@ -44,6 +45,7 @@ import com.tiquionophist.util.pluralizedCount
 import com.tiquionophist.util.prettyName
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.collections.immutable.toImmutableMap
+import org.jetbrains.compose.resources.painterResource
 
 /**
  * Subjects displayed in the table, in order.
@@ -394,7 +396,7 @@ private fun SubjectLockedIcon(subject: Subject) {
     Tooltip("${subject.prettyName} cannot currently be taught") {
         Image(
             modifier = Modifier.size(Dimens.SPACING_3),
-            painter = painterResource("icons/lock.svg"),
+            painter = painterResource(Res.drawable.ic_lock),
             contentDescription = "Locked",
             colorFilter = ColorFilter.tint(LocalContentColor.current),
             alpha = ThemeColors.current.disabledAlpha,

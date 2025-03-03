@@ -14,7 +14,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.DpSize
-import androidx.compose.ui.window.Dialog
+import androidx.compose.ui.window.DialogWindow
 import androidx.compose.ui.window.rememberDialogState
 import com.tiquionophist.ui.Dimens
 
@@ -27,7 +27,7 @@ fun ConfirmationDialog(
     onAccept: () -> Unit = {},
     onDecline: () -> Unit = {},
 ) {
-    Dialog(
+    DialogWindow(
         state = rememberDialogState(size = DpSize(width = Dp.Unspecified, height = Dp.Unspecified)),
         title = windowTitle,
         resizable = false,

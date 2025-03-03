@@ -18,7 +18,7 @@ import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.DpSize
-import androidx.compose.ui.window.Dialog
+import androidx.compose.ui.window.DialogWindow
 import androidx.compose.ui.window.rememberDialogState
 import com.tiquionophist.ui.Dimens
 
@@ -29,7 +29,7 @@ fun ErrorDialog(
     message: String = if (throwable == null) "An error occurred" else "An exception was thrown",
     onClose: () -> Unit
 ) {
-    Dialog(
+    DialogWindow(
         state = rememberDialogState(size = DpSize(width = Dp.Unspecified, height = Dp.Unspecified)),
         resizable = false,
         icon = rememberVectorPainter(Icons.Default.Warning),
