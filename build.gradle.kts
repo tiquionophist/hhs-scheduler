@@ -17,7 +17,6 @@ plugins {
 
 repositories {
     mavenCentral()
-    maven("https://maven.pkg.jetbrains.space/public/p/compose/dev")
     google()
 }
 
@@ -62,7 +61,6 @@ tasks.jacocoTestReport {
 }
 
 detekt {
-    config.from(files("detekt.yml"))
     buildUponDefaultConfig = true
 }
 
@@ -73,25 +71,28 @@ tasks.check {
 }
 
 val resourcesDir: File = sourceSets["main"].resources.sourceDirectories.first()
-val appProperties = resourcesDir.resolve("app.properties")
-    .bufferedReader()
-    .use { Properties().apply { load(it) } }
-val version = appProperties["version"] as String
+val version: String by lazy {
+    resourcesDir.resolve("app.properties").bufferedReader()
+        .use { reader -> Properties().apply { load(reader) } }
+        .getProperty("version")
+}
 
-compose.desktop {
-    application {
-        mainClass = "com.tiquionophist.ui.MainKt"
+compose.desktop.application {
+    mainClass = "com.tiquionophist.ui.MainKt"
 
-        nativeDistributions {
-            packageVersion = version
-            targetFormats(TargetFormat.Msi)
+    nativeDistributions {
+        packageVersion = version
+        targetFormats(TargetFormat.Msi)
 
-            // remove logging and crypto libraries to slightly reduce application size
-            modules = arrayListOf("java.base", "java.desktop", "java.sql")
+        // remove logging and crypto libraries to slightly reduce application size
+        modules = arrayListOf("java.base", "java.desktop", "java.sql")
 
-            windows {
-                iconFile.set(resourcesDir.resolve("app_icon.ico"))
-            }
+        windows {
+            iconFile.set(resourcesDir.resolve("app_icon.ico"))
+        }
+
+        linux {
+            iconFile.set(resourcesDir.resolve("app_icon.ico"))
         }
     }
 }

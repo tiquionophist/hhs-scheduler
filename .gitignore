@@ -1,6 +1,4 @@
 /.gradle/
+/.kotlin/
 /.idea/
 /build/
-
-/*.json
-/wix*/
