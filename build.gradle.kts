@@ -1,7 +1,6 @@
 import org.gradle.api.tasks.testing.logging.TestExceptionFormat
 import org.gradle.api.tasks.testing.logging.TestLogEvent
 import org.jetbrains.compose.desktop.application.dsl.TargetFormat
-import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import java.nio.file.Files
 import java.util.Properties
 import java.util.zip.ZipEntry
@@ -42,17 +41,9 @@ dependencies {
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 }
 
-tasks.withType<KotlinCompile>().configureEach {
+kotlin {
     compilerOptions {
         allWarningsAsErrors = true
-
-        val composeReportsDir = layout.buildDirectory.file("compose").get().asFile.absolutePath
-        freeCompilerArgs = listOf(
-            "-P",
-            "plugin:androidx.compose.compiler.plugins.kotlin:metricsDestination=$composeReportsDir",
-            "-P",
-            "plugin:androidx.compose.compiler.plugins.kotlin:reportsDestination=$composeReportsDir",
-        )
     }
 }
 
