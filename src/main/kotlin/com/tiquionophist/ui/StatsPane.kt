@@ -25,7 +25,6 @@ import androidx.compose.ui.unit.dp
 import com.tiquionophist.ui.common.CheckboxWithLabel
 import com.tiquionophist.ui.common.MatchingWidthColumn
 import com.tiquionophist.ui.common.StatsTable
-import com.tiquionophist.ui.common.fillParent
 
 /**
  * Shows the weekly stat effects of [GlobalState.scheduleConfiguration], placed at the right of the window.
@@ -35,7 +34,7 @@ fun StatsPane() {
     Surface(color = ThemeColors.current.surface2) {
         Box {
             val scrollState = rememberScrollState()
-            MatchingWidthColumn(Modifier.verticalScroll(scrollState).widthIn(min = 300.dp), min = false) {
+            MatchingWidthColumn(Modifier.verticalScroll(scrollState).widthIn(min = 300.dp)) {
                 Text(
                     maxLines = 1,
                     text = "Weekly class effects",
@@ -82,7 +81,6 @@ fun StatsPane() {
                                 text = "Whether to show subjects which have not been unlocked in the school; " +
                                     "only available after importing from a game save file.",
                                 fontSize = Dimens.FONT_SMALL,
-                                modifier = Modifier.fillParent(),
                             )
                         }
                     }
@@ -103,7 +101,6 @@ fun StatsPane() {
                                 text = "Whether to display the subject experience each teacher has in the scheduling " +
                                     "table; only available after importing from a game save file.",
                                 fontSize = Dimens.FONT_SMALL,
-                                modifier = Modifier.fillParent(),
                             )
                         }
                     }

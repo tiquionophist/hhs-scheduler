@@ -17,7 +17,6 @@ import androidx.compose.ui.platform.LocalLayoutDirection
 fun MatchingWidthColumn(
     modifier: Modifier = Modifier,
     horizontalAlignment: Alignment.Horizontal = Alignment.CenterHorizontally,
-    min: Boolean = true,
     content: @Composable () -> Unit,
 ) {
     val layoutDirection = LocalLayoutDirection.current
@@ -25,13 +24,7 @@ fun MatchingWidthColumn(
         modifier = modifier,
         content = content,
         measurePolicy = { measurables, constraints ->
-            val goalWidth = measurables.maxOf {
-                if (min) {
-                    it.minIntrinsicWidth(constraints.maxHeight)
-                } else {
-                    it.maxIntrinsicWidth(constraints.maxHeight)
-                }
-            }
+            val goalWidth = measurables.maxOf { it.minIntrinsicWidth(constraints.maxHeight) }
                 .coerceAtLeast(constraints.minWidth)
 
             val placeables = measurables.map {
