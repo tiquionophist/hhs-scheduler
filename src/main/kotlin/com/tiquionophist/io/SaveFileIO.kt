@@ -5,27 +5,15 @@ import com.fasterxml.jackson.dataformat.xml.XmlMapper
 import com.fasterxml.jackson.module.kotlin.kotlinModule
 import com.tiquionophist.core.Teacher
 import com.tiquionophist.ui.ComputedSchedule
-import org.jetbrains.exposed.sql.Column
-import org.jetbrains.exposed.sql.Database
-import org.jetbrains.exposed.sql.Table
-import org.jetbrains.exposed.sql.selectAll
-import org.jetbrains.exposed.sql.statements.api.ExposedBlob
-import org.jetbrains.exposed.sql.transactions.TransactionManager
-import org.jetbrains.exposed.sql.transactions.transaction
-import org.jetbrains.exposed.sql.update
 import java.io.File
 import java.io.InputStream
-import java.sql.Connection
+import java.sql.DriverManager
 import javax.xml.stream.XMLInputFactory
 import javax.xml.stream.XMLOutputFactory
 import javax.xml.stream.XMLStreamReader
 import javax.xml.stream.XMLStreamWriter
 
 object SaveFileIO {
-    private object SaveInfoTable : Table(name = "hhs_SaveInfo") {
-        val data: Column<ExposedBlob> = blob("Data")
-    }
-
     /**
      * The required number of periods per week in save game files, since they are hardcoded to 5 days/week and 4
      * periods/day.
@@ -52,21 +40,15 @@ object SaveFileIO {
             }
 
             SaveFileType.SQL -> {
-                val blob = transaction(openSqliteDb(file)) {
-                    val saveInfos = SaveInfoTable
-                        .selectAll()
-                        .toList()
-
-                    require(saveInfos.size == 1) {
-                        "expecting exactly one ${SaveInfoTable.tableName} row; found ${saveInfos.size}"
-                    }
-
-                    saveInfos.first()[SaveInfoTable.data]
+                val dataBytes = DriverManager.getConnection("jdbc:sqlite:${file.absolutePath}").use { connection ->
+                    val resultSet = connection.createStatement().executeQuery("SELECT Data FROM hhs_SaveInfo LIMIT 1")
+                    check(resultSet.next()) { "no hhs_SaveInfo row found" }
+                    resultSet.getBytes(1)
                 }
 
                 onReadSaveFile()
 
-                EncodingUtil.unzip(blob.inputStream)
+                EncodingUtil.unzip(dataBytes.inputStream())
             }
         }
     }
@@ -146,10 +128,10 @@ object SaveFileIO {
             }
         }
 
-        transaction(openSqliteDb(destinationFile)) {
-            SaveInfoTable.update {
-                it[data] = ExposedBlob(newData)
-            }
+        DriverManager.getConnection("jdbc:sqlite:${destinationFile.absolutePath}").use { connection ->
+            val stmt = connection.prepareStatement("UPDATE hhs_SaveInfo SET Data = ?")
+            stmt.setBytes(1, newData)
+            stmt.executeUpdate()
         }
     }
 
@@ -245,10 +227,5 @@ object SaveFileIO {
                 }
             }
         }
-    }
-
-    private fun openSqliteDb(file: File): Database {
-        TransactionManager.manager.defaultIsolationLevel = Connection.TRANSACTION_SERIALIZABLE
-        return Database.connect("jdbc:sqlite:${file.absolutePath}", "org.sqlite.JDBC")
     }
 }
