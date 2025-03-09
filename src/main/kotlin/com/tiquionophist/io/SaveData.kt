@@ -8,6 +8,7 @@ import com.tiquionophist.core.ScheduleConfiguration
 import com.tiquionophist.core.Subject
 import com.tiquionophist.core.Teacher
 import com.tiquionophist.util.prettyName
+import java.util.EnumMap
 
 /**
  * Wraps the main contents of a save file, from [SaveFile.data].
@@ -110,13 +111,17 @@ data class SaveData(
          * [tuesday], etc.
          */
         fun toSubjectFrequency(): Map<Subject, Int> {
-            val subjects = listOf(monday.strings, tuesday.strings, wednesday.strings, thursday.strings, friday.strings)
-                .flatten()
-                .mapNotNull { subjectNameToEnum(it) }
-
-            return subjects.fold(mapOf()) { map, subject ->
-                map.plus(subject to (map[subject] ?: 0) + 1)
+            val days = listOf(monday.strings, tuesday.strings, wednesday.strings, thursday.strings, friday.strings)
+            val frequencies = EnumMap<_, Int>(Subject::class.java)
+            for (day in days) {
+                for (string in day) {
+                    val subject = subjectNameToEnum(string)
+                    if (subject != null) {
+                        frequencies[subject] = (frequencies[subject] ?: 0) + 1
+                    }
+                }
             }
+            return frequencies
         }
 
         companion object {
