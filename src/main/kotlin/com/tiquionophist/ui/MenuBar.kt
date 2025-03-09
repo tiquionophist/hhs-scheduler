@@ -1,9 +1,11 @@
 package com.tiquionophist.ui
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.input.key.Key
 import androidx.compose.ui.input.key.KeyShortcut
 import androidx.compose.ui.window.FrameWindowScope
@@ -34,25 +36,27 @@ private val appVersion: String? by lazy { appProperties?.getProperty("version") 
  * The application menu bar.
  */
 @Composable
-fun FrameWindowScope.MenuBar() {
-    val throwableState = remember { mutableStateOf<Throwable?>(null) }
-    val confirmConfigurationState = remember { mutableStateOf(false) }
+fun FrameWindowScope.MenuBar(
+    onAddCustomTeacher: () -> Unit,
+) {
+    var throwable by remember { mutableStateOf<Throwable?>(null) }
+    var confirmingConfiguration by remember { mutableStateOf(false) }
 
-    throwableState.value?.let { throwable ->
+    if (throwable != null) {
         ErrorDialog(
             throwable = throwable,
-            onClose = { throwableState.value = null }
+            onClose = { throwable = null }
         )
     }
 
-    if (confirmConfigurationState.value) {
+    if (confirmingConfiguration) {
         ConfirmationDialog(
             windowTitle = "Confirm imported schedule configuration",
             prompt = "The imported schedule has different subject frequencies across classes so per-class " +
                 "scheduling has been enabled. Disable it to have subjects taught the same amount across all classes.",
             cancelText = null,
-            onAccept = { confirmConfigurationState.value = false },
-            onDecline = { confirmConfigurationState.value = false },
+            onAccept = { confirmingConfiguration = false },
+            onDecline = { error("impossible") },
         )
     }
 
@@ -74,7 +78,7 @@ fun FrameWindowScope.MenuBar() {
                                 iconTint = tint,
                             )
                         } else {
-                            throwableState.value = result.exceptionOrNull()
+                            throwable = result.exceptionOrNull()
                         }
                     }
                 },
@@ -97,7 +101,7 @@ fun FrameWindowScope.MenuBar() {
                         if (result.isSuccess) {
                             GlobalState.scheduleConfiguration = result.getOrThrow()
                         } else {
-                            throwableState.value = result.exceptionOrNull()
+                            throwable = result.exceptionOrNull()
                         }
                     }
                 },
@@ -160,10 +164,10 @@ fun FrameWindowScope.MenuBar() {
                                 GlobalState.currentClassIndex = if (sameSubjectFrequencyInAllClasses) null else 0
 
                                 if (!sameSubjectFrequencyInAllClasses) {
-                                    confirmConfigurationState.value = true
+                                    confirmingConfiguration = true
                                 }
                             } else {
-                                throwableState.value = result.exceptionOrNull()
+                                throwable = result.exceptionOrNull()
                             }
                         }
                     }
@@ -181,7 +185,7 @@ fun FrameWindowScope.MenuBar() {
             Item(
                 text = "Add custom teacher",
                 shortcut = KeyShortcut(Key.Equals, ctrl = true),
-                onClick = { CustomTeacherDialogHandler.visible = true },
+                onClick = onAddCustomTeacher,
             )
         }
 

@@ -29,6 +29,61 @@ import kotlinx.collections.immutable.toImmutableMap
 import org.jetbrains.compose.resources.painterResource
 
 /**
+ * A grid-based view of the lessons in a [schedule] for the class at [classIndex].
+ */
+@Composable
+fun ScheduleTable(configuration: ScheduleConfiguration, schedule: Schedule, classIndex: Int) {
+    val dayNames = remember(configuration.daysPerWeek) {
+        @Suppress("MagicNumber")
+        if (configuration.daysPerWeek == 5) {
+            listOf("Monday", "Tuesday", "Wednesday", "Thursday", "Friday")
+        } else {
+            List(configuration.daysPerWeek) { "Day ${it + 1}" }
+        }
+    }
+
+    val columns = remember(configuration.periodsPerDay, configuration.daysPerWeek, classIndex) {
+        val periodNamesColumn = PeriodNamesColumn
+
+        val chunkedLessons = schedule.lessons[classIndex].chunked(configuration.periodsPerDay)
+        val scheduleDayColumns = List(configuration.daysPerWeek) { day ->
+            ScheduleDayColumn(dayName = dayNames[day], lessons = chunkedLessons[day])
+        }
+
+        listOf(periodNamesColumn).plus(scheduleDayColumns).toImmutableList()
+    }
+
+    val rows = remember(configuration.periodsPerDay) {
+        listOf(null).plus(List(configuration.periodsPerDay) { it }).toImmutableList()
+    }
+
+    // strong divider after the header row, weak dividers between each period row
+    val horizontalDividers = remember(rows.size) {
+        buildMap {
+            repeat(rows.size - 1) { rowIndex ->
+                put(rowIndex + 1, TableDivider(weak = rowIndex != 0))
+            }
+        }.toImmutableMap()
+    }
+
+    // strong divider after the period name column, weak dividers between each day column
+    val verticalDividers = remember(columns.size) {
+        buildMap {
+            repeat(columns.size - 1) { colIndex ->
+                put(colIndex + 1, TableDivider(weak = colIndex != 0))
+            }
+        }.toImmutableMap()
+    }
+
+    Table(
+        columns = columns,
+        rows = rows,
+        horizontalDividers = horizontalDividers,
+        verticalDividers = verticalDividers,
+    )
+}
+
+/**
  * A column which displays the period number for each period index row.
  */
 private object PeriodNamesColumn : ColumnWithHeader<Int> {
@@ -110,51 +165,4 @@ private class ScheduleDayColumn(
             }
         }
     }
-}
-
-/**
- * A grid-based view of the lessons in a [schedule] for the class at [classIndex].
- */
-@Composable
-fun ScheduleTable(configuration: ScheduleConfiguration, schedule: Schedule, classIndex: Int) {
-    val dayNames = remember(configuration.daysPerWeek) {
-        @Suppress("MagicNumber")
-        if (configuration.daysPerWeek == 5) {
-            listOf("Monday", "Tuesday", "Wednesday", "Thursday", "Friday")
-        } else {
-            List(configuration.daysPerWeek) { "Day ${it + 1}" }
-        }
-    }
-
-    val columns = remember(configuration.periodsPerDay, configuration.daysPerWeek, classIndex) {
-        val periodNamesColumn = PeriodNamesColumn
-
-        val chunkedLessons = schedule.lessons[classIndex].chunked(configuration.periodsPerDay)
-        val scheduleDayColumns = List(configuration.daysPerWeek) { day ->
-            ScheduleDayColumn(dayName = dayNames[day], lessons = chunkedLessons[day])
-        }
-
-        listOf(periodNamesColumn).plus(scheduleDayColumns).toImmutableList()
-    }
-
-    val rows = remember(configuration.periodsPerDay) {
-        listOf(null).plus(List(configuration.periodsPerDay) { it }).toImmutableList()
-    }
-
-    Table(
-        columns = columns,
-        rows = rows,
-        // strong divider after the header row, weak dividers between each period row
-        horizontalDividers = List(rows.size - 1) { rowIndex ->
-            rowIndex + 1 to TableDivider(
-                color = if (rowIndex == 0) ThemeColors.current.divider else ThemeColors.current.weakDivider
-            )
-        }.toMap().toImmutableMap(),
-        // strong divider after the period name column, weak dividers between each day column
-        verticalDividers = List(columns.size - 1) { colIndex ->
-            colIndex + 1 to TableDivider(
-                color = if (colIndex == 0) ThemeColors.current.divider else ThemeColors.current.weakDivider
-            )
-        }.toMap().toImmutableMap(),
-    )
 }

@@ -12,6 +12,8 @@ import androidx.compose.ui.platform.LocalLayoutDirection
  *
  * In theory [horizontalAlignment] should not be necessary, but in case any children refuse to conform to this
  * calculated width, it is used to align the children.
+ *
+ * TODO revisit
  */
 @Composable
 fun MatchingWidthColumn(

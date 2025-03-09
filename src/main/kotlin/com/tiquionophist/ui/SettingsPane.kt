@@ -54,8 +54,8 @@ import org.jetbrains.compose.resources.painterResource
  */
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun SettingsPane() {
-    Surface(color = ThemeColors.current.surface3) {
+fun SettingsPane(modifier: Modifier = Modifier) {
+    Surface(color = ThemeColors.current.surface3, modifier = modifier) {
         Row(
             modifier = Modifier.fillMaxWidth().padding(horizontal = Dimens.SPACING_3, vertical = Dimens.SPACING_2),
             horizontalArrangement = Arrangement.SpaceBetween,

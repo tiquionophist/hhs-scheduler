@@ -1,11 +1,10 @@
 package com.tiquionophist.ui.common
 
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
 import androidx.compose.material.Checkbox
 import androidx.compose.material.CheckboxColors
 import androidx.compose.material.CheckboxDefaults
@@ -34,15 +33,13 @@ fun CheckboxWithLabel(
     Row(
         modifier = modifier.clickable(enabled = enabled) { onCheckedChange(!checked) }.padding(padding),
         verticalAlignment = verticalAlignment,
+        horizontalArrangement = Arrangement.spacedBy(checkboxPadding)
     ) {
         Checkbox(checked = checked, enabled = enabled, onCheckedChange = null, colors = colors)
 
-        Spacer(Modifier.width(checkboxPadding))
-
-        if (enabled) {
-            content()
-        } else {
-            CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.disabled, content = content)
-        }
+        CompositionLocalProvider(
+            LocalContentAlpha provides if (enabled) LocalContentAlpha.current else ContentAlpha.disabled,
+            content = content,
+        )
     }
 }

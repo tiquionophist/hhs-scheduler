@@ -1,33 +1,23 @@
 package com.tiquionophist.ui.common
 
+import androidx.compose.runtime.Composable
 import androidx.compose.runtime.State
-import androidx.compose.runtime.mutableStateOf
-import kotlinx.coroutines.CoroutineScope
+import androidx.compose.runtime.produceState
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.TimeSource
 
 /**
  * Returns a [State] of the duration from the time this function was called, updated every [increment].
- *
- * Runs on the given [coroutineScope], which should be attached to a specific point in the composition to make sure the
- * coroutine is cleaned up when it is no longer needed.
  */
-fun liveDurationState(
-    coroutineScope: CoroutineScope,
-    increment: Duration = 100.milliseconds,
-): State<Duration> {
-    val state = mutableStateOf(Duration.ZERO)
-    val start = TimeSource.Monotonic.markNow()
-
-    coroutineScope.launch {
+@Composable
+fun liveDurationState(increment: Duration = 25.milliseconds): State<Duration> {
+    return produceState(initialValue = Duration.ZERO) {
+        val start = TimeSource.Monotonic.markNow()
         while (true) {
             delay(increment.inWholeMilliseconds)
-            state.value = start.elapsedNow().absoluteValue
+            value = start.elapsedNow().absoluteValue
         }
     }
-
-    return state
 }

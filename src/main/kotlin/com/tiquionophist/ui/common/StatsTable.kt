@@ -15,11 +15,38 @@ import com.tiquionophist.core.StatSet
 import com.tiquionophist.ui.Dimens
 import com.tiquionophist.ui.ThemeColors
 import com.tiquionophist.util.prettyName
+import kotlinx.collections.immutable.ImmutableList
+import kotlinx.collections.immutable.ImmutableMap
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.persistentMapOf
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.collections.immutable.toImmutableMap
 import java.math.BigDecimal
+
+@Composable
+fun StatsTable(stats: StatSet, modifier: Modifier = Modifier) {
+    val statsList: ImmutableList<Pair<Stat, StatValue>> = remember(stats) {
+        stats.stats
+            .map { it.key to StatValue(it.value) }
+            .sortedBy { it.first.prettyName }
+            .toImmutableList()
+    }
+
+    val horizontalDividers: ImmutableMap<Int, TableDivider> = remember(statsList.size) {
+        List(statsList.size + 1) { rowIndex ->
+            rowIndex to TableDivider(weak = rowIndex != 0 && rowIndex != statsList.size)
+        }.toMap().toImmutableMap()
+    }
+
+    Table(
+        columns = columns,
+        rows = statsList,
+        verticalDividers = verticalDividers,
+        horizontalDividers = horizontalDividers,
+        fillMaxWidth = true,
+        modifier = modifier.width(IntrinsicSize.Min),
+    )
+}
 
 @Immutable
 private data class StatValue(val value: BigDecimal) {
@@ -51,35 +78,10 @@ private object StatValueColumn : Column<Pair<Stat, StatValue>> {
     }
 }
 
-@Composable
-fun StatsTable(stats: StatSet) {
-    val statsList = remember(stats) {
-        stats
-            .stats
-            .mapValues { StatValue(it.value) }
-            .toList()
-            .sortedBy { it.first.prettyName }
-            .toImmutableList()
-    }
+private val columns = persistentListOf(StatNameColumn, StatValueColumn)
 
-    Table(
-        columns = persistentListOf(StatNameColumn, StatValueColumn),
-        rows = statsList,
-        verticalDividers = persistentMapOf(
-            0 to TableDivider(dividerSize = 0.dp, paddingAfter = Dimens.SPACING_2),
-            1 to TableDivider(color = ThemeColors.current.weakDivider),
-            2 to TableDivider(dividerSize = 0.dp, paddingAfter = Dimens.SPACING_2),
-        ),
-        horizontalDividers = List(statsList.size + 1) { rowIndex ->
-            rowIndex to TableDivider(
-                color = if (rowIndex == 0 || rowIndex == statsList.size) {
-                    ThemeColors.current.divider
-                } else {
-                    ThemeColors.current.weakDivider
-                }
-            )
-        }.toMap().toImmutableMap(),
-        fillMaxWidth = true,
-        modifier = Modifier.width(IntrinsicSize.Min),
-    )
-}
+private val verticalDividers = persistentMapOf(
+    0 to TableDivider(dividerSize = 0.dp, paddingAfter = Dimens.SPACING_2),
+    1 to TableDivider(weak = true),
+    2 to TableDivider(dividerSize = 0.dp, paddingAfter = Dimens.SPACING_2),
+)

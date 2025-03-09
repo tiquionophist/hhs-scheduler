@@ -46,6 +46,84 @@ import kotlinx.collections.immutable.toImmutableMap
 import org.jetbrains.compose.resources.painterResource
 
 /**
+ * A grid-based view of the teacher/subject assignments and frequencies in [GlobalState.scheduleConfiguration].
+ */
+@Composable
+fun ScheduleConfigurationTable() {
+    val configuration = GlobalState.scheduleConfiguration
+    val scheduledTeachers = configuration.teacherAssignments.keys
+
+    val teachers = remember(
+        scheduledTeachers,
+        GlobalState.customTeachers,
+        GlobalState.showLexvilleTeachers,
+        GlobalState.showUnusedTeachers,
+    ) {
+        Teacher.DEFAULT_TEACHERS
+            .plus(scheduledTeachers)
+            .plus(GlobalState.customTeachers)
+            .plus(if (GlobalState.showLexvilleTeachers) Teacher.LEXVILLE_TEACHERS else emptySet())
+            .let { teachers ->
+                if (GlobalState.showUnusedTeachers) {
+                    teachers
+                } else {
+                    teachers.filter { configuration.teacherEnabled(it) }
+                        .takeUnless { it.isEmpty() } ?: teachers // don't allow empty teachers
+                }
+            }
+            .sortedBy { it.fullName }
+    }
+
+    val fixedRows = listOf(null)
+
+    val subjectRows = remember(GlobalState.showUnusedSubjects, GlobalState.showLockedSubjects, configuration) {
+        subjects
+            .filter {
+                val enabled = configuration.subjectEnabled(subject = it, classIndex = GlobalState.currentClassIndex)
+                val locked = configuration.allowedSubjects?.get(it) == false
+
+                (GlobalState.showUnusedSubjects || enabled) && (GlobalState.showLockedSubjects || !locked)
+            }
+            .takeUnless { it.minus(Subject.EMPTY).isEmpty() }
+            ?: subjects // don't allow empty subjects
+    }
+
+    val verticalDividers = remember(teachers.size) {
+        buildMap {
+            put(fixedColumns.size, TableDivider(paddingBefore = Dimens.SPACING_2))
+
+            repeat(teachers.size - 1) { teacherIndex ->
+                put(teacherIndex + fixedColumns.size + 1, TableDivider(weak = true))
+            }
+        }.toImmutableMap()
+    }
+
+    val horizontalDividers = remember(subjectRows.size) {
+        buildMap {
+            put(fixedRows.size, TableDivider(paddingBefore = Dimens.SPACING_2))
+
+            repeat(subjectRows.size - 1) { subjectIndex ->
+                put(subjectIndex + fixedRows.size + 1, TableDivider(weak = true))
+            }
+        }.toImmutableMap()
+    }
+
+    Table(
+        columns = fixedColumns
+            .plus(
+                teachers.map { teacher ->
+                    SubjectTeacherAssignmentsColumn(teacher)
+                }
+            )
+            .toImmutableList(),
+        rows = fixedRows.plus(subjectRows).toImmutableList(),
+        fillMaxHeight = true,
+        verticalDividers = verticalDividers,
+        horizontalDividers = horizontalDividers,
+    )
+}
+
+/**
  * Subjects displayed in the table, in order.
  */
 private val subjects: List<Subject> = Subject.entries
@@ -211,13 +289,13 @@ private object SubjectFrequencyPickerColumn : ColumnWithHeader<Subject> {
     override fun itemContent(value: Subject) {
         val config = GlobalState.scheduleConfiguration
         val classIndex = GlobalState.currentClassIndex
-        val subjectLocked = config.allowedSubjects?.get(value) == false
         if (value == Subject.EMPTY) {
             Text(
                 modifier = Modifier.padding(Dimens.SPACING_2),
                 text = (config.subjectFrequency[classIndex ?: 0][value] ?: 0).toString(),
             )
         } else {
+            val subjectLocked = config.allowedSubjects?.get(value) == false
             NumberPicker(
                 modifier = Modifier.padding(Dimens.SPACING_2),
                 value = config.subjectFrequency[classIndex ?: 0][value] ?: 0,
@@ -378,17 +456,18 @@ private class SubjectTeacherAssignmentsColumn(private val teacher: Teacher) : Co
             )
 
             if (subjectLocked) {
-                Box(Modifier.align(Alignment.CenterEnd).padding(Dimens.SPACING_3)) {
-                    SubjectLockedIcon(subject = value)
-                }
+                SubjectLockedIcon(
+                    subject = value,
+                    modifier = Modifier.align(Alignment.CenterEnd).padding(Dimens.SPACING_3),
+                )
             }
         }
     }
 }
 
 @Composable
-private fun SubjectLockedIcon(subject: Subject) {
-    Tooltip("${subject.prettyName} cannot currently be taught") {
+private fun SubjectLockedIcon(subject: Subject, modifier: Modifier = Modifier) {
+    Tooltip(text = "${subject.prettyName} cannot currently be taught", modifier = modifier) {
         Image(
             modifier = Modifier.size(Dimens.SPACING_3),
             painter = painterResource(Res.drawable.ic_lock),
@@ -399,91 +478,8 @@ private fun SubjectLockedIcon(subject: Subject) {
     }
 }
 
-/**
- * A grid-based view of the teacher/subject assignments and frequencies in [GlobalState.scheduleConfiguration].
- */
-@Composable
-fun ScheduleConfigurationTable() {
-    val configuration = GlobalState.scheduleConfiguration
-    val scheduledTeachers = configuration.teacherAssignments.keys
-
-    val teachers = remember(
-        scheduledTeachers,
-        GlobalState.customTeachers,
-        GlobalState.showLexvilleTeachers,
-        GlobalState.showUnusedTeachers,
-    ) {
-        Teacher.DEFAULT_TEACHERS
-            .plus(scheduledTeachers)
-            .plus(GlobalState.customTeachers)
-            .plus(if (GlobalState.showLexvilleTeachers) Teacher.LEXVILLE_TEACHERS else emptySet())
-            .let { teachers ->
-                if (GlobalState.showUnusedTeachers) {
-                    teachers
-                } else {
-                    teachers.filter { configuration.teacherEnabled(it) }
-                        .takeUnless { it.isEmpty() } ?: teachers // don't allow empty teachers
-                }
-            }
-            .sortedBy { it.fullName }
-    }
-
-    val fixedColumns = listOf(
-        SubjectColumn(classIndex = GlobalState.currentClassIndex),
-        SubjectFrequencyPickerColumn,
-        TotalTeacherAssignmentsColumn(classIndex = GlobalState.currentClassIndex),
-    )
-
-    val fixedRows = listOf(null)
-
-    val subjectRows = remember(GlobalState.showUnusedSubjects, GlobalState.showLockedSubjects, configuration) {
-        subjects
-            .filter {
-                val enabled = configuration.subjectEnabled(subject = it, classIndex = GlobalState.currentClassIndex)
-                val locked = configuration.allowedSubjects?.get(it) == false
-
-                (GlobalState.showUnusedSubjects || enabled) && (GlobalState.showLockedSubjects || !locked)
-            }
-            .takeUnless { it.minus(Subject.EMPTY).isEmpty() }
-            ?: subjects // don't allow empty subjects
-    }
-
-    Table(
-        columns = fixedColumns
-            .plus(
-                teachers.map { teacher ->
-                    SubjectTeacherAssignmentsColumn(teacher)
-                }
-            )
-            .toImmutableList(),
-        rows = fixedRows.plus(subjectRows).toImmutableList(),
-        fillMaxHeight = true,
-        verticalDividers = mapOf(
-            // strong divider after fixed columns
-            Pair(
-                fixedColumns.size,
-                TableDivider(
-                    paddingBefore = Dimens.SPACING_2,
-                    color = ThemeColors.current.divider,
-                )
-            ),
-        ).plus(
-            // weak dividers between each teacher column
-            List(teachers.size - 1) { teacherIndex ->
-                Pair(teacherIndex + fixedColumns.size + 1, TableDivider(color = ThemeColors.current.weakDivider))
-            }
-        ).toImmutableMap(),
-        horizontalDividers = mapOf(
-            // strong divider after header row
-            fixedRows.size to TableDivider(
-                paddingBefore = Dimens.SPACING_2,
-                color = ThemeColors.current.divider,
-            ),
-        ).plus(
-            // weak dividers between each subject row
-            List(subjectRows.size - 1) { subjectIndex ->
-                Pair(subjectIndex + fixedRows.size + 1, TableDivider(color = ThemeColors.current.weakDivider))
-            }
-        ).toImmutableMap(),
-    )
-}
+private val fixedColumns = listOf(
+    SubjectColumn(classIndex = GlobalState.currentClassIndex),
+    SubjectFrequencyPickerColumn,
+    TotalTeacherAssignmentsColumn(classIndex = GlobalState.currentClassIndex),
+)

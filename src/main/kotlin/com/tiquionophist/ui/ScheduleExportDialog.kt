@@ -43,13 +43,13 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 private sealed class ExportStatus {
-    object NotStarted : ExportStatus()
-    object InProgress : ExportStatus()
+    data object NotStarted : ExportStatus()
+    data object InProgress : ExportStatus()
     data class Error(val throwable: Throwable) : ExportStatus()
-    object Success : ExportStatus()
+    data object Success : ExportStatus()
 }
 
-private val DIALOG_HEIGHT = 200.dp
+private val DIALOG_HEIGHT = 300.dp
 
 @Composable
 fun ScheduleExportDialog(computedSchedule: ComputedSchedule, onClose: () -> Unit) {
@@ -116,7 +116,7 @@ private fun ScheduleExportDialogContent(computedSchedule: ComputedSchedule) {
         var status by remember { mutableStateOf<ExportStatus>(ExportStatus.NotStarted) }
 
         when (status) {
-            ExportStatus.NotStarted -> {
+            is ExportStatus.NotStarted -> {
                 val coroutineScope = rememberCoroutineScope { Dispatchers.Default }
                 Button(
                     modifier = Modifier.align(Alignment.End),
@@ -149,10 +149,10 @@ private fun ScheduleExportDialogContent(computedSchedule: ComputedSchedule) {
                     Text("Choose save file")
                 }
             }
-            ExportStatus.InProgress -> {
+            is ExportStatus.InProgress -> {
                 CircularProgressIndicator(modifier = Modifier.align(Alignment.End))
             }
-            ExportStatus.Success -> {
+            is ExportStatus.Success -> {
                 Text(
                     modifier = Modifier.align(Alignment.CenterHorizontally),
                     color = Color.Green,

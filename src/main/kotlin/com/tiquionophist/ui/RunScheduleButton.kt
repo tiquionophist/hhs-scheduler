@@ -15,9 +15,12 @@ import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.derivedStateOf
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -27,16 +30,15 @@ import com.tiquionophist.ic_stop
 import com.tiquionophist.ui.common.ErrorDialog
 import com.tiquionophist.ui.common.IconAndTextButton
 import com.tiquionophist.ui.common.liveDurationState
-import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import kotlin.time.DurationUnit
 
 private class ErrorDialogState(
     val title: String,
     val message: String,
-    val throwable: Throwable?
+    val throwable: Throwable?,
 )
 
 private const val SCHEDULE_NOT_FOUND_TITLE = "No schedule found"
@@ -51,108 +53,103 @@ private const val EXCEPTION_MESSAGE =
 @Composable
 fun RunScheduleButton(
     schedulerSettings: SchedulerSettings,
+    modifier: Modifier = Modifier,
     configuration: ScheduleConfiguration = GlobalState.scheduleConfiguration,
     enabled: Boolean = true,
     runImageVector: ImageVector = Icons.Default.PlayArrow,
     runText: String = "Run",
 ) {
-    val dialogState = remember { mutableStateOf<Set<ErrorDialogState>>(emptySet()) }
-    dialogState.value.forEach { errorDialogState ->
+    val coroutineScope = rememberCoroutineScope()
+    var job by remember { mutableStateOf<Job?>(null) }
+    val loading = job != null
+
+    var errorDialogs by remember { mutableStateOf<Set<ErrorDialogState>>(emptySet()) }
+
+    errorDialogs.forEach { errorDialogState ->
         ErrorDialog(
             title = errorDialogState.title,
             message = errorDialogState.message,
             throwable = errorDialogState.throwable,
-            onClose = {
-                dialogState.value = dialogState.value.minus(errorDialogState)
-            }
+            onClose = { errorDialogs -= errorDialogState }
         )
     }
 
-    Row {
-        val jobState = remember { mutableStateOf<Job?>(null) }
-        val loading = jobState.value != null
-
+    Row(modifier = modifier) {
         if (loading) {
             IconAndTextButton(
                 text = "Cancel",
                 iconRes = Res.drawable.ic_stop,
                 colors = ButtonDefaults.buttonColors(backgroundColor = MaterialTheme.colors.error),
                 onClick = {
-                    jobState.value?.cancel()
-                    jobState.value = null
+                    job?.cancel()
+                    job = null
                 }
             )
         }
 
-        val coroutineScope = rememberCoroutineScope { Dispatchers.Default }
         Button(
             enabled = enabled && !loading,
             onClick = {
-                jobState.value = coroutineScope.launch {
+                job = coroutineScope.launch {
                     val scheduler = schedulerSettings.create()
 
-                    val result = runCatching {
-                        scheduler.schedule(configuration)?.also { it.verify(configuration) }
-                    }
-
-                    if (isActive) {
-                        if (result.isSuccess) {
-                            val schedule = result.getOrThrow()
-                            if (schedule == null) {
-                                val errorDialogState = ErrorDialogState(
-                                    title = SCHEDULE_NOT_FOUND_TITLE,
-                                    message = SCHEDULE_NOT_FOUND_MESSAGE,
-                                    throwable = null,
-                                )
-                                dialogState.value = dialogState.value.plus(errorDialogState)
-                            } else {
-                                val computedSchedule = ComputedSchedule(
-                                    configuration = configuration,
-                                    schedulerSettings = schedulerSettings,
-                                    schedule = schedule,
-                                )
-
-                                GlobalState.computedSchedules = GlobalState.computedSchedules.plus(computedSchedule)
-                            }
-                        } else {
-                            val errorDialogState = ErrorDialogState(
-                                title = EXCEPTION_TITLE,
-                                message = EXCEPTION_MESSAGE,
-                                throwable = result.exceptionOrNull(),
+                    @Suppress("TooGenericExceptionCaught")
+                    try {
+                        val schedule = scheduler.schedule(configuration)?.also { it.verify(configuration) }
+                        if (schedule == null) {
+                            errorDialogs += ErrorDialogState(
+                                title = SCHEDULE_NOT_FOUND_TITLE,
+                                message = SCHEDULE_NOT_FOUND_MESSAGE,
+                                throwable = null,
                             )
-                            dialogState.value = dialogState.value.plus(errorDialogState)
+                        } else {
+                            GlobalState.computedSchedules += ComputedSchedule(
+                                configuration = configuration,
+                                schedulerSettings = schedulerSettings,
+                                schedule = schedule,
+                            )
                         }
+                    } catch (_: CancellationException) {
+                        // no-op
+                    } catch (throwable: Throwable) {
+                        errorDialogs += ErrorDialogState(
+                            title = EXCEPTION_TITLE,
+                            message = EXCEPTION_MESSAGE,
+                            throwable = throwable,
+                        )
                     }
-
-                    jobState.value = null // can't use the job isCompleted since it would not refresh the composition
                 }
+                    .apply {
+                        // can't use the job isCompleted since it would not refresh the composition
+                        invokeOnCompletion { job = null }
+                    }
             },
-            content = {
-                if (loading) {
-                    CircularProgressIndicator(
-                        modifier = Modifier.size(Dimens.SPACING_3),
-                        strokeWidth = Dimens.PROGRESS_INDICATOR_STROKE_WIDTH,
-                    )
+        ) {
+            if (loading) {
+                CircularProgressIndicator(
+                    modifier = Modifier.size(Dimens.SPACING_3),
+                    strokeWidth = Dimens.PROGRESS_INDICATOR_STROKE_WIDTH,
+                )
 
-                    Spacer(Modifier.width(Dimens.SPACING_2))
+                Spacer(Modifier.width(Dimens.SPACING_2))
 
-                    val loadingCoroutineScope = rememberCoroutineScope { Dispatchers.Default }
-                    val durationState = remember { liveDurationState(loadingCoroutineScope) }
-                    val seconds = durationState.value.toDouble(DurationUnit.SECONDS)
-                    Text("Running for %.1fs".format(seconds))
-                } else {
-                    Image(
-                        imageVector = runImageVector,
-                        contentDescription = null,
-                        colorFilter = ColorFilter.tint(LocalContentColor.current),
-                        alpha = LocalContentAlpha.current,
-                    )
-
-                    Spacer(Modifier.width(Dimens.SPACING_2))
-
-                    Text(text = runText, maxLines = 2)
+                val durationState = liveDurationState()
+                val formattedDurationState = remember {
+                    derivedStateOf { "%.1fs".format(durationState.value.toDouble(DurationUnit.SECONDS)) }
                 }
+                Text("Running for ${formattedDurationState.value}")
+            } else {
+                Image(
+                    imageVector = runImageVector,
+                    contentDescription = null,
+                    colorFilter = ColorFilter.tint(LocalContentColor.current),
+                    alpha = LocalContentAlpha.current,
+                )
+
+                Spacer(Modifier.width(Dimens.SPACING_2))
+
+                Text(text = runText, maxLines = 2)
             }
-        )
+        }
     }
 }

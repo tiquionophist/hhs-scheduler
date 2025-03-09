@@ -11,6 +11,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
 
+// TODO revisit/remove
 @Composable
 fun Modifier.enabledIf(enabled: Boolean) = if (enabled) this else alpha(ThemeColors.current.disabledAlpha)
 

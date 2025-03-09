@@ -8,9 +8,10 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.Immutable
+import androidx.compose.runtime.Stable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.IntrinsicMeasurable
 import androidx.compose.ui.layout.IntrinsicMeasureScope
 import androidx.compose.ui.layout.Layout
@@ -36,6 +37,7 @@ import kotlin.math.roundToInt
  * Represents a column in a [Table] whose rows have type [T], specifying how its contents are laid out and the [content]
  * of each row.
  */
+@Stable
 interface Column<T> {
     /**
      * Specifies how the column width is determined.
@@ -71,6 +73,7 @@ interface Column<T> {
 /**
  * A convenience wrapper for a [Column] which includes a special header row as the first row as a null value.
  */
+@Stable
 interface ColumnWithHeader<T : Any> : Column<T?> {
     val headerHorizontalAlignment: Alignment.Horizontal
         get() = Alignment.CenterHorizontally
@@ -115,6 +118,7 @@ interface ColumnWithHeader<T : Any> : Column<T?> {
 /**
  * Specifies how the width of a column is determined.
  */
+@Immutable
 sealed class ColumnWidth {
     /**
      * Fixed column width of [width].
@@ -124,7 +128,7 @@ sealed class ColumnWidth {
     /**
      * Fill the maximum width of any row.
      */
-    object MatchContent : ColumnWidth()
+    data object MatchContent : ColumnWidth()
 
     /**
      * Fill all remaining space in the table. If multiple columns have [Fill] width, space will be distributed relative
@@ -140,7 +144,7 @@ data class TableDivider(
     val paddingBefore: Dp = 0.dp,
     val paddingAfter: Dp = 0.dp,
     val dividerSize: Dp = Dimens.BORDER_WIDTH,
-    val color: Color? = null,
+    val weak: Boolean = false,
 ) {
     val totalSize = paddingBefore + paddingAfter + dividerSize
 }
@@ -176,28 +180,28 @@ fun <T> Table(
 
     Layout(
         content = {
-            horizontalDividers.forEach { (_, divider) ->
+            for ((_, divider) in horizontalDividers) {
                 Box(
                     modifier = Modifier
                         .padding(top = divider.paddingBefore, bottom = divider.paddingAfter)
                         .fillMaxWidth()
                         .height(divider.dividerSize)
-                        .background(divider.color ?: ThemeColors.current.divider)
+                        .background(if (divider.weak) ThemeColors.current.weakDivider else ThemeColors.current.divider)
                 )
             }
 
-            verticalDividers.forEach { (_, divider) ->
+            for ((_, divider) in verticalDividers) {
                 Box(
                     modifier = Modifier
                         .padding(start = divider.paddingBefore, end = divider.paddingAfter)
                         .fillMaxHeight()
                         .width(divider.dividerSize)
-                        .background(divider.color ?: ThemeColors.current.divider)
+                        .background(if (divider.weak) ThemeColors.current.weakDivider else ThemeColors.current.divider)
                 )
             }
 
-            columns.forEach { column ->
-                rows.forEach { item ->
+            for (column in columns) {
+                for (item in rows) {
                     Box { column.content(item) }
                 }
             }

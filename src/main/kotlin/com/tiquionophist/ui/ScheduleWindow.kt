@@ -5,10 +5,11 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.Button
 import androidx.compose.material.ButtonDefaults
+import androidx.compose.material.Divider
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
@@ -17,6 +18,7 @@ import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.Share
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -31,11 +33,12 @@ import androidx.compose.ui.window.rememberWindowState
 import com.tiquionophist.Res
 import com.tiquionophist.app_icon
 import com.tiquionophist.ui.common.MatchingWidthColumn
-import com.tiquionophist.ui.common.topBorder
 import org.jetbrains.compose.resources.painterResource
 
 /**
  * Wraps global handling of the computed schedule dialog windows.
+ *
+ * TODO revisit
  */
 object ScheduleWindowHandler {
     @Composable
@@ -73,14 +76,14 @@ fun ScheduleWindow(
     ) {
         Surface {
             MatchingWidthColumn {
-                val selectedClassIndexState = remember { mutableStateOf(0) }
+                var selectedClassIndex by remember { mutableIntStateOf(0) }
 
                 Row {
                     repeat(computedSchedule.configuration.classes) { classIndex ->
-                        val selected = selectedClassIndexState.value == classIndex
+                        val selected = selectedClassIndex == classIndex
                         Button(
                             modifier = Modifier.fillMaxWidth().weight(1f),
-                            onClick = { selectedClassIndexState.value = classIndex },
+                            onClick = { selectedClassIndex = classIndex },
                             shape = RectangleShape,
                             colors = ButtonDefaults.buttonColors(
                                 backgroundColor = if (selected) {
@@ -101,13 +104,14 @@ fun ScheduleWindow(
                 ScheduleTable(
                     configuration = computedSchedule.configuration,
                     schedule = computedSchedule.schedule,
-                    classIndex = selectedClassIndexState.value,
+                    classIndex = selectedClassIndex,
                 )
 
-                Row(
-                    modifier = Modifier.topBorder().padding(Dimens.SPACING_2),
-                    horizontalArrangement = Arrangement.spacedBy(Dimens.SPACING_2, Alignment.End),
-                ) {
+                Divider(color = ThemeColors.current.divider)
+
+                Spacer(Modifier.height(Dimens.SPACING_2))
+
+                Row(horizontalArrangement = Arrangement.spacedBy(Dimens.SPACING_2, Alignment.End)) {
                     RunScheduleButton(
                         schedulerSettings = computedSchedule.schedulerSettings,
                         configuration = computedSchedule.configuration,

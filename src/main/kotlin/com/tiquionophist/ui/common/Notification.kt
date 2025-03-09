@@ -1,5 +1,6 @@
 package com.tiquionophist.ui.common
 
+import androidx.compose.runtime.Immutable
 import androidx.compose.ui.graphics.Color
 import org.jetbrains.compose.resources.DrawableResource
 import kotlin.time.Duration
@@ -8,6 +9,7 @@ import kotlin.time.Duration.Companion.seconds
 /**
  * A notification which can be displayed by [NotificationContainer].
  */
+@Immutable
 data class Notification(
     val title: String,
     val message: String,

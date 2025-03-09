@@ -13,13 +13,15 @@ import com.tiquionophist.ui.Dimens
 @Composable
 fun Tooltip(
     text: String,
+    modifier: Modifier = Modifier,
     content: @Composable () -> Unit,
 ) {
     Tooltip(
         tooltipContent = {
             Text(text)
         },
-        content = content
+        modifier = modifier,
+        content = content,
     )
 }
 
@@ -27,6 +29,7 @@ fun Tooltip(
 @Composable
 fun Tooltip(
     tooltipContent: @Composable () -> Unit,
+    modifier: Modifier = Modifier,
     content: @Composable () -> Unit,
 ) {
     TooltipArea(
@@ -37,6 +40,7 @@ fun Tooltip(
                 }
             }
         },
+        modifier = modifier,
         content = content,
     )
 }

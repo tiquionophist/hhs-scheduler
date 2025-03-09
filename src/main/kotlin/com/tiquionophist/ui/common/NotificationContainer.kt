@@ -26,8 +26,8 @@ import kotlinx.coroutines.delay
 import org.jetbrains.compose.resources.painterResource
 
 @Composable
-fun NotificationContainer(content: @Composable () -> Unit) {
-    Box {
+fun NotificationContainer(modifier: Modifier = Modifier, content: @Composable () -> Unit) {
+    Box(modifier = modifier) {
         content()
 
         GlobalState.currentNotification?.let { notification ->

@@ -19,6 +19,8 @@ import java.lang.Integer.max
  * infinity; this modifier instead uses the larger of the content's minimum intrinsic height and the actual constrained
  * maximum height. Thus, it will scroll when it is beyond its minimum intrinsic height and fill the maximum space
  * otherwise.
+ *
+ * TODO revisit
  */
 fun Modifier.fillMaxHeightVerticalScroll(scrollState: ScrollState): Modifier {
     return composed {
@@ -46,6 +48,8 @@ fun Modifier.fillMaxHeightVerticalScroll(scrollState: ScrollState): Modifier {
  * infinity; this modifier instead uses the larger of the content's minimum intrinsic width and the actual constrained
  * maximum width. Thus, it will scroll when it is beyond its minimum intrinsic width and fill the maximum space
  * otherwise.
+ *
+ * TODO revisit
  */
 fun Modifier.fillMaxWidthHorizontalScroll(scrollState: ScrollState): Modifier {
     return composed {

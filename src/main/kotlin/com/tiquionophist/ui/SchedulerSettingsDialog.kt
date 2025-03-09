@@ -9,7 +9,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
@@ -28,6 +28,7 @@ import androidx.compose.material.TextButton
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -44,16 +45,14 @@ import com.tiquionophist.ic_arrow_drop_down
 import com.tiquionophist.scheduler.ExhaustiveScheduler
 import com.tiquionophist.scheduler.RandomizedScheduler
 import com.tiquionophist.ui.common.CheckboxWithLabel
-import com.tiquionophist.ui.common.ContentWithPane
 import com.tiquionophist.ui.common.NumberPicker
-import com.tiquionophist.ui.common.PaneDirection
-import com.tiquionophist.ui.common.topBorder
 import com.tiquionophist.util.prettyName
 import org.jetbrains.compose.resources.painterResource
 
 private val DIALOG_WIDTH = 800.dp
 private val DIALOG_HEIGHT = 700.dp
 
+@Immutable
 data class SchedulerSettings(
     val fillOrder: RandomizedScheduler.ScheduleFillOrder = RandomizedScheduler.ScheduleFillOrder.CLASS_BY_CLASS,
     val exhaustive: Boolean = false,
@@ -96,39 +95,38 @@ fun SchedulerSettingsDialog(
         Surface(elevation = Dimens.TOOLTIP_ELEVATION) {
             val settingsState = remember { mutableStateOf(initialSchedulerSettings) }
 
-            ContentWithPane(
-                direction = PaneDirection.BOTTOM,
-                content = {
-                    val scrollState = rememberScrollState()
-                    Box {
-                        Box(modifier = Modifier.verticalScroll(scrollState)) {
-                            Column(
-                                modifier = Modifier.padding(Dimens.SPACING_2),
-                                verticalArrangement = Arrangement.spacedBy(Dimens.SPACING_2),
-                            ) {
-                                Text(
-                                    "Scheduler settings control the algorithm used to generate a schedule. This " +
-                                        "should generally work out of the box, but allows for some tuning for " +
-                                        "advanced users."
-                                )
+            Column {
+                val scrollState = rememberScrollState()
+                Box(modifier = Modifier.weight(1f)) {
+                    Box(modifier = Modifier.verticalScroll(scrollState)) {
+                        Column(
+                            modifier = Modifier.padding(Dimens.SPACING_2),
+                            verticalArrangement = Arrangement.spacedBy(Dimens.SPACING_2),
+                        ) {
+                            Text(
+                                "Scheduler settings control the algorithm used to generate a schedule. This " +
+                                    "should generally work out of the box, but allows for some tuning for " +
+                                    "advanced users."
+                            )
 
-                                Divider()
+                            Divider()
 
-                                SchedulerSettings(settingsState)
-                            }
+                            SchedulerSettings(settingsState)
                         }
-
-                        VerticalScrollbar(
-                            modifier = Modifier.align(Alignment.CenterEnd).fillMaxHeight(),
-                            adapter = rememberScrollbarAdapter(scrollState),
-                        )
                     }
-                },
-                pane = {
-                    Row(
-                        modifier = Modifier.topBorder().padding(Dimens.SPACING_2).fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                    ) {
+
+                    VerticalScrollbar(
+                        modifier = Modifier.align(Alignment.CenterEnd).fillMaxHeight(),
+                        adapter = rememberScrollbarAdapter(scrollState),
+                    )
+                }
+
+                Column {
+                    Divider(color = ThemeColors.current.divider)
+
+                    Spacer(Modifier.height(Dimens.SPACING_2))
+
+                    Row(horizontalArrangement = Arrangement.SpaceBetween) {
                         Button(
                             enabled = settingsState.value != SchedulerSettings(),
                             onClick = { settingsState.value = SchedulerSettings() },
@@ -154,7 +152,7 @@ fun SchedulerSettingsDialog(
                         }
                     }
                 }
-            )
+            }
         }
     }
 }
