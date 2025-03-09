@@ -2,7 +2,6 @@ package com.tiquionophist.core
 
 import androidx.compose.runtime.Immutable
 import com.tiquionophist.scheduler.ClassroomFillOrder
-import com.tiquionophist.util.flattenToSet
 import com.tiquionophist.util.prettyName
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.Serializable
@@ -151,7 +150,7 @@ data class ScheduleConfiguration(
         }
 
         val missingSubjects: Set<Subject> = subjectFrequency.flatMapTo(mutableSetOf()) { it.keys }
-            .minus(teacherAssignments.values.flattenToSet())
+            .minus(teacherAssignments.values.flatMapTo(mutableSetOf()) { it })
             .minus(Subject.EMPTY)
         missingSubjects.forEach { subject ->
             errors += "${subject.prettyName} is not taught by any teachers."
