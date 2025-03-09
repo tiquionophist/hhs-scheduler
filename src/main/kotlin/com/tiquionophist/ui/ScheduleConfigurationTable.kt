@@ -8,7 +8,6 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -26,7 +25,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.lerp
-import androidx.compose.ui.graphics.painter.BitmapPainter
 import androidx.compose.ui.text.style.TextAlign
 import com.tiquionophist.Res
 import com.tiquionophist.core.ScheduleConfiguration
@@ -50,7 +48,7 @@ import org.jetbrains.compose.resources.painterResource
 /**
  * Subjects displayed in the table, in order.
  */
-private val subjects: List<Subject> = Subject.values()
+private val subjects: List<Subject> = Subject.entries
     .filter { it != Subject.EMPTY }
     .sortedBy { it.prettyName }
     .plus(Subject.EMPTY)
@@ -104,10 +102,10 @@ private class SubjectColumn(private val classIndex: Int?) : ColumnWithHeader<Sub
             }
         ) {
             Row(verticalAlignment = Alignment.CenterVertically) {
-                val imageBitmap = value.imageBitmap
-                if (imageBitmap != null) {
+                val imageRes = value.imageRes
+                if (imageRes != null) {
                     Image(
-                        painter = BitmapPainter(imageBitmap),
+                        painter = painterResource(imageRes),
                         contentDescription = value.prettyName,
                         modifier = Modifier
                             .padding(horizontal = Dimens.SPACING_2)
@@ -297,14 +295,11 @@ private class SubjectTeacherAssignmentsColumn(private val teacher: Teacher) : Co
             verticalArrangement = Arrangement.spacedBy(Dimens.SPACING_2),
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
-            teacher.imageBitmap?.let { imageBitmap ->
+            teacher.imageRes?.let { imageRes ->
                 Image(
-                    painter = BitmapPainter(imageBitmap),
+                    painter = painterResource(imageRes),
                     contentDescription = teacher.fullName,
-                    modifier = Modifier
-                        .width(Dimens.ScheduleConfigurationTable.TEACHER_IMAGE_WIDTH)
-                        // set the aspect ratio so that the image has a minimum intrinsic height
-                        .aspectRatio(imageBitmap.width.toFloat() / imageBitmap.height)
+                    modifier = Modifier.width(Dimens.ScheduleConfigurationTable.TEACHER_IMAGE_WIDTH),
                 )
             }
 

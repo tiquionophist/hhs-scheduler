@@ -15,7 +15,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.painter.BitmapPainter
 import com.tiquionophist.core.Lesson
 import com.tiquionophist.core.Schedule
 import com.tiquionophist.core.ScheduleConfiguration
@@ -27,6 +26,7 @@ import com.tiquionophist.ui.common.TableDivider
 import com.tiquionophist.util.prettyName
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.collections.immutable.toImmutableMap
+import org.jetbrains.compose.resources.painterResource
 
 /**
  * A column which displays the period number for each period index row.
@@ -89,9 +89,9 @@ private class ScheduleDayColumn(
                 modifier = Modifier.height(Dimens.ScheduleTable.CELL_HEIGHT).padding(Dimens.SPACING_2),
                 horizontalArrangement = Arrangement.spacedBy(Dimens.SPACING_2)
             ) {
-                subject.imageBitmap?.let { imageBitmap ->
+                subject.imageRes?.let { imageRes ->
                     Image(
-                        painter = BitmapPainter(imageBitmap),
+                        painter = painterResource(imageRes),
                         contentDescription = subject.prettyName,
                     )
                 }

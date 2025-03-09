@@ -14,9 +14,7 @@ import com.tiquionophist.ui.common.Notification
  * TODO handle error dialogs here as well
  */
 object GlobalState {
-    private val initialConfiguration = ScheduleConfiguration.EMPTY
-
-    var scheduleConfiguration by mutableStateOf(initialConfiguration)
+    var scheduleConfiguration by mutableStateOf(ScheduleConfiguration.EMPTY)
     var customTeachers by mutableStateOf(emptySet<Teacher>())
     var computedSchedules by mutableStateOf(listOf<ComputedSchedule>())
 

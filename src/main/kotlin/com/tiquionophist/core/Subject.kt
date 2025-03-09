@@ -1,6 +1,26 @@
 package com.tiquionophist.core
 
-import com.tiquionophist.ui.common.loadImageBitmapOrNull
+import com.tiquionophist.Res
+import com.tiquionophist.subject_anatomy
+import com.tiquionophist.subject_art
+import com.tiquionophist.subject_biology
+import com.tiquionophist.subject_bondage
+import com.tiquionophist.subject_chemistry
+import com.tiquionophist.subject_computer_science
+import com.tiquionophist.subject_economics
+import com.tiquionophist.subject_english
+import com.tiquionophist.subject_geography
+import com.tiquionophist.subject_history
+import com.tiquionophist.subject_math
+import com.tiquionophist.subject_music
+import com.tiquionophist.subject_philosophy
+import com.tiquionophist.subject_physics
+import com.tiquionophist.subject_practical_sex_education
+import com.tiquionophist.subject_religion
+import com.tiquionophist.subject_school_sport
+import com.tiquionophist.subject_swimming
+import com.tiquionophist.subject_theoretical_education
+import org.jetbrains.compose.resources.DrawableResource
 import java.util.EnumSet
 
 /**
@@ -106,9 +126,31 @@ enum class Subject(
             Stat.INHIBITION to "-0.05",
             Stat.LUST to "0.2",
         )
-    );
+    ),
+    ;
 
-    private val imageFilename = "subjects/$name.png"
-
-    val imageBitmap by lazy { loadImageBitmapOrNull(imageFilename) }
+    val imageRes: DrawableResource? by lazy {
+        when (this) {
+            ANATOMY -> Res.drawable.subject_anatomy
+            ART -> Res.drawable.subject_art
+            BIOLOGY -> Res.drawable.subject_biology
+            BONDAGE -> Res.drawable.subject_bondage
+            CHEMISTRY -> Res.drawable.subject_chemistry
+            COMPUTER_SCIENCE -> Res.drawable.subject_computer_science
+            ECONOMICS -> Res.drawable.subject_economics
+            EMPTY -> null
+            ENGLISH -> Res.drawable.subject_english
+            GEOGRAPHY -> Res.drawable.subject_geography
+            HISTORY -> Res.drawable.subject_history
+            MATH -> Res.drawable.subject_math
+            MUSIC -> Res.drawable.subject_music
+            PHILOSOPHY -> Res.drawable.subject_philosophy
+            PHYSICS -> Res.drawable.subject_physics
+            PRACTICAL_SEX_EDUCATION -> Res.drawable.subject_practical_sex_education
+            RELIGION -> Res.drawable.subject_religion
+            SCHOOL_SPORT -> Res.drawable.subject_school_sport
+            SWIMMING -> Res.drawable.subject_swimming
+            THEORETICAL_SEX_EDUCATION -> Res.drawable.subject_theoretical_education
+        }
+    }
 }

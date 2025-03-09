@@ -86,7 +86,7 @@ data class ScheduleConfiguration(
      * non-empty.
      */
     @Transient
-    val subjectAssignments: EnumMap<Subject, Set<Teacher>> = Subject.values()
+    val subjectAssignments: EnumMap<Subject, Set<Teacher>> = Subject.entries
         .associateWith { subject ->
             teacherAssignments.filterValues { it.contains(subject) }.keys
         }
@@ -162,7 +162,7 @@ data class ScheduleConfiguration(
             }
         }
 
-        Classroom.values().forEach { classroom ->
+        Classroom.entries.forEach { classroom ->
             val classesPerWeek = subjectFrequency.sumOf { classFrequency ->
                 classFrequency
                     .filterKeys { it.classrooms?.size == 1 && it.classrooms.contains(classroom) }

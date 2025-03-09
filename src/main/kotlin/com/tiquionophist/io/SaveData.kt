@@ -304,7 +304,7 @@ data class SaveData(
             return if (subjectName.isEmpty()) {
                 Subject.EMPTY
             } else {
-                Subject.values().firstOrNull { it.prettyName == subjectName }
+                Subject.entries.firstOrNull { it.prettyName == subjectName }
             }
         }
 

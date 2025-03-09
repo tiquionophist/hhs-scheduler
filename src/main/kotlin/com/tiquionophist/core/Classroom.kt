@@ -13,7 +13,8 @@ enum class Classroom {
     GYM,
     MUSIC,
     SPORTS_AREA,
-    SWIMMING_POOL;
+    SWIMMING_POOL,
+    ;
 
     /**
      * The canonical name of the classroom used in the game. This is similar to its [Classroom.prettyName], but not

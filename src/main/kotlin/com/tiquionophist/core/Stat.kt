@@ -34,10 +34,7 @@ enum class Stat(val positiveBetter: Boolean) {
  * A collection of [Stat]s mapped to [BigDecimal] values (to avoid floating point addition).
  */
 @Immutable
-data class StatSet(private val statsMap: EnumMap<Stat, BigDecimal>) {
-    val stats: Map<Stat, BigDecimal>
-        get() = statsMap
-
+data class StatSet(val stats: EnumMap<Stat, BigDecimal>) {
     /**
      * A convenience constructor which converts [String]s into [BigDecimal]s. Repeated [Stat]s in the arguments are
      * ignored.
@@ -53,13 +50,13 @@ data class StatSet(private val statsMap: EnumMap<Stat, BigDecimal>) {
      * Combines this [StatSet] and the given one, summing their values.
      */
     operator fun plus(other: StatSet): StatSet {
-        val map = EnumMap(statsMap)
-        other.statsMap.forEach { (stat, value) ->
+        val map = EnumMap(stats)
+        other.stats.forEach { (stat, value) ->
             map.compute(stat) { _, currentValue ->
                 (currentValue?.plus(value) ?: value).takeIf { it != BigDecimal.ZERO }
             }
         }
 
-        return StatSet(statsMap = map)
+        return StatSet(stats = map)
     }
 }

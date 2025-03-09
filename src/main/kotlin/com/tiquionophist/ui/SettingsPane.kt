@@ -192,7 +192,7 @@ fun SettingsPane() {
                             expanded = dropdownExpanded.value,
                             onDismissRequest = { dropdownExpanded.value = false }
                         ) {
-                            ClassroomFillOrder.values().forEach { classroomFillOrder ->
+                            ClassroomFillOrder.entries.forEach { classroomFillOrder ->
                                 DropdownMenuItem(
                                     onClick = {
                                         GlobalState.scheduleConfiguration = config.copy(

@@ -297,7 +297,7 @@ private fun FillOrderSelector(
                 expanded = dropdownExpanded.value,
                 onDismissRequest = { dropdownExpanded.value = false }
             ) {
-                RandomizedScheduler.ScheduleFillOrder.values().forEach { fillOrder ->
+                RandomizedScheduler.ScheduleFillOrder.entries.forEach { fillOrder ->
                     DropdownMenuItem(
                         onClick = {
                             onFillOrderSelected(fillOrder)
