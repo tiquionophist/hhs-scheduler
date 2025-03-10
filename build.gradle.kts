@@ -100,8 +100,7 @@ compose.resources {
 
 // convenience task which builds all relevant release artifacts into a single directory
 tasks.register("createRelease") {
-    mustRunAfter("clean")
-    dependsOn("clean", "check", "package", "createDistributable", "packageUberJarForCurrentOS")
+    dependsOn("check", "package", "createDistributable", "packageUberJarForCurrentOS")
 
     doLast {
         val releaseDir = layout.buildDirectory.file("release-$version").get().asFile
